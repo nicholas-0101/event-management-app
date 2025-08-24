@@ -1,3 +1,5 @@
+"use client";
+import { useState } from "react";
 import SearchBar from "./core-components/searchbar";
 import HeroBanner from "./core-components/landing-banner";
 import CategoryFilter from "./core-components/filter-category";
@@ -11,6 +13,8 @@ const events = [
 ];
 
 export default function Home() {
+  const [activeCategory, setActiveCategory] = useState("All Types");
+
   return (
     <section>
       <div className="flex flex-col gap-6">
@@ -18,22 +22,24 @@ export default function Home() {
           <SearchBar />
         </div>
         <div className="flex justify-center">
-          <HeroBanner />
+          <HeroBanner setActiveCategory={setActiveCategory} />
         </div>
         <div className="flex w-full mx-auto items-center justify-between">
           <DateFilter />
-          <CategoryFilter />
+          <CategoryFilter
+            activeCategory={activeCategory}
+            setActiveCategory={setActiveCategory}
+          />
         </div>
         <div className="flex w-full mx-auto items-center justify-between">
           <EventCard
-            thumbnail="https://picsum.photos/id/238/800/400"
-            title="Tech Conference"
-            dateStart={new Date("2025-10-12")}
-            dateEnd={new Date("2025-10-14")}
-            category="Technology"
-            description="Join industry leaders to discuss future tech trends."
-            price={100000}
-            href="/events/tech-conference"
+            thumbnail="https://media.stubhubstatic.com/stubhub-v2-catalog/d_vgg-defaultLogo.jpg/q_auto:low,f_auto,c_fill,g_auto,w_1200,h_736,dpr_auto/categories/49735/6398337"
+            title="BORNPINK IN JAKARTA"
+            dateStart={new Date("2025-11-01")}
+            dateEnd={new Date("2025-11-02")}
+            category="Concert"
+            price={1000000}
+            href="/events/bornpink-in-jakarta"
           />
         </div>
       </div>

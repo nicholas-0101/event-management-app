@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Autoplay from "embla-carousel-autoplay";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import {
   Carousel,
   CarouselContent,
@@ -12,39 +12,32 @@ import {
 } from "@/components/ui/carousel";
 
 const slides = [
-  {
-    id: 1,
-    img: "sport_banner.png", // sports
-  },
-  {
-    id: 2,
-    img: "https://picsum.photos/id/238/800/400", // theater
-  },
-  {
-    id: 3,
-    img: "concert_banner.png", // concert
-  },
-  {
-    id: 4,
-    img: "https://picsum.photos/id/238/800/400", // festival
-  },
+  { id: 1, img: "concert_banner.png", category: "Concert" },
+  { id: 2, img: "festival_banner.png", category: "Festival" },
+  { id: 3, img: "sport_banner.png", category: "Sport" },
+  { id: 4, img: "theater_banner.png", category: "Theater" },
 ];
 
-export default function HeroBanner() {
+interface Props {
+  setActiveCategory: (category: string) => void;
+}
+
+export default function HeroBanner({ setActiveCategory }: Props) {
   const autoplay = React.useRef(
-    Autoplay({ delay: 3000, stopOnInteraction: false }) // scroll to the next slide every 3s
+    Autoplay({ delay: 3000, stopOnInteraction: false })
   );
+
   return (
     <div className="w-full">
-      <Carousel
-        plugins={[autoplay.current]} // plugins for autoplay
-        className="w-full cursor-pointer"
-      >
+      <Carousel plugins={[autoplay.current]} className="w-full cursor-pointer">
         <CarouselContent>
           {slides.map((slide) => (
             <CarouselItem key={slide.id}>
               <div className="p-2">
-                <Card className="w-full h-[450px] bg-[#6FB229] shadow-none rounded-4xl overflow-hidden">
+                <Card
+                  className="w-full h-[450px] bg-[#6FB229] shadow-none rounded-4xl overflow-hidden"
+                  onClick={() => setActiveCategory(slide.category)}
+                >
                   <img
                     src={slide.img}
                     alt={`Slide ${slide.id}`}
@@ -55,8 +48,8 @@ export default function HeroBanner() {
             </CarouselItem>
           ))}
         </CarouselContent>
-        <CarouselPrevious className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent shadow-none" />
-        <CarouselNext className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent shadow-none" />
+        <CarouselPrevious className="border-0 bg-transparent shadow-none" />
+        <CarouselNext className="border-0 bg-transparent shadow-none" />
       </Carousel>
     </div>
   );

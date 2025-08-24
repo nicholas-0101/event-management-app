@@ -1,12 +1,17 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
-export default function CategoryFilter() {
-  const [activeCategory, setActiveCategory] = useState("All Types");
+interface Props {
+  activeCategory: string;
+  setActiveCategory: (category: string) => void;
+}
 
-  const categories = ["All Types", "Sport", "Concert", "Theater", "Festival"];
+export default function CategoryFilter({
+  activeCategory,
+  setActiveCategory,
+}: Props) {
+  const categories = ["All Types", "Concert", "Festival", "Sport", "Theater"];
 
   return (
     <section>
@@ -15,7 +20,7 @@ export default function CategoryFilter() {
           <Button
             key={category}
             onClick={() => setActiveCategory(category)}
-            className={`rounded-full font-medium cursor-pointer border-1 border-[#00481a] text-[#00481a] transition-colors
+            className={`rounded-full font-medium cursor-pointer border border-[#00481a] text-[#00481a] transition-colors
               ${
                 activeCategory === category
                   ? "bg-[#c6ee9a] hover:bg-[#97d753]"
