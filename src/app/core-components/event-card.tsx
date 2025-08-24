@@ -12,7 +12,6 @@ interface CardItemProps {
   dateStart: Date;
   dateEnd: Date;
   category: string;
-  description: string;
   price: number;
   href: string;
 }
