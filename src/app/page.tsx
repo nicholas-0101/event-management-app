@@ -6,6 +6,7 @@ import CategoryFilter from "./core-components/filter-category";
 import DateFilter from "./core-components/filter-date";
 import EventCard from "./core-components/event-card";
 import { apiCall } from "@/helper/axios";
+import { LoaderIcon, SearchX } from "lucide-react";
 
 type Event = {
   id: number;
@@ -17,17 +18,24 @@ type Event = {
   event_price: number;
 };
 
-export default function Home() {
+export default function LandingPage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState("All Types");
+  const filteredEvents =
+    activeCategory === "All Types"
+      ? events
+      : events.filter(
+          (event) =>
+            event.event_category?.toLowerCase() === activeCategory.toLowerCase()
+        );
 
   const fetchEvents = async () => {
     try {
       const res = await apiCall.get<{ success: boolean; data: Event[] }>(
         "/event"
       );
-      setEvents(res.data.data); 
+      setEvents(res.data.data);
     } catch (error) {
       console.error("Failed to fetch events:", error);
     } finally {
@@ -39,7 +47,30 @@ export default function Home() {
     fetchEvents();
   }, []);
 
-  if (loading) return <p className="text-center">Loading events...</p>;
+  if (loading)
+    return (
+      <section>
+        <div className="flex flex-col gap-6">
+          <div className="flex justify-center">
+            <SearchBar />
+          </div>
+          <div className="flex justify-center">
+            <HeroBanner setActiveCategory={setActiveCategory} />
+          </div>
+          <div className="flex w-full mx-auto items-center justify-between">
+            <DateFilter />
+            <CategoryFilter
+              activeCategory={activeCategory}
+              setActiveCategory={setActiveCategory}
+            />
+          </div>
+        </div>
+        <p className="pt-4 text-neutral-600 text-center text-3xl font-medium flex flex-col gap-2 justify-center items-center">
+          <LoaderIcon color="#525252" size={200} />
+          Loading events...
+        </p>
+      </section>
+    );
 
   return (
     <section>
@@ -57,32 +88,26 @@ export default function Home() {
             setActiveCategory={setActiveCategory}
           />
         </div>
-        {/* <div className="flex w-full mx-auto items-center justify-between">
-          <EventCard
-            thumbnail="https://media.stubhubstatic.com/stubhub-v2-catalog/d_vgg-defaultLogo.jpg/q_auto:low,f_auto,c_fill,g_auto,w_1200,h_736,dpr_auto/categories/49735/6398337"
-            title="BORNPINK IN JAKARTA"
-            dateStart={new Date("2025-11-01")}
-            dateEnd={new Date("2025-11-02")}
-            category="Concert"
-            price={1000000}
-            href="/events/bornpink-in-jakarta"
-          />
-        </div> */}
-
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 p-4">
-          {events.map((event) => (
-            <EventCard
-              key={event.id}
-              thumbnail={event.event_thumbnail}
-              title={event.event_name}
-              dateStart={new Date(event.event_start_date)}
-              dateEnd={new Date(event.event_end_date)}
-              category={event.event_category}
-              price={event.event_price}
-              href={`/events/${event.id}`}
-            />
-          ))}
-        </div>
+        {filteredEvents.length === 0 ? (
+          <p className="pt-4 text-neutral-600 text-center text-3xl font-medium flex flex-col gap-2 justify-center items-center">
+            <SearchX color="#525252" size={200} /> Events Not Found
+          </p>
+        ) : (
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 p-4">
+            {filteredEvents.map((event) => (
+              <EventCard
+                key={event.id}
+                thumbnail={event.event_thumbnail}
+                title={event.event_name}
+                dateStart={new Date(event.event_start_date)}
+                dateEnd={new Date(event.event_end_date)}
+                category={event.event_category}
+                price={event.event_price}
+                href={`/events/${event.id}`}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

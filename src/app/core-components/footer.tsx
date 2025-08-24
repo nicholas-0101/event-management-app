@@ -5,8 +5,8 @@ export default function Footer() {
   return (
     <footer className="w-full text-neutral-600 pb-10">
       <hr className="my-8 border-t-2 border-gray-600 w-full mx-0" />
-      <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-8">
-
+      <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-8">
+        {/* Left: Logo & description */}
         <div>
           <Link href={"/"}>
             <img
@@ -21,6 +21,7 @@ export default function Footer() {
           </p>
         </div>
 
+        {/* Middle: Quick Links */}
         <div>
           <h3 className="text-lg font-semibold mb-3">Quick Links</h3>
           <ul className="space-y-2 text-sm">
@@ -47,36 +48,8 @@ export default function Footer() {
           </ul>
         </div>
 
-        <div>
-          <h3 className="text-lg font-semibold mb-3">Categories</h3>
-          <ul className="space-y-2 text-sm">
-            <li>
-              <Link href="/events?category=Concert" className="hover:underline">
-                Concerts
-              </Link>
-            </li>
-            <li>
-              <Link href="/events?category=Sport" className="hover:underline">
-                Sports
-              </Link>
-            </li>
-            <li>
-              <Link href="/events?category=Theater" className="hover:underline">
-                Theater
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/events?category=Festival"
-                className="hover:underline"
-              >
-                Festivals
-              </Link>
-            </li>
-          </ul>
-        </div>
-
-        <div>
+        {/* Right: Follow Us */}
+        <div className="flex flex-col md:items-end">
           <h3 className="text-lg font-semibold mb-3">Follow Us</h3>
           <div className="flex gap-4">
             <a href="#" className="hover:text-[#00481a]">
