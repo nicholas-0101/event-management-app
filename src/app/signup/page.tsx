@@ -2,6 +2,17 @@
 "use client";
 import { useState } from "react";
 import { apiCall } from "@/helper/axios";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Card } from "@/components/ui/card";
 
 type SignupForm = {
   username: string;
@@ -53,74 +64,82 @@ export default function Signup() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-md p-8 bg-white shadow-md rounded-lg">
-        <h1 className="text-4xl font-bold text-center text-green-600 mb-8">
-          viagogo
-        </h1>
-        <h2 className="text-2xl font-semibold text-center mb-6">
+    <div className="flex items-center justify-center pt-20">
+      <Card className="w-full max-w-md p-8 bg-white shadow-md rounded-3xl">
+        <h2 className="text-2xl font-semibold text-center mb-6 text-[#09431C]">
           Create an account
         </h2>
         {error && <p className="text-red-500 mb-4">{error}</p>}
-        <form onSubmit={handleSignup}>
-          <input
-            type="text"
-            placeholder="Username"
-            value={form.username}
-            onChange={handleInputChange}
-            name="username"
-            className="w-full p-2 mb-4 border rounded"
-            required
-          />
-          <input
-            type="email"
-            placeholder="Email"
-            value={form.email}
-            onChange={handleInputChange}
-            name="email"
-            className="w-full p-2 mb-4 border rounded"
-            required
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={form.password}
-            onChange={handleInputChange}
-            name="password"
-            className="w-full p-2 mb-4 border rounded"
-            required
-          />
-          <select
-            name="role"
-            value={form.role}
-            onChange={handleInputChange}
-            className="w-full p-2 mb-4 border rounded"
-            required
-          >
-            <option value="USER">User</option>
-            <option value="ADMIN">Admin</option>
-            <option value="ORGANIZER">Organizer</option>
-          </select>
-          <button type="submit" className="w-full p-2 bg-gray-200 rounded">
+
+        <form onSubmit={handleSignup} className=" flex flex-col gap-10">
+          <div className=" flex flex-col gap-4">
+            <Input
+              type="text"
+              placeholder="Username"
+              value={form.username}
+              onChange={handleInputChange}
+              name="username"
+              className="w-full p-2 border rounded-lg"
+              required
+            />
+            <Input
+              type="email"
+              placeholder="Email"
+              value={form.email}
+              onChange={handleInputChange}
+              name="email"
+              className="w-full p-2 border rounded-lg"
+              required
+            />
+            <Input
+              type="password"
+              placeholder="Password"
+              value={form.password}
+              onChange={handleInputChange}
+              name="password"
+              className="w-full p-2 border rounded-lg"
+              required
+            />
+            <Select
+              name="role"
+              value={form.role}
+              onValueChange={(value) =>
+                setForm((prev) => ({ ...prev, role: value }))
+              }
+            >
+              <SelectTrigger className="w-full rounded-lg border p-2">
+                <SelectValue placeholder="Select Role" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectItem value="USER">User</SelectItem>
+                  <SelectItem value="ADMIN">Admin</SelectItem>
+                  <SelectItem value="ORGANIZER">Organizer</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <Button type="submit" className="w-full p-2 bg-[#6FB229] hover:bg-[#09431C] rounded-lg">
             Sign up
-          </button>
+          </Button>
         </form>
-        <div className="mt-4 text-center">
-          <button className="w-full p-2 bg-green-600 text-white rounded">
-            Guest purchase? Find your order
-          </button>
-        </div>
-        <div className="mt-4 text-center">
-          <button className="w-full p-2 bg-blue-600 text-white rounded">
-            Log In with Facebook
-          </button>
-        </div>
-        <div className="mt-4 text-center">
-          <a href="#" className="text-blue-500 hover:underline">
-            Already have an account? Sign in
+
+        <div className="flex justify-center">
+          <p className="text-[#09431C] flex flex-col justify-center">
+            Already have an account?
+          </p>
+          <a href="/signin">
+            <Button
+              type="button"
+              variant={"link"}
+              className="text-[#6FB229] hover:text-grey-400 p-0 pl-1.5"
+            >
+              Sign In
+            </Button>
           </a>
         </div>
-      </div>
+      </Card>
     </div>
   );
 }
