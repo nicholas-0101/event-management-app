@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import SearchBar from "./core-components/searchbar";
 import HeroBanner from "./core-components/landing-banner";
 import CategoryFilter from "./core-components/filter-category";
@@ -22,13 +22,7 @@ export default function LandingPage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState("All Types");
-  const filteredEvents =
-    activeCategory === "All Types"
-      ? events
-      : events.filter(
-          (event) =>
-            event.event_category?.toLowerCase() === activeCategory.toLowerCase()
-        );
+  const [search, setSearch] = useState("");
 
   const fetchEvents = async () => {
     try {
@@ -47,12 +41,27 @@ export default function LandingPage() {
     fetchEvents();
   }, []);
 
+  const filteredEvents = useMemo(() => {
+    return events.filter((event) => {
+      const matchesCategory =
+        activeCategory === "All Types" ||
+        event.event_category?.toLowerCase() === activeCategory.toLowerCase();
+
+      const searchLower = search.toLowerCase();
+      const matchesSearch =
+        event.event_name.toLowerCase().includes(searchLower) ||
+        event.event_category.toLowerCase().includes(searchLower);
+
+      return matchesCategory && matchesSearch;
+    });
+  }, [events, activeCategory, search]);
+
   if (loading)
     return (
       <section>
         <div className="flex flex-col gap-6">
           <div className="flex justify-center">
-            <SearchBar />
+            <SearchBar onSearch={setSearch} />
           </div>
           <div className="flex justify-center">
             <HeroBanner setActiveCategory={setActiveCategory} />
@@ -76,7 +85,7 @@ export default function LandingPage() {
     <section>
       <div className="flex flex-col gap-6">
         <div className="flex justify-center">
-          <SearchBar />
+          <SearchBar onSearch={setSearch} />
         </div>
         <div className="flex justify-center">
           <HeroBanner setActiveCategory={setActiveCategory} />

@@ -14,7 +14,7 @@ export default function Footer() {
   
   return (
     <footer className="w-full text-neutral-600 pb-10">
-      <hr className="my-8 border-t-2 border-gray-600 w-full mx-0" />
+      <hr className="my-8 border-t border-gray-600 w-full mx-0" />
       <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-8">
         <div>
           <Link href={"/"}>

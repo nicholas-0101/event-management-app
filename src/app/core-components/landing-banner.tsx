@@ -28,6 +28,30 @@ export default function HeroBanner({ setActiveCategory }: Props) {
   );
 
   return (
+    // <div className="w-full">
+    //   <Carousel plugins={[autoplay.current]} className="w-full cursor-pointer">
+    //     <CarouselContent>
+    //       {slides.map((slide) => (
+    //         <CarouselItem key={slide.id}>
+    //           <div className="p-2">
+    //             <Card
+    //               className="w-full h-[450px] bg-[#6FB229] shadow-none rounded-4xl overflow-hidden"
+    //               onClick={() => setActiveCategory(slide.category)}
+    //             >
+    //               <img
+    //                 src={slide.img}
+    //                 alt={`Slide ${slide.id}`}
+    //                 className="w-full h-full object-cover"
+    //               />
+    //             </Card>
+    //           </div>
+    //         </CarouselItem>
+    //       ))}
+    //     </CarouselContent>
+    //     <CarouselPrevious className="border-0 bg-transparent shadow-none" />
+    //     <CarouselNext className="border-0 bg-transparent shadow-none" />
+    //   </Carousel>
+    // </div>
     <div className="w-full">
       <Carousel plugins={[autoplay.current]} className="w-full cursor-pointer">
         <CarouselContent>
@@ -35,14 +59,16 @@ export default function HeroBanner({ setActiveCategory }: Props) {
             <CarouselItem key={slide.id}>
               <div className="p-2">
                 <Card
-                  className="w-full h-[450px] bg-[#6FB229] shadow-none rounded-4xl overflow-hidden"
+                  className="w-full shadow-none rounded-4xl overflow-hidden"
                   onClick={() => setActiveCategory(slide.category)}
                 >
-                  <img
-                    src={slide.img}
-                    alt={`Slide ${slide.id}`}
-                    className="w-full h-full object-cover"
-                  />
+                  <div className="relative w-full aspect-[71/25]">
+                    <img
+                      src={slide.img}
+                      alt={`Slide ${slide.id}`}
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                  </div>
                 </Card>
               </div>
             </CarouselItem>
