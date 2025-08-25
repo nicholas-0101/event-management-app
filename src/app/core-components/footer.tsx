@@ -1,13 +1,21 @@
 "use client";
-
+import { usePathname } from "next/navigation";
 import { FaFacebook, FaInstagram, FaTwitter } from "react-icons/fa";
 import Link from "next/link";
 export default function Footer() {
+  const pathname = usePathname();
+
+  // list of routes where navbar should be hidden
+  const hiddenRoutes = ["/signin", "/signup", "/verify", "/pre-verify"];
+  const hideFooter = hiddenRoutes.some((route) => pathname.startsWith(route));
+  if (hideFooter) {
+    return null;
+  }
+  
   return (
     <footer className="w-full text-neutral-600 pb-10">
       <hr className="my-8 border-t-2 border-gray-600 w-full mx-0" />
       <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-8">
-       
         <div>
           <Link href={"/"}>
             <img
@@ -52,13 +60,13 @@ export default function Footer() {
           <h3 className="text-lg font-semibold mb-3">Follow Us</h3>
           <div className="flex gap-4">
             <a href="#" className="hover:text-[#00481a]">
-              <FaFacebook size={32}/>
+              <FaFacebook size={32} />
             </a>
             <a href="#" className="hover:text-[#00481a]">
-              <FaInstagram size={32}/>
+              <FaInstagram size={32} />
             </a>
             <a href="#" className="hover:text-[#00481a]">
-              <FaTwitter size={32}/>
+              <FaTwitter size={32} />
             </a>
           </div>
         </div>

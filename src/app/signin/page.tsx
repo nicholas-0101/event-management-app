@@ -1,119 +1,283 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { apiCall } from "@/helper/axios";
+import { Formik, Form, Field } from "formik";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Eye, EyeOff } from "lucide-react";
+import { SignInSchema, ISignInValue } from "./SigninSchema";
 
-// Mendefinisikan tipe data untuk state form login
-type LoginForm = {
-  email: string;
-  password: string;
-  stayLoggedIn: boolean;
-};
-
-// Mengatur nilai awal untuk form
-const initialState: LoginForm = {
-  email: "",
-  password: "",
-  stayLoggedIn: false,
-};
-
-// Komponen halaman Signin
 export default function Signin() {
-  // Menggunakan useState untuk mengelola state form
-  const [form, setForm] = useState<LoginForm>(initialState);
+  const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
 
-  // Fungsi untuk menangani perubahan input pada form
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = event.target;
-    setForm({
-      ...form,
-      // Jika tipe input adalah checkbox, gunakan 'checked', jika tidak gunakan 'value'
-      [name]: type === "checkbox" ? checked : value,
-    });
-  };
+  const handleSignin = async (values: ISignInValue) => {
+    try {
+      setError("");
+      const res = await apiCall.post("/auth/signin", values);
+      localStorage.setItem("token", res.data.token);
 
-  // Fungsi untuk menangani submit form login
-  const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault(); // Mencegah refresh halaman
-    console.log("Form:", form); // Menampilkan data form ke konsol
-    // Di sini Anda akan menambahkan logika otentikasi (misalnya, memanggil API login)
+      router.replace("/"); 
+    } catch (err: any) {
+      setError(
+        err?.response?.data?.message || "Failed to sign in. Please try again."
+      );
+    }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-md p-8 bg-white shadow-md rounded-lg">
-        <h1 className="text-4xl font-bold text-center text-green-600 mb-8">
-          TicketNest
-        </h1>
-        <h2 className="text-2xl font-semibold text-center mb-6">
-          Sign in to viagogo
+    <div className="flex items-center justify-center min-h-screen">
+      <Card className="w-full max-w-md p-8 bg-white shadow-md rounded-3xl">
+        <h2 className="text-2xl font-semibold text-center mb-6 text-[#09431C]">
+          Sign in to your account
         </h2>
-        <form onSubmit={handleLogin}>
-          {/* Input untuk Email */}
-          <input
-            type="email"
-            placeholder="Email"
-            value={form.email}
-            onChange={handleInputChange}
-            name="email"
-            className="w-full p-2 mb-4 border rounded"
-            required
-          />
-          {/* Input untuk Password */}
-          <input
-            type="password"
-            placeholder="Password"
-            value={form.password}
-            onChange={handleInputChange}
-            name="password"
-            className="w-full p-2 mb-4 border rounded"
-            required
-          />
-          {/* Checkbox untuk 'Stay logged in' */}
-          <div className="flex items-center mb-4">
-            <input
-              type="checkbox"
-              id="stayLoggedIn"
-              checked={form.stayLoggedIn}
-              onChange={handleInputChange}
-              name="stayLoggedIn"
-              className="mr-2"
-            />
-            <label htmlFor="stayLoggedIn" className="text-sm">
-              Stay logged in
-            </label>
-          </div>
-          {/* Tombol Sign in */}
-          <button type="submit" className="w-full p-2 bg-gray-200 rounded">
-            Sign in
-          </button>
-        </form>
-        {/* Link Forgot Password */}
-        <div className="mt-4 text-center">
-          <a href="#" className="text-blue-500 hover:underline">
-            Forgot Password
-          </a>
-        </div>
-        {/* Pesan persetujuan */}
-        <div className="mt-6 text-center">
-          <p>
-            By signing in or creating an account, you agree to our user
-            agreement and acknowledge our privacy policy. You may receive SMS
-            notifications from us and can opt out at any time.
+
+        <Formik<ISignInValue>
+          initialValues={{ email: "", password: "" }}
+          validationSchema={SignInSchema}
+          onSubmit={handleSignin}
+        >
+          {({ errors, touched, values, handleChange }) => (
+            <Form className="flex flex-col gap-10">
+              <div className="flex flex-col gap-4">
+                {/* Email */}
+                <div className="flex flex-col gap-2">
+                  <Label className="text-[#09431C]">Email</Label>
+                  <Input
+                    type="email"
+                    name="email"
+                    placeholder="Your email"
+                    value={values.email}
+                    onChange={handleChange}
+                    className="w-full p-2 border rounded-lg"
+                  />
+                  {errors.email && touched.email && (
+                    <span className="text-red-400 italic text-sm">
+                      {errors.email}
+                    </span>
+                  )}
+                </div>
+
+                {/* Password */}
+                <div className="flex flex-col gap-2">
+                  <Label className="text-[#09431C]">Password</Label>
+                  <div className="relative w-full">
+                    <Input
+                      type={showPassword ? "text" : "password"}
+                      name="password"
+                      placeholder="Your password"
+                      value={values.password}
+                      onChange={handleChange}
+                      className="w-full p-2 border rounded-lg"
+                    />
+                    <Button
+                      type="button"
+                      onClick={() => setShowPassword((prev) => !prev)}
+                      className="absolute right-2 top-2 text-gray-500 hover:text-black w-1 h-1"
+                      variant="ghost"
+                    >
+                      {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
+                    </Button>
+                  </div>
+                  {errors.password && touched.password && (
+                    <span className="text-red-400 italic text-sm">
+                      {errors.password}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-0">
+                <Label className="text-red-400 mb-4 font-normal italic">
+                  {error}
+                </Label>
+                <Button
+                  type="submit"
+                  className="w-full p-2 bg-[#6FB229] hover:bg-[#09431C] rounded-lg"
+                >
+                  Sign In
+                </Button>
+              </div>
+            </Form>
+          )}
+        </Formik>
+
+        {/* Footer */}
+        <div className="flex justify-center mt-4">
+          <p className="text-[#09431C] flex flex-col justify-center">
+            Don't have an account?
           </p>
-        </div>
-        {/* Tombol Guest purchase */}
-        <div className="mt-8 text-center">
-          <button className="w-full p-2 bg-green-600 text-white rounded">
-            Guest purchase? Find your order
-          </button>
-        </div>
-        {/* Link Create account */}
-        <div className="mt-4 text-center">
-          <a href="/signup" className="text-blue-500 hover:underline">
-            New to viagogo? Create account
+          <a href="/signup">
+            <Button
+              type="button"
+              variant="link"
+              className="text-[#6FB229] hover:text-grey-400 p-0 pl-1.5"
+            >
+              Sign Up
+            </Button>
           </a>
         </div>
-      </div>
+      </Card>
     </div>
   );
 }
+
+// "use client";
+// import { useRouter } from "next/navigation";
+// import { useState } from "react";
+// import { apiCall } from "@/helper/axios";
+// import { Formik, Form, FormikProps } from "formik";
+// import { Button } from "@/components/ui/button";
+// import {
+//   Select,
+//   SelectContent,
+//   SelectGroup,
+//   SelectItem,
+//   SelectTrigger,
+//   SelectValue,
+// } from "@/components/ui/select";
+// import { Input } from "@/components/ui/input";
+// import { Card } from "@/components/ui/card";
+// import { Label } from "@/components/ui/label";
+// import { Eye, EyeOff } from "lucide-react";
+// import { SignInSchema, ISignInValue } from "./SigninSchema";
+
+// type LoginForm = {
+//   email: string;
+//   password: string;
+//   stayLoggedIn: boolean;
+// };
+
+// const initialState: LoginForm = {
+//   email: "",
+//   password: "",
+//   stayLoggedIn: false,
+// };
+
+// export default function Signin() {
+//   const [form, setForm] = useState<LoginForm>(initialState);
+//   const [showPassword, setShowPassword] = useState(false);
+
+//   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+//     const { name, value, type, checked } = event.target;
+//     setForm({
+//       ...form,
+//       [name]: type === "checkbox" ? checked : value,
+//     });
+//   };
+
+//   const handleSignin = async (event: React.FormEvent<HTMLFormElement>) => {
+//     event.preventDefault();
+//     console.log("Form:", form);
+//   };
+
+//   return (
+//     <div className="flex items-center justify-center min-h-screen">
+//       <Card className="w-full max-w-md p-8 bg-white shadow-md rounded-3xl">
+//         <h2 className="text-2xl font-semibold text-center mb-6 text-[#09431C]">
+//           Create an account
+//         </h2>
+
+//         <Formik<ISignInValue>
+//           initialValues={{
+//             email: "",
+//             password: "",
+//           }}
+//           validationSchema={SignInSchema}
+//           onSubmit={handleSignin}
+//         >
+//           {(props) => {
+//             const { errors, touched, values, handleChange, setFieldValue } =
+//               props;
+//             return (
+//               <Form className="flex flex-col gap-10">
+//                 <div className="flex flex-col gap-4">
+
+//                   <div className="flex flex-col gap-2">
+//                     <Label className="text-[#09431C]">Email</Label>
+//                     <Input
+//                       type="email"
+//                       name="email"
+//                       placeholder="Your email"
+//                       value={values.email}
+//                       onChange={handleChange}
+//                       className="w-full p-2 border rounded-lg"
+//                     />
+//                     {errors.email && touched.email && (
+//                       <span className="text-red-400 italic text-sm">
+//                         {errors.email}
+//                       </span>
+//                     )}
+//                   </div>
+
+//                   <div className="flex flex-col gap-2">
+//                     <Label className="text-[#09431C]">Password</Label>
+//                     <div className="relative w-full">
+//                       <Input
+//                         type={showPassword ? "text" : "password"}
+//                         name="password"
+//                         placeholder="Your password"
+//                         value={values.password}
+//                         onChange={handleChange}
+//                         className="w-full p-2 border rounded-lg"
+//                       />
+//                       <Button
+//                         type="button"
+//                         onClick={() => setShowPassword((prev) => !prev)}
+//                         className="absolute right-2 top-2 text-gray-500 hover:text-black w-1 h-1"
+//                         variant={"ghost"}
+//                       >
+//                         {showPassword ? (
+//                           <Eye size={20} />
+//                         ) : (
+//                           <EyeOff size={20} />
+//                         )}
+//                       </Button>
+//                     </div>
+//                     {errors.password && touched.password && (
+//                       <span className="text-red-400 italic text-sm">
+//                         {errors.password}
+//                       </span>
+//                     )}
+//                   </div>
+//                 </div>
+
+//                 <div className="flex flex-col gap-0">
+//                   <Label className="text-red-400 mb-4 font-normal italic">
+//                     {error}
+//                   </Label>
+//                   <Button
+//                     type="submit"
+//                     className="w-full p-2 bg-[#6FB229] hover:bg-[#09431C] rounded-lg"
+//                   >
+//                     Sign In
+//                   </Button>
+//                 </div>
+//               </Form>
+//             );
+//           }}
+//         </Formik>
+
+//         <div className="flex justify-center mt-4">
+//           <p className="text-[#09431C] flex flex-col justify-center">
+//             Don't have an account?
+//           </p>
+//           <a href="/signup">
+//             <Button
+//               type="button"
+//               variant={"link"}
+//               className="text-[#6FB229] hover:text-grey-400 p-0 pl-1.5"
+//             >
+//               Sign Up
+//             </Button>
+//           </a>
+//         </div>
+//       </Card>
+//     </div>
+//   );
+// }
