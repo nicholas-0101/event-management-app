@@ -1,7 +1,8 @@
-"use client"
+"use client";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import UserButton from "../user-profile/page";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -38,17 +39,10 @@ export default function Navbar() {
               Create Event
             </Button>
           </Link>
+
+          {/* User button */}
           <div className="flex gap-2">
-            <Link href="/signin">
-              <Button variant="link" className="cursor-pointer p-0">
-                Sign In
-              </Button>
-            </Link>
-            <Link href="/user-profile">
-              <Button variant="link" className="cursor-pointer p-0">
-                ProfilePic
-              </Button>
-            </Link>
+            <UserButton />
           </div>
         </div>
       </div>
