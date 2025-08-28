@@ -1,91 +1,3 @@
-// "use client";
-
-// import { useState, useEffect } from "react";
-// import { useRouter, useParams } from "next/navigation";
-// import axios from "axios";
-// import { Button } from "@/components/ui/button";
-// import { Card } from "@/components/ui/card";
-// import { apiCall } from "@/helper/axios";
-
-// export default function VerifyPage() {
-//   const router = useRouter();
-//   const params = useParams();
-//   const [mounted, setMounted] = useState(false);
-//   const [status, setStatus] = useState<
-//     "idle" | "loading" | "success" | "error"
-//   >("idle");
-//   const [message, setMessage] = useState("");
-
-//   const handleVerify = async () => {
-//     try {
-//       // grab token from url
-//       const token = params?.tkn;
-
-//       if (!token) {
-//         setMessage("Invalid link");
-//         setStatus("error");
-//         return;
-//       }
-
-//       setStatus("loading");
-
-//       const res = await apiCall.get(
-//         `/auth/verify?tkn=${token}`
-//       );
-
-//       setMessage(res.data.message || "Account verified successfully");
-//       setStatus("success");
-//     } catch (error: any) {
-//       console.log(error)
-//       setMessage(error.response?.data?.message || "Verification failed");
-//       setStatus("error");
-//     }
-//   };
-
-//   return (
-//     <div className="flex flex-col h-screen">
-//       <main className="flex-1 flex items-center justify-center">
-//         <div className="flex flex-col gap-4 w-full max-w-md px-4">
-//           <Card className="p-6 bg-white shadow-md text-center flex flex-col gap-2 rounded-3xl">
-//             <h1 className="text-2xl font-bold mb-2 text-[#09431C]">Verify your account</h1>
-//             <p
-//               className={`mb-4 ${
-//                 status === "success"
-//                   ? "text-green-600"
-//                   : status === "error"
-//                   ? "text-red-400"
-//                   : "text-gray-600"
-//               }`}
-//             >
-//               {status === "idle" &&
-//                 "Click the button below to verify your account"}
-//               {status === "loading" && "Verifying your account..."}
-//               {(status === "success" || status === "error") && message}
-//             </p>
-
-//             {status === "idle" && (
-//               <Button
-//                 onClick={handleVerify}
-//                 className="w-full rounded-lg bg-[#6FB229] hover:bg-[#09431C] cursor-pointer"
-//               >
-//                 Verify
-//               </Button>
-//             )}
-//             {status === "success" && (
-//               <a href="/signin">
-//                 <Button className="w-full rounded-lg bg-[#6FB229] hover:bg-[#09431C] cursor-pointer">
-//                   Sign In
-//                 </Button>
-//               </a>
-//             )}
-//           </Card>
-//         </div>
-//       </main>
-//     </div>
-//   );
-// }
-
-
 "use client";
 
 import { useState } from "react";
@@ -96,7 +8,9 @@ import { apiCall } from "@/helper/axios";
 
 export default function VerifyPage({ params }: { params: { token: string } }) {
   const router = useRouter();
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [status, setStatus] = useState<
+    "idle" | "loading" | "success" | "error"
+  >("idle");
   const [message, setMessage] = useState("");
 
   const handleVerify = async () => {
@@ -117,7 +31,9 @@ export default function VerifyPage({ params }: { params: { token: string } }) {
       <main className="flex-1 flex items-center justify-center">
         <div className="flex flex-col gap-4 w-full max-w-md px-4">
           <Card className="p-6 bg-white shadow-md text-center flex flex-col gap-2 rounded-3xl">
-            <h1 className="text-2xl font-bold mb-2 text-[#09431C]">Verify your account</h1>
+            <h1 className="text-2xl font-bold mb-2 text-[#09431C]">
+              Verify your account
+            </h1>
             <p
               className={`mb-4 ${
                 status === "success"
@@ -127,7 +43,8 @@ export default function VerifyPage({ params }: { params: { token: string } }) {
                   : "text-gray-600"
               }`}
             >
-              {status === "idle" && "Click the button below to verify your account"}
+              {status === "idle" &&
+                "Click the button below to verify your account"}
               {status === "loading" && "Verifying your account..."}
               {(status === "success" || status === "error") && message}
             </p>
