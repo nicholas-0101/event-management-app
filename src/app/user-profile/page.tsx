@@ -1,8 +1,17 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import { ChevronDown, LogOut, User as UserIcon } from "lucide-react";
 
 interface UserButtonData {
   username: string;
@@ -13,15 +22,19 @@ interface UserButtonData {
 
 const UserButton: React.FC = () => {
   const [user, setUser] = useState<UserButtonData | null>(null);
-  const [open, setOpen] = useState(false);
   const router = useRouter();
-  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // helper untuk format URL gambar
+  const getProfilePicUrl = (pic: string | null | undefined) => {
+    if (!pic) return "/avatar-placeholder.png";
+    if (pic.startsWith("http")) return pic;
+    return `http://localhost:4400/${pic}`;
+  };
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
       const parsedUser = JSON.parse(storedUser);
-
       setUser({
         username: parsedUser.username,
         referral_code: parsedUser.referral_code,
@@ -29,21 +42,6 @@ const UserButton: React.FC = () => {
         profile_pic: parsedUser.profile_pic ?? null,
       });
     }
-
-    // Tutup dropdown saat klik di luar
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
   }, []);
 
   const handleLogout = () => {
@@ -52,52 +50,71 @@ const UserButton: React.FC = () => {
     router.push("/signin");
   };
 
+  const handleNavigate = (path: string) => {
+    router.push(path);
+  };
+
   if (!user) {
     return (
       <Button
         onClick={() => router.push("/signin")}
-        className="bg-[#6FB229] hover:bg-[#09431C] text-white rounded-lg px-4 py-2"
+        className="rounded-full px-5"
       >
-        Login
+        Sign in
       </Button>
     );
   }
 
   return (
-    <div className="relative" ref={dropdownRef}>
-      <Button
-        onClick={() => setOpen((prev) => !prev)}
-        className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 rounded-lg px-3 py-2"
-      >
-        <img
-          src={user.profile_pic || "/avatar-placeholder.png"}
-          alt="Profile"
-          className="w-8 h-8 rounded-full object-cover"
-        />
-        <span className="font-semibold">{user.username}</span>
-      </Button>
-
-      {open && (
-        <div className="absolute right-0 mt-2 w-64 bg-white border rounded-lg shadow-lg z-50">
-          <div className="p-4 flex flex-col gap-2">
-            <div className="flex flex-col">
-              <span className="font-semibold">Referral Code:</span>
-              <span className="text-blue-600">{user.referral_code ?? "-"}</span>
-            </div>
-            <div className="flex flex-col">
-              <span className="font-semibold">Points:</span>
-              <span className="text-green-600">{user.points}</span>
-            </div>
-            <button
-              onClick={handleLogout}
-              className="mt-2 w-full py-1 px-2 bg-red-500 text-white rounded hover:bg-red-600"
-            >
-              Logout
-            </button>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="outline"
+          className="flex items-center gap-2 rounded-full pl-2 pr-3 h-10 border-input/60 hover:shadow-sm"
+        >
+          <img
+            src={getProfilePicUrl(user.profile_pic)}
+            alt="Profile"
+            className="w-8 h-8 rounded-full object-cover ring-1 ring-border"
+          />
+          <span className="max-w-[120px] truncate text-sm font-medium">
+            {user.username}
+          </span>
+          <ChevronDown className="size-4 text-muted-foreground" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-72">
+        <div className="px-3 py-3 flex items-center gap-3">
+          <img
+            src={getProfilePicUrl(user.profile_pic)}
+            alt="Profile"
+            className="w-10 h-10 rounded-full object-cover ring-1 ring-border"
+          />
+          <div className="min-w-0">
+            <p className="text-sm font-semibold truncate">{user.username}</p>
+            <p className="text-xs text-muted-foreground truncate">
+              Ref: {user.referral_code ?? "-"}
+            </p>
+          </div>
+          <div className="ml-auto text-right">
+            <p className="text-xs text-muted-foreground">Points</p>
+            <p className="text-sm font-semibold text-green-600">
+              {user.points}
+            </p>
           </div>
         </div>
-      )}
-    </div>
+        <DropdownMenuSeparator />
+        <DropdownMenuLabel className="text-xs text-muted-foreground">
+          Menu
+        </DropdownMenuLabel>
+        <DropdownMenuItem onClick={() => handleNavigate("/user-profile")}>
+          <UserIcon className="size-4" /> Profile
+        </DropdownMenuItem>
+        <DropdownMenuItem variant="destructive" onClick={handleLogout}>
+          <LogOut className="size-4" /> Logout
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
 
