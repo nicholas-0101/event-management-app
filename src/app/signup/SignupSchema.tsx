@@ -1,17 +1,30 @@
 import * as Yup from "yup";
 
 export const SignUpSchema = Yup.object().shape({
-  username: Yup.string().required("*username is required"),
-  email: Yup.string().email("*invalid email").required("*email is required"),
+  username: Yup.string()
+    .min(3, "*username must be at least 3 characters")
+    .max(20, "*username must be less than 20 characters")
+    .matches(
+      /^[a-zA-Z0-9_]+$/,
+      "*username can only contain letters, numbers, and underscores"
+    )
+    .required("*username is required"),
+  email: Yup.string()
+    .email("*invalid email format")
+    .required("*email is required"),
   password: Yup.string()
     .min(6, "*password must be at least 6 characters")
     .matches(
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/,
-      "Password must contain at least 1 lowercase, 1 uppercase, and 1 number"
+      "*password must contain at least 1 lowercase, 1 uppercase, and 1 number"
     )
     .required("*password is required"),
-  referral: Yup.string().optional(),
-  role: Yup.string().required("*role is required"),
+  referral: Yup.string()
+    .min(1, "*referral code cannot be empty if provided")
+    .optional(),
+  role: Yup.string()
+    .oneOf(["USER", "ORGANIZER"], "*please select a valid role")
+    .required("*role is required"),
 });
 
 export interface ISignUpValue {
