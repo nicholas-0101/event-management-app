@@ -13,7 +13,11 @@ export default function SearchBar({ onSearch, delay = 500 }: SearchBarProps) {
 
   useEffect(() => {
     const handler = setTimeout(() => {
-      onSearch(value);
+      if (value.length >= 3) {
+        onSearch(value);
+      } else {
+        onSearch("")
+      }
     }, delay);
 
     return () => clearTimeout(handler);

@@ -102,7 +102,7 @@ export default function LandingPage() {
             <SearchX color="#525252" size={200} /> Events Not Found
           </p>
         ) : (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 p-4">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {filteredEvents.map((event) => (
               <EventCard
                 key={event.id}
