@@ -23,7 +23,7 @@ export default function CategoryFilter({
             className={`rounded-full font-medium cursor-pointer border border-[#00481a] text-[#00481a] transition-colors
               ${
                 activeCategory === category
-                  ? "bg-[#c6ee9a] hover:bg-[#97d753]"
+                  ? "bg-[#c6ee9a] hover:bg-[#c6ee9a]"
                   : "bg-[#97d753] hover:bg-[#c6ee9a]"
               }
             `}
