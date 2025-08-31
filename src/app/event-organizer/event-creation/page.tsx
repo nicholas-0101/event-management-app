@@ -22,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { apiCall } from "@/helper/axios";
 
 export default function EventCreationPage() {
   const [date, setDate] = useState<DateRange | undefined>();
@@ -35,8 +36,61 @@ export default function EventCreationPage() {
       <Formik
         initialValues={initialValues}
         validationSchema={eventCreationSchema}
-        onSubmit={(values) => {
-          console.log("Submit payload:", values);
+        onSubmit={async (values, { resetForm }) => {
+          try {
+            const formData = new FormData();
+
+            // text fields
+            formData.append("event_name", values.event_name);
+            formData.append("event_description", values.event_description);
+            formData.append(
+              "event_start_date",
+              values.event_start_date
+                ? new Date(values.event_start_date).toISOString()
+                : ""
+            );
+            formData.append(
+              "event_end_date",
+              values.event_end_date
+                ? new Date(values.event_end_date).toISOString()
+                : ""
+            );
+            formData.append("event_location", values.event_location);
+            formData.append(
+              "event_category",
+              values.event_category.toUpperCase()
+            );
+
+            // tickets → stringify & cast numbers
+            const tickets = values.tickets.map((ticket) => ({
+              ticket_type: ticket.ticket_type.toUpperCase(),
+              price: Number(ticket.ticket_price) || 0,
+              quota: Number(ticket.ticket_quota) || 0,
+              available_qty:
+                ticket.ticket_quota !== undefined
+                  ? Number(ticket.ticket_quota)
+                  : Number(ticket.ticket_quota) || 0,
+            }));
+            formData.append("tickets", JSON.stringify(tickets));
+
+            // file
+            if (values.event_thumbnail) {
+              formData.append("event_thumbnail", values.event_thumbnail);
+            }
+
+            // send to API
+            await apiCall.post("/event/create", formData, {
+              headers: {
+                "Content-Type": "multipart/form-data",
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+            });
+
+            resetForm();
+            alert("Event created successfully!");
+          } catch (error) {
+            console.error("Event creation failed", error);
+          }
         }}
       >
         {({ errors, touched, values, setFieldValue }) => (
