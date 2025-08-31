@@ -34,7 +34,7 @@ export default function Navbar() {
               My Tickets
             </Button>
           </Link>
-          <Link href="/eo-organizer-dashboard">
+          <Link href="/event-organizer/event-creation">
             <Button variant="link" className="cursor-pointer p-0">
               Create Event
             </Button>
