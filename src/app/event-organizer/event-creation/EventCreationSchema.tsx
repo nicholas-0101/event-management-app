@@ -1,45 +1,86 @@
 import * as Yup from "yup";
 
+// export interface ITicket {
+//   ticket_price: number | null;
+//   ticket_quota: number | null;
+//   ticket_type: string;
+// }
+
+// export interface IEventCreate {
+//   event_name: string;
+//   event_total_seats: number | null;
+//   event_description: string;
+//   event_location: string;
+//   event_category: "concert" | "festival" | "sport" | "theater";
+//   event_thumbnail: File | null;
+//   event_start_date: Date | string;
+//   event_end_date: Date | string;
+//   tickets: ITicket[];
+// }
+
+// export const initialValues: IEventCreate = {
+//     event_name: "",
+//     event_total_seats: null,
+//     event_description: "",
+//     event_location: "",
+//     event_category: "" as "concert" | "festival" | "sport" | "theater",
+//     event_thumbnail: null,
+//     event_start_date: "",
+//     event_end_date: "",
+//     tickets: [
+//       {
+//         ticket_type: "Regular",
+//         ticket_price: null,
+//         ticket_quota: null,
+//       },
+//       {
+//         ticket_type: "vip",
+//         ticket_price: null,
+//         ticket_quota: null,
+//       },
+//     ],
+//   };
+
 export interface ITicket {
-  ticket_price: number | null;
-  ticket_quota: number | null;
+  ticket_price: number | "";   // allow empty string for inputs
+  ticket_quota: number | "";   // same here
   ticket_type: string;
 }
 
 export interface IEventCreate {
   event_name: string;
-  event_total_seats: number | null;
+  event_total_seats: number | ""; // keep input stable
   event_description: string;
   event_location: string;
-  event_category: "concert" | "festival" | "sport" | "theater";
+  event_category: "concert" | "festival" | "sport" | "theater" | ""; // allow empty initial
   event_thumbnail: File | null;
-  event_start_date: Date | string;
-  event_end_date: Date | string;
+  event_start_date: Date | null;
+  event_end_date: Date | null;
   tickets: ITicket[];
 }
 
 export const initialValues: IEventCreate = {
-    event_name: "",
-    event_total_seats: null,
-    event_description: "",
-    event_location: "",
-    event_category: "" as "concert" | "festival" | "sport" | "theater",
-    event_thumbnail: null,
-    event_start_date: "",
-    event_end_date: "",
-    tickets: [
-      {
-        ticket_type: "Regular",
-        ticket_price: null,
-        ticket_quota: null,
-      },
-      {
-        ticket_type: "vip",
-        ticket_price: null,
-        ticket_quota: null,
-      },
-    ],
-  };
+  event_name: "",
+  event_total_seats: "",
+  event_description: "",
+  event_location: "",
+  event_category: "", // user must pick one
+  event_thumbnail: null,
+  event_start_date: null,
+  event_end_date: null,
+  tickets: [
+    {
+      ticket_type: "Regular",
+      ticket_price: "",
+      ticket_quota: "",
+    },
+    {
+      ticket_type: "vip",
+      ticket_price: "",
+      ticket_quota: "",
+    },
+  ],
+};
 
 export const eventCreationSchema = Yup.object().shape({
   event_name: Yup.string().required("*event name is required"),
