@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { apiCall } from "@/helper/axios";
 import { Formik, Form } from "formik";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,39 @@ export default function Signin() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  // Check if user is already logged in
+  useEffect(() => {
+    const checkAuth = () => {
+      try {
+        const token = localStorage.getItem("token");
+        const userData = localStorage.getItem("user");
+
+        if (token && userData) {
+          const user = JSON.parse(userData);
+
+          // If user is already verified and logged in, redirect based on role
+          if (user.is_verified) {
+            if (user.role === "ORGANIZER") {
+              router.replace("/event-organizer");
+            } else {
+              router.replace("/");
+            }
+            return;
+          }
+        }
+      } catch (error) {
+        console.error("Auth check error:", error);
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkAuth();
+  }, [router]);
 
   const handleSignin = async (values: ISignInValue) => {
     try {
@@ -48,7 +81,12 @@ export default function Signin() {
 
       localStorage.setItem("user", JSON.stringify(userData));
 
-      router.replace("/"); // arahkan ke homepage
+      // Redirect berdasarkan role
+      if (user.role === "ORGANIZER") {
+        router.replace("/event-organizer");
+      } else {
+        router.replace("/"); // arahkan user biasa ke homepage
+      }
     } catch (err: any) {
       console.error("Login error:", err);
       setError(
@@ -58,6 +96,15 @@ export default function Signin() {
       );
     }
   };
+
+  // Show loading while checking auth
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#6FB229]"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex items-center justify-center min-h-screen">

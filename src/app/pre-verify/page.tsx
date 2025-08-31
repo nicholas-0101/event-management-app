@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, Mail, Copy, ExternalLink } from "lucide-react";
@@ -17,6 +18,39 @@ interface UserData {
 
 export default function PreVerifyPage() {
   const [userData, setUserData] = useState<UserData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
+
+  useEffect(() => {
+    const checkAuth = () => {
+      try {
+        const token = localStorage.getItem("token");
+        const userData = localStorage.getItem("user");
+
+        if (token && userData) {
+          const user = JSON.parse(userData);
+
+          // If user is already verified and logged in, redirect based on role
+          if (user.is_verified) {
+            if (user.role === "ORGANIZER") {
+              router.replace("/event-organizer");
+            } else {
+              router.replace("/");
+            }
+            return;
+          }
+        }
+      } catch (error) {
+        console.error("Auth check error:", error);
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkAuth();
+  }, [router]);
 
   useEffect(() => {
     // Get user data from localStorage
@@ -37,6 +71,15 @@ export default function PreVerifyPage() {
       alert("Referral code copied to clipboard!");
     }
   };
+
+  // Show loading while checking auth
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#6FB229]"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col min-h-screen">
