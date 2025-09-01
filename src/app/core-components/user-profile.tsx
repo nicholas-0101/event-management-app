@@ -203,8 +203,8 @@ const UserButton: React.FC = () => {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
-          variant="outline"
-          className="flex items-center gap-2 rounded-full pl-2 pr-3 h-10 border-input/60 hover:shadow-sm"
+          variant={"ghost"}
+          className="flex items-center gap-2 rounded-full pl-2 pr-3 h-10"
         >
           <img
             src={getProfilePicUrl(user.profile_pic)}
