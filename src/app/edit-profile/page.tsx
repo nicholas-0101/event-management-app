@@ -51,6 +51,13 @@ interface UpdateProfileForm {
 export default function EditProfile() {
   const router = useRouter();
   const [userData, setUserData] = useState<UserData | null>(null);
+
+  const getProfilePicUrl = (pic: string | null | undefined) => {
+    if (!pic)
+      return "https://i.pinimg.com/736x/1c/c5/35/1cc535901e32f18db87fa5e340a18aff.jpg";
+    if (pic.startsWith("http")) return pic;
+    return `http://localhost:4400/${pic}`;
+  };
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
   const [success, setSuccess] = useState<string>("");
@@ -376,19 +383,11 @@ export default function EditProfile() {
           <CardHeader className="border-b">
             <div className="flex items-center gap-4">
               <div className="relative">
-                {userData.profile_pic ? (
-                  <img
-                    src={userData.profile_pic}
-                    alt="Profile"
-                    className="size-16 rounded-full object-cover border-2 border-gray-200"
-                  />
-                ) : (
-                  <div className="size-16 rounded-full bg-muted flex items-center justify-center text-muted-foreground text-lg font-semibold">
-                    {userData.username
-                      ? userData.username.charAt(0).toUpperCase()
-                      : "U"}
-                  </div>
-                )}
+                <img
+                  src={getProfilePicUrl(userData.profile_pic)}
+                  alt="Profile"
+                  className="size-16 rounded-full object-cover border-2 border-gray-200"
+                />
               </div>
               <div className="flex-1">
                 <CardTitle>Edit Profile</CardTitle>
@@ -517,24 +516,16 @@ export default function EditProfile() {
                       <Label>Current Photo</Label>
                       <div className="mt-2 flex items-center gap-4">
                         <div className="relative">
-                          {userData.profile_pic ? (
-                            <img
-                              src={userData.profile_pic}
-                              alt="Profile"
-                              className="w-20 h-20 rounded-full object-cover border-2 border-gray-200"
-                            />
-                          ) : (
-                            <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center text-muted-foreground text-lg font-semibold border-2 border-gray-200">
-                              {userData.username
-                                ? userData.username.charAt(0).toUpperCase()
-                                : "U"}
-                            </div>
-                          )}
+                          <img
+                            src={getProfilePicUrl(userData.profile_pic)}
+                            alt="Profile"
+                            className="w-20 h-20 rounded-full object-cover border-2 border-gray-200"
+                          />
                         </div>
                         <div className="text-sm text-muted-foreground">
                           {userData.profile_pic
                             ? "Current profile photo"
-                            : "No profile photo set"}
+                            : "Using default profile photo"}
                         </div>
                       </div>
                     </div>

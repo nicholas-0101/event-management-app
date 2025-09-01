@@ -55,15 +55,28 @@ apiCall.interceptors.response.use(
     return response;
   },
   (error) => {
-    console.error("API Error:", error);
+    const isSigninRequest = error.config?.url?.includes("/auth/signin");
 
-    // Simple error logging
-    console.error("Error details:", {
-      message: error.message,
-      status: error.response?.status,
-      url: error.config?.url,
-      code: error.code,
-    });
+    // Don't log detailed errors for signin requests to avoid console spam
+    if (!isSigninRequest) {
+      console.error("API Error:", error);
+
+      // Simple error logging
+      const errorDetails = {
+        message: error.message || "Unknown error",
+        status: error.response?.status || "No status",
+        url: error.config?.url || "No URL",
+        code: error.code || "No code",
+      };
+
+      // Only log if we have meaningful error details
+      if (
+        errorDetails.message !== "Unknown error" ||
+        errorDetails.status !== "No status"
+      ) {
+        console.error("Error details:", errorDetails);
+      }
+    }
 
     // Handle network errors with retry mechanism
     if (
@@ -100,10 +113,17 @@ apiCall.interceptors.response.use(
     // Reset retry count for non-network errors
     retryCount = 0;
 
-    // Handle 401 Unauthorized
+    // Handle 401 Unauthorized - but not during signin process
     if (error.response?.status === 401) {
-      localStorage.removeItem("token");
-      window.location.href = "/signin";
+      const isSigninRequest = error.config?.url?.includes("/auth/signin");
+
+      if (!isSigninRequest) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        window.location.href = "/signin";
+      }
+      // For signin requests, let the component handle the error
+      // Don't suppress console log for debugging
     }
 
     return Promise.reject(error);

@@ -49,11 +49,6 @@ export default function EventOrganizerPage() {
         }
 
         const user = JSON.parse(userData);
-        if (!user.is_verified) {
-          router.replace("/pre-verify");
-          return;
-        }
-
         if (user.role !== "ORGANIZER") {
           router.replace("/");
           return;
@@ -160,7 +155,7 @@ export default function EventOrganizerPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+      <div className="flex items-center justify-center min-h-screen bg-white">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-4 border-[#00481a] border-t-transparent mx-auto mb-4"></div>
           <p className="text-gray-600 text-lg font-medium">Loading events...</p>
@@ -170,7 +165,7 @@ export default function EventOrganizerPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <div className="min-h-screen bg-white">
       <EOSidebar />
 
       <div className="flex justify-center">
@@ -180,7 +175,7 @@ export default function EventOrganizerPage() {
             <div className="px-6 py-8">
               <div className="flex items-center justify-between">
                 <div>
-                  <h1 className="text-3xl font-bold bg-gradient-to-r from-[#00481a] via-[#97d753] to-[#c6ee9a] bg-clip-text text-transparent">
+                  <h1 className="text-3xl font-bold text-[#09431C]">
                     Event Organizer Dashboard
                   </h1>
                   <p className="text-gray-600 mt-1">
@@ -189,7 +184,7 @@ export default function EventOrganizerPage() {
                 </div>
                 <Button
                   onClick={handleCreateEvent}
-                  className="bg-gradient-to-r from-[#00481a] to-[#97d753] hover:from-[#97d753] hover:to-[#c6ee9a] text-white"
+                  className="bg-[#09431C] hover:bg-[#09431C]/90 text-white"
                 >
                   <Plus className="w-4 h-4 mr-2" />
                   Create New Event
@@ -303,7 +298,7 @@ export default function EventOrganizerPage() {
                     </p>
                     <Button
                       onClick={handleCreateEvent}
-                      className="bg-gradient-to-r from-[#00481a] to-[#97d753] hover:from-[#97d753] hover:to-[#c6ee9a] text-white"
+                      className="bg-[#09431C] hover:bg-[#09431C]/90 text-white"
                     >
                       <Plus className="w-4 h-4 mr-2" />
                       Create Event

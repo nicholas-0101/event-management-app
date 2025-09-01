@@ -13,10 +13,10 @@ export const SignUpSchema = Yup.object().shape({
     .email("*invalid email format")
     .required("*email is required"),
   password: Yup.string()
-    .min(6, "*password must be at least 6 characters")
+    .min(4, "*password must be at least 4 characters")
     .matches(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/,
-      "*password must contain at least 1 lowercase, 1 uppercase, and 1 number"
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+      "*password must contain uppercase, lowercase, and number"
     )
     .required("*password is required"),
   referral: Yup.string()
