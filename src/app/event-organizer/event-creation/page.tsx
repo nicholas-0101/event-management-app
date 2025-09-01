@@ -29,7 +29,7 @@ export default function EventCreationPage() {
   const [date, setDate] = useState<DateRange | undefined>();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <div className="min-h-screen bg-gradient-to-br">
       <EOSidebar />
 
       <div className="flex justify-center w-full">
@@ -208,7 +208,7 @@ export default function EventCreationPage() {
                       id="event_description"
                       name="event_description"
                       placeholder="Write about the event..."
-                      className="w-full h-50 rounded-lg"
+                      className="w-full h-32 rounded-lg"
                     />
                     {errors.event_description && touched.event_description && (
                       <span className="text-red-400 italic text-sm">

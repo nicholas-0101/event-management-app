@@ -1,12 +1,18 @@
 "use client";
 import { useState, useEffect, useMemo } from "react";
+import Link from "next/link";
 import SearchBar from "./core-components/searchbar";
 import HeroBanner from "./core-components/landing-banner";
 import CategoryFilter from "./core-components/filter-category";
 import DateFilter from "./core-components/filter-date";
 import EventCard from "./core-components/event-card";
 import { apiCall } from "@/helper/axios";
-import { LoaderIcon, SearchX } from "lucide-react";
+import { ArrowRight, LoaderIcon, SearchX } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import slugify from "slugify";
+import { DateRange } from "react-day-picker";
+import qs from "qs";
+// import { useFiltersFromUrl, useSyncFiltersToUrl } from "@/hooks/useFilter";
 
 type Event = {
   id: number;
@@ -23,6 +29,7 @@ export default function LandingPage() {
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState("All Types");
   const [search, setSearch] = useState("");
+  const [dateRange, setDateRange] = useState<DateRange | undefined>();
 
   const fetchEvents = async () => {
     try {
@@ -52,9 +59,37 @@ export default function LandingPage() {
         event.event_name.toLowerCase().includes(searchLower) ||
         event.event_category.toLowerCase().includes(searchLower);
 
-      return matchesCategory && matchesSearch;
+      let matchesDate = true;
+      if (dateRange?.from) {
+        const normalize = (d: Date) =>
+          new Date(d.getFullYear(), d.getMonth(), d.getDate());
+
+        const start = normalize(new Date(event.event_start_date));
+
+        const endRaw = new Date(event.event_end_date);
+        endRaw.setDate(endRaw.getDate() - 1);
+        const end = normalize(endRaw);
+
+        const from = normalize(dateRange.from);
+        const to = dateRange.to ? normalize(dateRange.to) : from;
+
+        matchesDate = start <= to && end >= from;
+      }
+
+      return matchesCategory && matchesSearch && matchesDate;
     });
-  }, [events, activeCategory, search]);
+  }, [events, activeCategory, search, dateRange]);
+
+  // Sort by start date (newest first) and take only 6
+  const newestEvents = useMemo(() => {
+    return [...filteredEvents]
+      .sort(
+        (a, b) =>
+          new Date(b.event_start_date).getTime() -
+          new Date(a.event_start_date).getTime()
+      )
+      .slice(0, 6);
+  }, [filteredEvents]);
 
   if (loading)
     return (
@@ -67,7 +102,7 @@ export default function LandingPage() {
             <HeroBanner setActiveCategory={setActiveCategory} />
           </div>
           <div className="flex w-full mx-auto items-center justify-between">
-            <DateFilter />
+            <DateFilter onDateChange={setDateRange} />
             <CategoryFilter
               activeCategory={activeCategory}
               setActiveCategory={setActiveCategory}
@@ -91,33 +126,239 @@ export default function LandingPage() {
           <HeroBanner setActiveCategory={setActiveCategory} />
         </div>
         <div className="flex w-full mx-auto items-center justify-between">
-          <DateFilter />
+          <DateFilter onDateChange={setDateRange} />
           <CategoryFilter
             activeCategory={activeCategory}
             setActiveCategory={setActiveCategory}
           />
         </div>
-        {filteredEvents.length === 0 ? (
+        {newestEvents.length === 0 ? (
           <p className="pt-4 text-neutral-600 text-center text-3xl font-medium flex flex-col gap-2 justify-center items-center">
             <SearchX color="#525252" size={200} /> Events Not Found
           </p>
         ) : (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {filteredEvents.map((event) => (
-              <EventCard
-                key={event.id}
-                thumbnail={event.event_thumbnail}
-                title={event.event_name}
-                dateStart={new Date(event.event_start_date)}
-                dateEnd={new Date(event.event_end_date)}
-                category={event.event_category}
-                price={event.event_price}
-                href={`/events/${event.id}`}
-              />
-            ))}
-          </div>
+          <>
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {newestEvents.map((event) => (
+                <EventCard
+                  key={event.id}
+                  thumbnail={event.event_thumbnail}
+                  title={event.event_name}
+                  dateStart={event.event_start_date}
+                  dateEnd={event.event_end_date}
+                  category={event.event_category}
+                  price={event.event_price}
+                  href={`/event-detail/${slugify(event.event_name, {
+                    lower: true,
+                  })}`}
+                />
+              ))}
+            </div>
+
+            {/* See More button */}
+            {filteredEvents.length > 6 && (
+              <div className="flex justify-end pt-6">
+                <Link href="/explore">
+                  <Button variant={"link"} size="lg" className="text-[#6FB229]">
+                    See More <ArrowRight />
+                  </Button>
+                </Link>
+              </div>
+            )}
+          </>
         )}
       </div>
     </section>
   );
 }
+
+// "use client";
+// import { useState, useEffect, useMemo } from "react";
+// import Link from "next/link";
+// import { useRouter, useSearchParams } from "next/navigation";
+// import SearchBar from "./core-components/searchbar";
+// import HeroBanner from "./core-components/landing-banner";
+// import CategoryFilter from "./core-components/filter-category";
+// import DateFilter from "./core-components/filter-date";
+// import EventCard from "./core-components/event-card";
+// import { apiCall } from "@/helper/axios";
+// import { ArrowRight, LoaderIcon, SearchX } from "lucide-react";
+// import { Button } from "@/components/ui/button";
+// import slugify from "slugify";
+// import { DateRange } from "react-day-picker";
+// import qs from "qs";
+
+// type Event = {
+//   id: number;
+//   event_name: string;
+//   event_thumbnail: string;
+//   event_start_date: string;
+//   event_end_date: string;
+//   event_category: string;
+//   event_price: number;
+// };
+
+// export default function LandingPage() {
+//   const router = useRouter();
+//   const searchParams = useSearchParams();
+
+//   const [events, setEvents] = useState<Event[]>([]);
+//   const [loading, setLoading] = useState(true);
+//   const [activeCategory, setActiveCategory] = useState("All Types");
+//   const [search, setSearch] = useState("");
+//   const [dateRange, setDateRange] = useState<DateRange | undefined>();
+
+//   // Load filters from URL on page load
+//   useEffect(() => {
+//     const urlSearch = searchParams.get("search") || "";
+//     const urlCategory = searchParams.get("category") || "All Types";
+//     const urlFrom = searchParams.get("from");
+//     const urlTo = searchParams.get("to");
+
+//     setSearch(urlSearch);
+//     setActiveCategory(urlCategory);
+
+//     if (urlFrom) {
+//       setDateRange({
+//         from: new Date(urlFrom),
+//         to: urlTo ? new Date(urlTo) : undefined,
+//       });
+//     }
+//   }, [searchParams]);
+
+//   // Update URL whenever filters change
+//   useEffect(() => {
+//     const query = qs.stringify(
+//       {
+//         search: search || undefined,
+//         category: activeCategory !== "All Types" ? activeCategory : undefined,
+//         from: dateRange?.from?.toISOString(),
+//         to: dateRange?.to?.toISOString(),
+//       },
+//       { skipNulls: true }
+//     );
+
+//     router.replace(`?${query}`);
+//   }, [search, activeCategory, dateRange, router]);
+
+//   // Fetch events whenever filters change
+//   useEffect(() => {
+//     const fetchEvents = async () => {
+//       setLoading(true);
+
+//       try {
+//         const query = qs.stringify(
+//           {
+//             category: activeCategory !== "All Types" ? activeCategory : undefined,
+//             search: search || undefined,
+//             from: dateRange?.from?.toISOString(),
+//             to: dateRange?.to?.toISOString(),
+//           },
+//           { skipNulls: true }
+//         );
+
+//         const res = await apiCall.get<{ success: boolean; data: Event[] }>(
+//           `/event?${query}`
+//         );
+//         setEvents(res.data.data);
+//       } catch (error) {
+//         console.error("Failed to fetch events:", error);
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+
+//     fetchEvents();
+//   }, [search, activeCategory, dateRange]);
+
+//   // Sort by start date (newest first) and take only 6
+//   const newestEvents = useMemo(() => {
+//     return [...events]
+//       .sort(
+//         (a, b) =>
+//           new Date(b.event_start_date).getTime() -
+//           new Date(a.event_start_date).getTime()
+//       )
+//       .slice(0, 6);
+//   }, [events]);
+
+//   if (loading)
+//     return (
+//       <section>
+//         <div className="flex flex-col gap-6">
+//           <div className="flex justify-center">
+//             <SearchBar onSearch={setSearch} />
+//           </div>
+//           <div className="flex justify-center">
+//             <HeroBanner setActiveCategory={setActiveCategory} />
+//           </div>
+//           <div className="flex w-full mx-auto items-center justify-between">
+//             <DateFilter onDateChange={setDateRange} />
+//             <CategoryFilter
+//               activeCategory={activeCategory}
+//               setActiveCategory={setActiveCategory}
+//             />
+//           </div>
+//         </div>
+//         <p className="pt-4 text-neutral-600 text-center text-3xl font-medium flex flex-col gap-2 justify-center items-center">
+//           <LoaderIcon color="#525252" size={200} />
+//           Loading events...
+//         </p>
+//       </section>
+//     );
+
+//   return (
+//     <section>
+//       <div className="flex flex-col gap-6">
+//         <div className="flex justify-center">
+//           <SearchBar onSearch={setSearch} />
+//         </div>
+//         <div className="flex justify-center">
+//           <HeroBanner setActiveCategory={setActiveCategory} />
+//         </div>
+//         <div className="flex w-full mx-auto items-center justify-between">
+//           <DateFilter onDateChange={setDateRange} />
+//           <CategoryFilter
+//             activeCategory={activeCategory}
+//             setActiveCategory={setActiveCategory}
+//           />
+//         </div>
+
+//         {newestEvents.length === 0 ? (
+//           <p className="pt-4 text-neutral-600 text-center text-3xl font-medium flex flex-col gap-2 justify-center items-center">
+//             <SearchX color="#525252" size={200} /> Events Not Found
+//           </p>
+//         ) : (
+//           <>
+//             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+//               {newestEvents.map((event) => (
+//                 <EventCard
+//                   key={event.id}
+//                   thumbnail={event.event_thumbnail}
+//                   title={event.event_name}
+//                   dateStart={event.event_start_date}
+//                   dateEnd={event.event_end_date}
+//                   category={event.event_category}
+//                   price={event.event_price}
+//                   href={`/event-detail/${slugify(event.event_name, {
+//                     lower: true,
+//                   })}`}
+//                 />
+//               ))}
+//             </div>
+
+//             {events.length > 6 && (
+//               <div className="flex justify-end pt-6">
+//                 <Link href="/explore">
+//                   <Button variant={"link"} size="lg" className="text-[#6FB229]">
+//                     See More <ArrowRight />
+//                   </Button>
+//                 </Link>
+//               </div>
+//             )}
+//           </>
+//         )}
+//       </div>
+//     </section>
+//   );
+// }

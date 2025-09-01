@@ -6,6 +6,8 @@ import CategoryFilter from "../core-components/filter-category";
 import { apiCall } from "@/helper/axios";
 import { LoaderIcon, SearchX } from "lucide-react";
 import EventCard from "../core-components/event-card";
+import slugify from "slugify";
+import { DateRange } from "react-day-picker";
 
 type Event = {
   id: number;
@@ -22,6 +24,7 @@ export default function ExplorePage() {
   const [activeCategory, setActiveCategory] = useState("All Types");
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>();
 
   const fetchEvents = async () => {
     try {
@@ -47,15 +50,30 @@ export default function ExplorePage() {
         event.event_category?.toLowerCase() === activeCategory.toLowerCase();
 
       const searchLower = search.toLowerCase();
-      const matchesSearch = event.event_name
-        .toLowerCase()
-        .includes(searchLower);
-      event.event_category.toLowerCase().includes(searchLower);
+      const matchesSearch =
+        event.event_name.toLowerCase().includes(searchLower) ||
+        event.event_category.toLowerCase().includes(searchLower);
 
-      return matchesCategory && matchesSearch;
+      let matchesDate = true;
+      if (dateRange?.from) {
+        const normalize = (d: Date) =>
+          new Date(d.getFullYear(), d.getMonth(), d.getDate());
+
+        const start = normalize(new Date(event.event_start_date));
+
+        const endRaw = new Date(event.event_end_date);
+        endRaw.setDate(endRaw.getDate() - 1);
+        const end = normalize(endRaw);
+
+        const from = normalize(dateRange.from);
+        const to = dateRange.to ? normalize(dateRange.to) : from;
+
+        matchesDate = start <= to && end >= from;
+      }
+
+      return matchesCategory && matchesSearch && matchesDate;
     });
-  }, [events, activeCategory, search]);
-
+  }, [events, activeCategory, search, dateRange]);
 
   if (loading) {
     return (
@@ -64,7 +82,7 @@ export default function ExplorePage() {
           <SearchBar onSearch={setSearch} />
         </div>
         <div className="flex justify-between w-full mx-auto">
-          <DateFilter />
+          <DateFilter onDateChange={setDateRange}/>
           <CategoryFilter
             activeCategory={activeCategory}
             setActiveCategory={setActiveCategory}
@@ -84,7 +102,7 @@ export default function ExplorePage() {
         <SearchBar onSearch={setSearch} />
       </div>
       <div className="flex justify-between w-full mx-auto">
-        <DateFilter />
+        <DateFilter onDateChange={setDateRange}/>
         <CategoryFilter
           activeCategory={activeCategory}
           setActiveCategory={setActiveCategory}
@@ -102,11 +120,13 @@ export default function ExplorePage() {
                 key={event.id}
                 thumbnail={event.event_thumbnail}
                 title={event.event_name}
-                dateStart={new Date(event.event_start_date)}
-                dateEnd={new Date(event.event_end_date)}
+                dateStart={event.event_start_date}
+                dateEnd={event.event_end_date}
                 category={event.event_category}
                 price={event.event_price}
-                href={`/events/${event.id}`}
+                href={`/event-detail/${slugify(event.event_name, {
+                  lower: true,
+                })}`}
               />
             ))}
           </div>
