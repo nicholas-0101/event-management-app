@@ -2,7 +2,7 @@
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import UserButton from "../user-profile/page";
+import UserButton from "./user-profile";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -32,11 +32,6 @@ export default function Navbar() {
           <Link href="/transaction-history">
             <Button variant="link" className="cursor-pointer p-0">
               My Tickets
-            </Button>
-          </Link>
-          <Link href="/event-organizer/event-creation">
-            <Button variant="link" className="cursor-pointer p-0">
-              Create Event
             </Button>
           </Link>
 

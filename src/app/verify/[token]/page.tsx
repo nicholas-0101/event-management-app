@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { apiCall } from "@/helper/axios";
+import Link from "next/link";
 
 export default function VerifyPage({ params }: { params: { token: string } }) {
   const router = useRouter();
@@ -105,6 +106,21 @@ export default function VerifyPage({ params }: { params: { token: string } }) {
                   Sign In
                 </Button>
               </a>
+            )}
+            {status === "error" && (
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Button
+                    asChild
+                    className="w-full rounded-lg bg-[#6FB229] hover:bg-[#09431C]"
+                  >
+                    <Link href="/signup">Try Again</Link>
+                  </Button>
+                  <Button asChild variant="outline" className="w-full">
+                    <Link href="/">Go to Home</Link>
+                  </Button>
+                </div>
+              </div>
             )}
           </Card>
         </div>

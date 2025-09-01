@@ -98,14 +98,12 @@ export default function VerifyEmailChangePage() {
 
             {status === "loading" && (
               <div className="flex items-center justify-center">
-                <Loader2 className="w-6 h-6 text-blue-500 animate-spin" />
                 <span className="ml-2">Verifying...</span>
               </div>
             )}
 
             {status === "success" && (
               <div className="space-y-4">
-                <CheckCircle className="w-16 h-16 text-green-500 mx-auto" />
                 {newEmail && (
                   <div className="bg-green-50 p-3 rounded-lg">
                     <p className="text-sm text-green-700">
@@ -130,7 +128,6 @@ export default function VerifyEmailChangePage() {
 
             {status === "error" && (
               <div className="space-y-4">
-                <XCircle className="w-16 h-16 text-red-500 mx-auto" />
                 <div className="space-y-2">
                   <Button
                     asChild
