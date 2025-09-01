@@ -24,10 +24,12 @@
     "formik": "^2.4.6",
     "lucide-react": "^0.541.0",
     "next": "15.5.0",
+    "qs": "^6.14.0",
     "react": "19.1.0",
     "react-day-picker": "^9.9.0",
     "react-dom": "19.1.0",
     "react-icons": "^5.5.0",
+    "slugify": "^1.6.6",
     "tailwind-merge": "^3.3.1",
     "yup": "^1.7.0",
     "zustand": "^5.0.8"
@@ -35,6 +37,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
+    "@types/qs": "^6.14.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "tailwindcss": "^4",

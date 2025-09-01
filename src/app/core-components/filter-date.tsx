@@ -12,7 +12,11 @@ import { CalendarDays, ChevronDownIcon } from "lucide-react";
 import { DateRange } from "react-day-picker";
 import { format } from "date-fns";
 
-export default function DateFilter() {
+interface DateFilterProps {
+  onDateChange: (range: DateRange | undefined) => void;
+}
+
+export default function DateFilter({ onDateChange }: DateFilterProps) {
   const [open, setOpen] = useState(false);
   const [date, setDate] = useState<DateRange | undefined>();
 
@@ -44,7 +48,7 @@ export default function DateFilter() {
             selected={date}
             onSelect={(range) => {
               setDate(range);
-
+              onDateChange(range);
               if (range?.from && range?.to) {
                 setOpen(true);
               }

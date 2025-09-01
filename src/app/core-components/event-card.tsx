@@ -9,19 +9,33 @@ import { Badge } from "@/components/ui/badge";
 interface CardItemProps {
   thumbnail: string;
   title: string;
-  dateStart: Date;
-  dateEnd: Date;
+  dateStart: string;
+  dateEnd: string;
   category: string;
   price: number;
   href: string;
 }
 
-function formatDate(date: Date) {
-  return new Intl.DateTimeFormat("en-US", {
-    month: "short",
+function formatDate(date: string | Date) {
+  if (!date) return "";
+
+  if (typeof date !== "string") {
+    return new Intl.DateTimeFormat("en-GB", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    }).format(date);
+  }
+
+  const onlyDate = date.split("T")[0];
+  const [year, month, day] = onlyDate.split("-").map(Number);
+
+  // no timezone conversion
+  return new Intl.DateTimeFormat("en-GB", {
     day: "numeric",
+    month: "short",
     year: "numeric",
-  }).format(date);
+  }).format(new Date(year, month - 1, day));
 }
 
 export default function EventCard({
