@@ -102,7 +102,7 @@ export default function EventOrganizerPage() {
   };
 
   const handleCreateEvent = () => {
-    router.push("/event-organizer/event-management/create");
+    router.push("/event-organizer/event-creation");
   };
 
   const handleEditEvent = (eventId: number) => {

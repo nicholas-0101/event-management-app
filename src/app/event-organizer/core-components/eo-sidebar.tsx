@@ -38,7 +38,7 @@ const menuItems = [
       { title: "All Events", href: "/event-organizer/event-management" },
       {
         title: "Create Event",
-        href: "/event-organizer/event-management/create",
+        href: "/event-organizer/event-creation",
       },
       {
         title: "Event Analytics",
