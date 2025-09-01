@@ -164,7 +164,7 @@ export default function EventManagementPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+      <div className="flex items-center justify-center min-h-screen bg-white">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent mx-auto mb-4"></div>
           <p className="text-gray-600 text-lg font-medium">Loading events...</p>
@@ -174,7 +174,7 @@ export default function EventManagementPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <div className="min-h-screen bg-white">
       <EOSidebar />
 
       <div className="flex justify-center">
@@ -184,7 +184,7 @@ export default function EventManagementPage() {
             <div className="px-6 py-8">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
                 <div className="space-y-2">
-                  <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-indigo-900 bg-clip-text text-transparent">
+                  <h1 className="text-3xl md:text-4xl font-bold text-[#09431C]">
                     Event Management
                   </h1>
                   <p className="text-gray-600 text-lg">
@@ -193,7 +193,7 @@ export default function EventManagementPage() {
                 </div>
                 <Button
                   onClick={handleCreateEvent}
-                  className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-3 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                  className="bg-[#09431C] hover:bg-[#09431C]/90 text-white px-8 py-3 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
                 >
                   <Plus className="w-5 h-5 mr-2" />
                   Create New Event
@@ -370,7 +370,7 @@ export default function EventManagementPage() {
                     {events.length === 0 && (
                       <Button
                         onClick={handleCreateEvent}
-                        className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-3 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                        className="bg-[#09431C] hover:bg-[#09431C]/90 text-white px-8 py-3 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
                       >
                         <Plus className="w-5 h-5 mr-2" />
                         Create Your First Event
