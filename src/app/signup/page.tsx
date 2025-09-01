@@ -38,6 +38,13 @@ const initialState: SignupForm = {
 export default function Signup() {
   const [form, setForm] = useState<SignupForm>(initialState);
   const [error, setError] = useState<string>("");
+  const [fieldError, setFieldError] = useState<{
+    username?: string;
+    email?: string;
+    password?: string;
+    referral?: string;
+    role?: string;
+  }>({});
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string>("");
@@ -88,6 +95,7 @@ export default function Signup() {
 
   const handleSignup = async (values: ISignUpValue) => {
     setError("");
+    setFieldError({});
     setSuccessMessage("");
     setIsLoading(true);
 
@@ -137,18 +145,68 @@ export default function Signup() {
     } catch (error: any) {
       console.error("Error during signup:", error);
 
-      // Handle different types of errors
-      if (error.response?.data?.message) {
-        setError(error.response.data.message);
-      } else if (error.response?.status === 400) {
-        setError("Invalid data provided. Please check your input.");
+      // Handle different types of errors based on backend response
+      let errorMessage = "An error occurred during signup. Please try again.";
+      let newFieldError: {
+        username?: string;
+        email?: string;
+        password?: string;
+        referral?: string;
+        role?: string;
+      } = {};
+
+      if (error.response?.status === 400) {
+        // Handle validation errors from backend
+        if (error.response?.data?.errors) {
+          // Handle express-validator errors
+          const validationErrors = error.response.data.errors;
+          const usernameError = validationErrors.find(
+            (err: any) => err.path === "username"
+          );
+          const emailError = validationErrors.find(
+            (err: any) => err.path === "email"
+          );
+          const passwordError = validationErrors.find(
+            (err: any) => err.path === "password"
+          );
+          const roleError = validationErrors.find(
+            (err: any) => err.path === "role"
+          );
+
+          if (usernameError) {
+            newFieldError.username = usernameError.msg;
+          } else if (emailError) {
+            newFieldError.email = emailError.msg;
+          } else if (passwordError) {
+            newFieldError.password = passwordError.msg;
+          } else if (roleError) {
+            newFieldError.role = roleError.msg;
+          } else {
+            errorMessage =
+              validationErrors[0]?.msg ||
+              "Invalid data provided. Please check your input.";
+          }
+        } else if (error.response?.data?.message) {
+          // Handle specific field errors from backend
+          if (error.response?.data?.field === "email") {
+            newFieldError.email = error.response.data.message;
+          } else if (error.response?.data?.field === "username") {
+            newFieldError.username = error.response.data.message;
+          } else {
+            errorMessage = error.response.data.message;
+          }
+        } else {
+          errorMessage = "Invalid data provided. Please check your input.";
+        }
       } else if (error.response?.status === 409) {
-        setError(
-          "Email or username already exists. Please try a different one."
-        );
-      } else {
-        setError("An error occurred during signup. Please try again.");
+        errorMessage =
+          "Email or username already exists. Please try a different one.";
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
       }
+
+      setError(errorMessage);
+      setFieldError(newFieldError);
     } finally {
       setIsLoading(false);
     }
@@ -198,11 +256,11 @@ export default function Signup() {
                       onChange={handleChange}
                       className="w-full p-2 border rounded-lg"
                     />
-                    {errors.username && touched.username && (
+                    {(errors.username && touched.username) || fieldError.username ? (
                       <span className="text-red-400 italic text-sm">
-                        {errors.username}
+                        {fieldError.username || errors.username}
                       </span>
-                    )}
+                    ) : null}
                   </div>
 
                   {/* Email */}
@@ -216,11 +274,11 @@ export default function Signup() {
                       onChange={handleChange}
                       className="w-full p-2 border rounded-lg"
                     />
-                    {errors.email && touched.email && (
+                    {(errors.email && touched.email) || fieldError.email ? (
                       <span className="text-red-400 italic text-sm">
-                        {errors.email}
+                        {fieldError.email || errors.email}
                       </span>
-                    )}
+                    ) : null}
                   </div>
 
                   {/* Password */}
@@ -248,11 +306,11 @@ export default function Signup() {
                         )}
                       </Button>
                     </div>
-                    {errors.password && touched.password && (
+                    {(errors.password && touched.password) || fieldError.password ? (
                       <span className="text-red-400 italic text-sm">
-                        {errors.password}
+                        {fieldError.password || errors.password}
                       </span>
-                    )}
+                    ) : null}
                   </div>
 
                   {/* Referral */}
@@ -272,11 +330,11 @@ export default function Signup() {
                       Using a referral code will give you bonus points and the
                       referrer will also receive points!
                     </p>
-                    {errors.referral && touched.referral && (
+                    {(errors.referral && touched.referral) || fieldError.referral ? (
                       <span className="text-red-400 italic text-sm">
-                        {errors.referral}
+                        {fieldError.referral || errors.referral}
                       </span>
-                    )}
+                    ) : null}
                   </div>
 
                   {/* Role */}
@@ -307,11 +365,11 @@ export default function Signup() {
                         ? "Organizers can create events, manage tickets, and earn from ticket sales."
                         : "Please select a role to continue."}
                     </p>
-                    {errors.role && touched.role && (
+                    {(errors.role && touched.role) || fieldError.role ? (
                       <span className="text-red-400 italic text-sm">
-                        {errors.role}
+                        {fieldError.role || errors.role}
                       </span>
-                    )}
+                    ) : null}
                   </div>
                 </div>
 

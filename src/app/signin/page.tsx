@@ -15,6 +15,10 @@ export default function Signin() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [fieldError, setFieldError] = useState<{
+    email?: string;
+    password?: string;
+  }>({});
   const [loading, setLoading] = useState(true);
 
   // Check if user is already logged in
@@ -49,9 +53,11 @@ export default function Signin() {
     checkAuth();
   }, [router]);
 
-  const handleSignin = async (values: ISignInValue) => {
+  const handleSignin = async (values: ISignInValue, { setSubmitting }: any) => {
     try {
       setError("");
+      setFieldError({});
+      setSubmitting(true);
       const res = await apiCall.post("/auth/signin", values);
 
       console.log("Login response:", res.data);
@@ -88,12 +94,60 @@ export default function Signin() {
         router.replace("/"); // arahkan user biasa ke homepage
       }
     } catch (err: any) {
-      console.error("Login error:", err);
-      setError(
-        err?.response?.data?.message ||
-          err.message ||
-          "Failed to sign in. Please try again."
-      );
+      // Handle different types of errors based on backend response
+      let errorMessage = "Failed to sign in. Please try again.";
+      let newFieldError: { email?: string; password?: string } = {};
+
+      if (err?.response?.status === 401) {
+        // Backend returns "Invalid email or password" for both email not found and wrong password
+        // Check if backend provides field information
+        if (err?.response?.data?.field === "email") {
+          newFieldError.email =
+            "Email not found. Please check your email address.";
+        } else if (err?.response?.data?.field === "password") {
+          newFieldError.password = "Incorrect password. Please try again.";
+        } else {
+          errorMessage =
+            "Invalid email or password. Please check your credentials.";
+        }
+      } else if (err?.response?.status === 400) {
+        // Handle validation errors from backend
+        if (err?.response?.data?.errors) {
+          // Handle express-validator errors
+          const validationErrors = err.response.data.errors;
+          const emailError = validationErrors.find(
+            (error: any) => error.path === "email"
+          );
+          const passwordError = validationErrors.find(
+            (error: any) => error.path === "password"
+          );
+
+          if (emailError) {
+            newFieldError.email = emailError.msg;
+          } else if (passwordError) {
+            newFieldError.password = passwordError.msg;
+          } else {
+            errorMessage =
+              validationErrors[0]?.msg ||
+              "Invalid input. Please check your email and password.";
+          }
+        } else if (err?.response?.data?.message) {
+          errorMessage = err.response.data.message;
+        } else {
+          errorMessage = "Invalid input. Please check your email and password.";
+        }
+      } else if (err?.response?.status === 500) {
+        errorMessage = "Server error. Please try again later.";
+      } else if (err?.response?.data?.message) {
+        errorMessage = err.response.data.message;
+      } else if (err?.message) {
+        errorMessage = err.message;
+      }
+
+      setError(errorMessage);
+      setFieldError(newFieldError);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -118,7 +172,7 @@ export default function Signin() {
           validationSchema={SignInSchema}
           onSubmit={handleSignin}
         >
-          {({ errors, touched, values, handleChange }) => (
+          {({ errors, touched, values, handleChange, isSubmitting }) => (
             <Form className="flex flex-col gap-10">
               <div className="flex flex-col gap-4">
                 {/* Email */}
@@ -132,11 +186,11 @@ export default function Signin() {
                     onChange={handleChange}
                     className="w-full p-2 border rounded-lg"
                   />
-                  {errors.email && touched.email && (
+                  {(errors.email && touched.email) || fieldError.email ? (
                     <span className="text-red-400 italic text-sm">
-                      {errors.email}
+                      {fieldError.email || errors.email}
                     </span>
-                  )}
+                  ) : null}
                 </div>
 
                 {/* Password */}
@@ -160,11 +214,12 @@ export default function Signin() {
                       {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
                     </Button>
                   </div>
-                  {errors.password && touched.password && (
+                  {(errors.password && touched.password) ||
+                  fieldError.password ? (
                     <span className="text-red-400 italic text-sm">
-                      {errors.password}
+                      {fieldError.password || errors.password}
                     </span>
-                  )}
+                  ) : null}
                 </div>
               </div>
 
@@ -174,9 +229,10 @@ export default function Signin() {
                 </Label>
                 <Button
                   type="submit"
-                  className="w-full p-2 bg-[#6FB229] hover:bg-[#09431C] rounded-lg"
+                  disabled={isSubmitting}
+                  className="w-full p-2 bg-[#6FB229] hover:bg-[#09431C] rounded-lg disabled:opacity-50"
                 >
-                  Sign In
+                  {isSubmitting ? "Signing In..." : "Sign In"}
                 </Button>
               </div>
             </Form>

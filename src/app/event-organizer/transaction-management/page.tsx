@@ -238,7 +238,7 @@ export default function TransactionManagementPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+      <div className="flex items-center justify-center min-h-screen bg-white">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent mx-auto mb-4"></div>
           <p className="text-gray-600 text-lg font-medium">
@@ -250,7 +250,7 @@ export default function TransactionManagementPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <div className="min-h-screen bg-white">
       <EOSidebar />
 
       <div className="flex justify-center">
@@ -260,7 +260,7 @@ export default function TransactionManagementPage() {
             <div className="px-6 py-8">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
                 <div className="space-y-2">
-                  <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-indigo-900 bg-clip-text text-transparent">
+                  <h1 className="text-3xl md:text-4xl font-bold text-[#09431C]">
                     Transaction Management
                   </h1>
                   <p className="text-gray-600 text-lg">
