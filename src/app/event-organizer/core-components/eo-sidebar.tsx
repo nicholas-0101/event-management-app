@@ -58,7 +58,7 @@ const menuItems = [
       },
       {
         title: "Pending Approval",
-        href: "/event-organizer/transaction-management?status=WAITING_CONFIRMATION",
+        href: "/event-organizer/pending-approval",
       },
       {
         title: "Transaction Stats",

@@ -230,10 +230,17 @@ export default function TransactionManagementPage() {
   };
 
   const formatCurrency = (amount: number) => {
+    if (!amount || amount === 0) {
+      return "Rp 0";
+    }
     return new Intl.NumberFormat("id-ID", {
       style: "currency",
       currency: "IDR",
-    }).format(amount);
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    })
+      .format(amount)
+      .replace(/\s/g, "");
   };
 
   if (loading) {
@@ -267,6 +274,18 @@ export default function TransactionManagementPage() {
                     Review and manage payment transactions with ease
                   </p>
                 </div>
+                <div className="flex gap-3">
+                  <Button
+                    variant="outline"
+                    onClick={() =>
+                      router.push("/event-organizer/pending-approval")
+                    }
+                    className="border-2 border-[#00481a] hover:border-[#97d753] hover:bg-[#c6ee9a] text-[#00481a] hover:text-[#00481a] font-medium"
+                  >
+                    <Clock className="w-4 h-4 mr-2" />
+                    Pending Approval
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
@@ -274,7 +293,7 @@ export default function TransactionManagementPage() {
           {/* Main Content */}
           <div className="space-y-8">
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
               <Card className="h-full bg-white/70 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
                   <CardTitle className="text-sm font-medium text-gray-700">
@@ -319,8 +338,10 @@ export default function TransactionManagementPage() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold text-[#00481a]">
-                    {formatCurrency(stats.total_revenue)}
+                  <div className="text-xl font-bold text-[#00481a] break-words">
+                    {stats.total_revenue
+                      ? formatCurrency(stats.total_revenue)
+                      : "Rp 0"}
                   </div>
                   <p className="text-sm text-gray-600">
                     From successful transactions
@@ -338,8 +359,10 @@ export default function TransactionManagementPage() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold text-[#00481a]">
-                    {formatCurrency(stats.pending_revenue)}
+                  <div className="text-xl font-bold text-[#00481a] break-words">
+                    {stats.pending_revenue
+                      ? formatCurrency(stats.pending_revenue)
+                      : "Rp 0"}
                   </div>
                   <p className="text-sm text-gray-600">Awaiting approval</p>
                 </CardContent>
@@ -487,7 +510,9 @@ export default function TransactionManagementPage() {
                             </td>
                             <td className="py-4 px-4">
                               <div className="font-semibold text-gray-900">
-                                {formatCurrency(transaction.total_price)}
+                                {transaction.total_price
+                                  ? formatCurrency(transaction.total_price)
+                                  : "Rp 0"}
                               </div>
                               <div className="text-sm text-gray-500">
                                 {transaction.tickets.length} ticket(s)
@@ -593,7 +618,9 @@ export default function TransactionManagementPage() {
                     Amount:
                   </span>
                   <span className="text-lg font-bold text-green-600">
-                    {formatCurrency(selectedTransaction.total_price)}
+                    {selectedTransaction.total_price
+                      ? formatCurrency(selectedTransaction.total_price)
+                      : "Rp 0"}
                   </span>
                 </div>
                 <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">

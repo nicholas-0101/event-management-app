@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import "../globals.css";
+import AuthGuard from "@/components/core-components/auth-guard";
 
 const roboto = Roboto({
   variable: "--font-roboto",
@@ -9,22 +10,24 @@ const roboto = Roboto({
 });
 
 export const metadata: Metadata = {
-  title: "TicketNest",
-  description: "Simplify Your Event",
+  title: "TicketNest Event Organizer",
+  description: "Event Organizer Dashboard",
 };
 
-export default function RootLayout({
+export default function EventOrganizerLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={roboto.className}>
-        <div className="px-36">
-          <div className="pt-4 pb-15">{children}</div>
-        </div>
-      </body>
-    </html>
+    <AuthGuard
+      requiredRole="ORGANIZER"
+      redirectTo="/"
+      requireVerification={false}
+    >
+      <div className="px-36">
+        <div className="pt-4 pb-15">{children}</div>
+      </div>
+    </AuthGuard>
   );
 }

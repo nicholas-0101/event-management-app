@@ -25,6 +25,7 @@ import {
   TrendingUp,
   Clock,
   CheckCircle,
+  Gift,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
@@ -124,6 +125,10 @@ export default function EventManagementPage() {
         alert("Error deleting event");
       }
     }
+  };
+
+  const handleCreateVoucher = (eventId: number) => {
+    router.push(`/event-organizer/voucher-creation/${eventId}`);
   };
 
   const getEventStatus = (startDate: string, endDate: string) => {
@@ -425,7 +430,7 @@ export default function EventManagementPage() {
                           </div>
                         </div>
 
-                        <CardHeader className="pb-4">
+                        <CardHeader className="pb-2">
                           <CardTitle className="text-xl font-bold text-gray-900 line-clamp-2 pr-2 group-hover:text-blue-600 transition-colors duration-300">
                             {event.event_name}
                           </CardTitle>
@@ -434,82 +439,69 @@ export default function EventManagementPage() {
                           </p>
                         </CardHeader>
 
-                        <CardContent className="space-y-4 flex-grow">
-                          <div className="space-y-3">
-                            <div className="flex items-center text-gray-700">
-                              <Calendar className="w-5 h-5 mr-3 text-blue-600 shrink-0" />
-                              <span className="font-medium">
-                                {format(
-                                  new Date(event.event_start_date),
-                                  "PPP",
-                                  {
-                                    locale: id,
-                                  }
-                                )}
-                              </span>
-                            </div>
+                        <CardContent className="space-y-2 flex-grow flex flex-col">
+                          <div className="flex items-center text-sm text-gray-600">
+                            <Calendar className="w-4 h-4 mr-2 text-[#00481a]" />
+                            {format(new Date(event.event_start_date), "PPP", {
+                              locale: id,
+                            })}
+                          </div>
 
-                            <div className="flex items-center text-gray-700">
-                              <MapPin className="w-5 h-5 mr-3 text-red-600 shrink-0" />
-                              <span className="font-medium truncate">
-                                {event.event_location}
-                              </span>
-                            </div>
+                          <div className="flex items-center text-sm text-gray-600">
+                            <MapPin className="w-4 h-4 mr-2 text-[#00481a]" />
+                            {event.event_location}
+                          </div>
 
-                            <div className="flex items-center text-gray-700">
-                              <Users className="w-5 h-5 mr-3 text-green-600 shrink-0" />
-                              <span className="font-medium">
-                                {event.total_seats - event.available_seats} /{" "}
-                                {event.total_seats} seats
-                              </span>
-                            </div>
+                          <div className="flex items-center text-sm text-gray-600">
+                            <Users className="w-4 h-4 mr-2 text-[#00481a]" />
+                            {event.total_seats - event.available_seats} /{" "}
+                            {event.total_seats} seats
                           </div>
 
                           {/* Occupancy Bar */}
-                          <div className="space-y-2">
-                            <div className="flex justify-between text-sm">
-                              <span className="text-gray-600 font-medium">
-                                Occupancy Rate
-                              </span>
-                              <span className="text-[#00481a] font-bold">
-                                {occupancyRate.toFixed(1)}%
-                              </span>
-                            </div>
-                            <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
-                              <div
-                                className="bg-gradient-to-r from-[#97d753] to-[#c6ee9a] h-3 rounded-full transition-all duration-500 ease-out"
-                                style={{ width: `${occupancyRate}%` }}
-                              ></div>
-                            </div>
+                          <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div
+                              className="bg-gradient-to-r from-[#97d753] to-[#c6ee9a] h-2 rounded-full transition-all duration-300"
+                              style={{ width: `${occupancyRate}%` }}
+                            ></div>
                           </div>
+                          <p className="text-xs text-gray-500 text-center">
+                            {occupancyRate.toFixed(1)}% occupied
+                          </p>
 
                           {/* Action Buttons */}
-                          <div className="flex space-x-3 pt-4 mt-auto">
+                          <div className="grid grid-cols-4 gap-1 pt-2 mt-auto">
                             <Button
                               variant="outline"
                               size="sm"
                               onClick={() => handleViewEvent(event.id)}
-                              className="flex-1 border-2 border-gray-300 hover:border-blue-500 hover:bg-blue-50 text-gray-700 hover:text-blue-700 font-medium py-2 transition-all duration-300"
+                              className="border-2 border-[#00481a] hover:border-[#97d753] hover:bg-[#c6ee9a] text-[#00481a] hover:text-[#00481a] font-medium py-1.5 px-1 text-xs"
                             >
-                              <Eye className="w-4 h-4 mr-2" />
-                              View
+                              <Eye className="w-3 h-3" />
                             </Button>
                             <Button
                               variant="outline"
                               size="sm"
                               onClick={() => handleEditEvent(event.id)}
-                              className="flex-1 border-2 border-gray-300 hover:border-green-500 hover:bg-green-50 text-gray-700 hover:text-green-700 font-medium py-2 transition-all duration-300"
+                              className="border-2 border-[#00481a] hover:border-[#97d753] hover:bg-[#c6ee9a] text-[#00481a] hover:text-[#00481a] font-medium py-1.5 px-1 text-xs"
                             >
-                              <Edit className="w-4 h-4 mr-2" />
-                              Edit
+                              <Edit className="w-3 h-3" />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleCreateVoucher(event.id)}
+                              className="border-2 border-purple-300 hover:border-purple-500 hover:bg-purple-50 text-purple-700 hover:text-purple-800 font-medium py-1.5 px-1 text-xs"
+                            >
+                              <Gift className="w-3 h-3" />
                             </Button>
                             <Button
                               variant="outline"
                               size="sm"
                               onClick={() => handleDeleteEvent(event.id)}
-                              className="border-2 border-gray-300 hover:border-red-500 hover:bg-red-50 text-gray-700 hover:text-red-700 font-medium py-2 transition-all duration-300"
+                              className="border-2 border-red-300 hover:border-red-500 hover:bg-red-50 text-red-700 hover:text-red-800 font-medium py-1.5 px-1 text-xs"
                             >
-                              <Trash2 className="w-4 h-4" />
+                              <Trash2 className="w-3 h-3" />
                             </Button>
                           </div>
                         </CardContent>
