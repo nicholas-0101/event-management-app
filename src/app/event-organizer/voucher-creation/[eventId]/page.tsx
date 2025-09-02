@@ -101,7 +101,6 @@
 //   );
 // }
 
-
 "use client";
 import { useState } from "react";
 import { useRouter, useParams } from "next/navigation";
@@ -111,6 +110,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { voucherValidationSchema } from "./VoucherSchema";
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 export default function CreateVoucherPage() {
   const router = useRouter();
@@ -121,8 +129,8 @@ export default function CreateVoucherPage() {
   const initialValues = {
     voucher_code: "",
     discount_value: "",
-    voucher_start_date: "",
-    voucher_end_date: "",
+    voucher_start_date: null,
+    voucher_end_date: null,
   };
 
   const handleSubmit = async (values: typeof initialValues) => {
@@ -158,7 +166,7 @@ export default function CreateVoucherPage() {
         validationSchema={voucherValidationSchema}
         onSubmit={handleSubmit}
       >
-        {({ values, handleChange }) => (
+        {({ values, handleChange, setFieldValue }) => (
           <Form className="flex flex-col gap-4">
             <div className="flex flex-col gap-2">
               <Label>Voucher Code</Label>
@@ -197,7 +205,7 @@ export default function CreateVoucherPage() {
               />
             </div>
 
-            <div className="flex flex-col gap-2">
+            {/* <div className="flex flex-col gap-2">
               <Label>Voucher Start Date</Label>
               <Field
                 as={Input}
@@ -224,6 +232,108 @@ export default function CreateVoucherPage() {
                 onChange={handleChange}
                 className="rounded-lg"
               />
+              <ErrorMessage
+                name="voucher_end_date"
+                component="div"
+                className="text-red-400 text-sm italic"
+              />
+            </div> */}
+
+            {/* Voucher Start Date */}
+            <div className="flex flex-col gap-2">
+              <Label>Voucher Start Date</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal rounded-lg",
+                      !values.voucher_start_date && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {values.voucher_start_date
+                      ? format(values.voucher_start_date, "PPP")
+                      : "Pick a date"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={values.voucher_start_date || undefined}
+                    onSelect={(date) => {
+                      if (date) {
+                        // Normalize to UTC midnight
+                        const utcDate = new Date(
+                          Date.UTC(
+                            date.getFullYear(),
+                            date.getMonth(),
+                            date.getDate()
+                          )
+                        );
+                        setFieldValue("voucher_start_date", utcDate);
+                      }
+                    }}
+                    disabled={(d) => {
+                      const today = new Date();
+                      const yesterday = new Date(today);
+                      yesterday.setDate(today.getDate() - 1);
+                      return d < yesterday;
+                    }}
+                  />
+                </PopoverContent>
+              </Popover>
+              <ErrorMessage
+                name="voucher_start_date"
+                component="div"
+                className="text-red-400 text-sm italic"
+              />
+            </div>
+
+            {/* Voucher Expired Date */}
+            <div className="flex flex-col gap-2">
+              <Label>Voucher Expired Date</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal rounded-lg",
+                      !values.voucher_end_date && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {values.voucher_end_date
+                      ? format(values.voucher_end_date, "PPP")
+                      : "Pick a date"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={values.voucher_end_date || undefined}
+                    onSelect={(date) => {
+                      if (date) {
+                        // Normalize to UTC midnight
+                        const utcDate = new Date(
+                          Date.UTC(
+                            date.getFullYear(),
+                            date.getMonth(),
+                            date.getDate()
+                          )
+                        );
+                        setFieldValue("voucher_end_date", utcDate);
+                      }
+                    }}
+                    disabled={(d) => {
+                      const today = new Date();
+                      const yesterday = new Date(today);
+                      yesterday.setDate(today.getDate() - 1);
+                      return d < yesterday;
+                    }}
+                  />
+                </PopoverContent>
+              </Popover>
               <ErrorMessage
                 name="voucher_end_date"
                 component="div"

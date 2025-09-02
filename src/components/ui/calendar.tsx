@@ -185,43 +185,94 @@ function CalendarDayButton({
     if (modifiers.focused) ref.current?.focus();
   }, [modifiers.focused]);
 
-  return (
-    <Button
-  ref={ref}
-  variant="ghost"
-  size="icon"
-  data-day={day.date.toLocaleDateString()}
-  data-selected-single={
-    modifiers.selected &&
-    !modifiers.range_start &&
-    !modifiers.range_end &&
-    !modifiers.range_middle
-  }
-  data-range-start={modifiers.range_start}
-  data-range-end={modifiers.range_end}
-  data-range-middle={modifiers.range_middle}
-  className={cn(
-    "hover:bg-[#dcf6c0] hover:text-[#00481a]",
+//   return (
+//     <Button
+//   ref={ref}
+//   variant="ghost"
+//   size="icon"
+//   data-day={day.date.toLocaleDateString()}
+//   data-selected-single={
+//     modifiers.selected &&
+//     !modifiers.range_start &&
+//     !modifiers.range_end &&
+//     !modifiers.range_middle
+//   }
+//   data-range-start={modifiers.range_start}
+//   data-range-end={modifiers.range_end}
+//   data-range-middle={modifiers.range_middle}
+//   className={cn(
+//     "hover:bg-[#dcf6c0] hover:text-[#00481a]",
 
-    "data-[today=true]:border data-[today=true]:border-dashed data-[today=true]:border-[#00481a] data-[today=true]:text-[#00481a] data-[today=true]:rounded-full",
+//     "data-[today=true]:border data-[today=true]:border-dashed data-[today=true]:border-[#00481a] data-[today=true]:text-[#00481a] data-[today=true]:rounded-full",
 
-    "data-[range-start=true]:border-[#00481a] data-[range-start=true]:border-2 data-[range-start=true]:bg-[#c6ee9a] data-[range-start=true]:text-[#00481a] data-[range-start=true]:rounded-l-full data-[range-start=true]:rounded-r-none",
+//     "data-[range-start=true]:border-[#00481a] data-[range-start=true]:border-2 data-[range-start=true]:bg-[#c6ee9a] data-[range-start=true]:text-[#00481a] data-[range-start=true]:rounded-l-full data-[range-start=true]:rounded-r-none",
+    
+//     "data-[range-middle=true]:bg-[#dcf6c0] data-[range-middle=true]:text-[#00481a] data-[range-middle=true]:rounded-none",
 
-    "data-[range-middle=true]:bg-[#dcf6c0] data-[range-middle=true]:text-[#00481a] data-[range-middle=true]:rounded-none",
+//     "data-[range-end=true]:border-[#00481a] data-[range-end=true]:border-2 data-[range-end=true]:bg-[#c6ee9a] data-[range-end=true]:text-[#00481a] data-[range-end=true]:rounded-r-full data-[range-end=true]:rounded-l-none",
 
-    "data-[range-end=true]:border-[#00481a] data-[range-end=true]:border-2 data-[range-end=true]:bg-[#c6ee9a] data-[range-end=true]:text-[#00481a] data-[range-end=true]:rounded-r-full data-[range-end=true]:rounded-l-none",
+//     "[&[data-range-start=true][data-range-end=true]]:rounded-full",
+//     "[&[data-range-start=true][data-range-end=true]]:border-[#00481a] [&[data-range-start=true][data-range-end=true]]:border-2",
+//     "[&[data-range-start=true][data-range-end=true]]:text-[#00481a]",
 
-    "[&[data-range-start=true][data-range-end=true]]:rounded-full",
-    "[&[data-range-start=true][data-range-end=true]]:border-[#00481a] [&[data-range-start=true][data-range-end=true]]:border-2",
-    "[&[data-range-start=true][data-range-end=true]]:text-[#00481a]",
+//     "flex aspect-square size-auto w-full min-w-(--cell-size) font-medium rounded-full",
+    
+//     defaultClassNames.day,
+//     className
+//   )}
+//   {...props}
+// />
+//   );
 
-    "flex aspect-square size-auto w-full min-w-(--cell-size) font-medium rounded-full",
-    defaultClassNames.day,
-    className
-  )}
-  {...props}
-/>
-  );
+return (
+  <Button
+    ref={ref}
+    variant="ghost"
+    size="icon"
+    data-day={day.date.toLocaleDateString()}
+    data-selected-single={
+      modifiers.selected &&
+      !modifiers.range_start &&
+      !modifiers.range_end &&
+      !modifiers.range_middle
+    }
+    data-range-start={modifiers.range_start}
+    data-range-end={modifiers.range_end}
+    data-range-middle={modifiers.range_middle}
+    className={cn(
+      // Hover
+      "hover:bg-[#dcf6c0] hover:text-[#00481a] hover:rounded-full",
+
+      // Today
+      "data-[today=true]:border data-[today=true]:border-dashed data-[today=true]:border-[#00481a] data-[today=true]:text-[#00481a] data-[today=true]:rounded-full",
+
+      // Single selected date
+      "data-[selected-single=true]:bg-[#c6ee9a] data-[selected-single=true]:border-2 data-[selected-single=true]:border-[#00481a] data-[selected-single=true]:text-[#00481a] data-[selected-single=true]:rounded-full",
+
+      // Range start
+      "data-[range-start=true]:border-[#00481a] data-[range-start=true]:border-2 data-[range-start=true]:bg-[#c6ee9a] data-[range-start=true]:text-[#00481a] data-[range-start=true]:rounded-l-full data-[range-start=true]:rounded-r-none",
+
+      // Range middle
+      "data-[range-middle=true]:bg-[#dcf6c0] data-[range-middle=true]:text-[#00481a] data-[range-middle=true]:rounded-none",
+
+      // Range end
+      "data-[range-end=true]:border-[#00481a] data-[range-end=true]:border-2 data-[range-end=true]:bg-[#c6ee9a] data-[range-end=true]:text-[#00481a] data-[range-end=true]:rounded-r-full data-[range-end=true]:rounded-l-none",
+
+      // Range start + end together
+      "[&[data-range-start=true][data-range-end=true]]:rounded-full",
+      "[&[data-range-start=true][data-range-end=true]]:border-[#00481a]",
+      "[&[data-range-start=true][data-range-end=true]]:border-2",
+      "[&[data-range-start=true][data-range-end=true]]:text-[#00481a]",
+
+      // Default
+      "flex aspect-square w-full min-w-[var(--cell-size)] font-medium justify-center items-center",
+
+      defaultClassNames.day,
+      className
+    )}
+    {...props}
+  />
+);
 }
 
 export { Calendar, CalendarDayButton };
