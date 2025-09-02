@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { apiCall } from "@/helper/axios";
 import { CalendarDaysIcon, LoaderIcon, MapPin, SearchX } from "lucide-react";
+import Link from "next/link";
 
 interface ITicket {
   ticket_type: string;
@@ -16,6 +17,7 @@ interface ITicket {
 }
 
 interface IEvent {
+  id: number;
   event_name: string;
   event_description: string;
   event_location: string;
@@ -79,6 +81,7 @@ export default function EventDetailPage() {
         }));
 
         setEvent({
+          id: data.id, // or data.event_id depending on backend response
           ...data,
           tickets,
         });
@@ -184,10 +187,19 @@ export default function EventDetailPage() {
               <Button className="w-full bg-[#6FB229] hover:bg-[#09431C] rounded-lg">
                 Rate Event
               </Button>
-            ) : (
-              <Button className="w-full bg-[#6FB229] hover:bg-[#09431C] rounded-lg">
-                Buy Ticket
+            ) : event.tickets.every((t) => t.available_qty === 0) ? (
+              <Button
+                className="w-full bg-[#6FB229] cursor-not-allowed rounded-lg"
+                disabled
+              >
+                Sold Out
               </Button>
+            ) : (
+              <Link href={`/transaction/${event.id}`}>
+                <Button className="w-full bg-[#6FB229] hover:bg-[#09431C] rounded-lg">
+                  Buy Ticket
+                </Button>
+              </Link>
             )}
           </div>
         </div>
