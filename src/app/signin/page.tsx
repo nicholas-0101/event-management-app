@@ -10,6 +10,7 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Eye, EyeOff } from "lucide-react";
 import { SignInSchema, ISignInValue } from "./SigninSchema";
+import { setAuthData, getAuthData } from "@/lib/auth-utils";
 
 export default function Signin() {
   const router = useRouter();
@@ -25,15 +26,12 @@ export default function Signin() {
   useEffect(() => {
     const checkAuth = () => {
       try {
-        const token = localStorage.getItem("token");
-        const userData = localStorage.getItem("user");
+        const { token, userData } = getAuthData();
 
         if (token && userData) {
-          const user = JSON.parse(userData);
-
           // If user is already verified and logged in, redirect based on role
-          if (user.is_verified) {
-            if (user.role === "ORGANIZER") {
+          if (userData.is_verified) {
+            if (userData.role === "ORGANIZER") {
               router.replace("/event-organizer");
             } else {
               router.replace("/");
@@ -43,8 +41,6 @@ export default function Signin() {
         }
       } catch (error) {
         console.error("Auth check error:", error);
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
       } finally {
         setLoading(false);
       }
@@ -70,9 +66,6 @@ export default function Signin() {
         return;
       }
 
-      // Simpan token
-      localStorage.setItem("token", token);
-
       // Simpan user info sesuai Prisma schema
       const userData = {
         id: user.id,
@@ -85,7 +78,8 @@ export default function Signin() {
         profile_pic: user.profile_pic ?? null,
       };
 
-      localStorage.setItem("user", JSON.stringify(userData));
+      // Use new auth utility function
+      setAuthData(token, userData);
 
       // Redirect berdasarkan role
       if (user.role === "ORGANIZER") {

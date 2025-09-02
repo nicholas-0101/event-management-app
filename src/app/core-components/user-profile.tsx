@@ -20,6 +20,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { apiCall } from "@/helper/axios";
+import { getAuthData, clearAuthData } from "@/lib/auth-utils";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -44,15 +45,15 @@ const UserButton: React.FC = () => {
   const router = useRouter();
 
   const getProfilePicUrl = (pic: string | null | undefined) => {
-if (!pic)
-  return "https://i.pinimg.com/736x/1c/c5/35/1cc535901e32f18db87fa5e340a18aff.jpg";
+    if (!pic)
+      return "https://i.pinimg.com/736x/1c/c5/35/1cc535901e32f18db87fa5e340a18aff.jpg";
     if (pic.startsWith("http")) return pic;
     return `http://localhost:4400/${pic}`;
   };
 
   const fetchUserData = async (showLoading = true) => {
     try {
-      const token = localStorage.getItem("token");
+      const { token } = getAuthData();
       if (!token) {
         setLoading(false);
         return;
@@ -62,63 +63,76 @@ if (!pic)
         setLoading(true);
       }
 
-      // Fetch fresh data from backend
-      const response = await apiCall.get("/auth/keep");
-      const userData = response.data.data || response.data;
+      // Try to fetch from backend, but fallback to local data if endpoint not available
+      try {
+        const res = await apiCall.get("/auth/keep");
+        const userData = res.data?.data || res.data;
 
-      const userInfo: UserButtonData = {
-        username: userData.username || userData.email || "User",
-        referral_code: userData.referral_code || null,
-        points: typeof userData.points === "number" ? userData.points : 0,
-        profile_pic: userData.profile_pic || null,
-      };
-
-      // Update localStorage with fresh data
-      localStorage.setItem("user", JSON.stringify(userData));
-      setUser(userInfo);
-
-      // Log success for debugging
-      console.log("User data refreshed successfully:", userInfo);
-    } catch (error: any) {
-      console.error("Error fetching user data:", error);
-
-      // Handle specific error cases
-      if (error.response?.status === 401 || error.response?.status === 403) {
-        // Token expired or invalid
-        console.log("Token expired or invalid, redirecting to login");
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        router.push("/signin");
-        return;
-      }
-
-      if (error.response?.status === 404) {
-        console.log("Endpoint not found, using localStorage data");
-        // Fallback to localStorage if endpoint not found
-        const storedUser = localStorage.getItem("user");
-        if (storedUser) {
-          const parsedUser = JSON.parse(storedUser);
-          setUser({
-            username: parsedUser.username,
-            referral_code: parsedUser.referral_code,
-            points: parsedUser.points ?? 0,
-            profile_pic: parsedUser.profile_pic ?? null,
-          });
+        if (!userData) {
+          throw new Error("User data not found");
         }
-        return;
-      }
 
-      // Fallback to localStorage for any other error
-      const storedUser = localStorage.getItem("user");
-      if (storedUser) {
-        const parsedUser = JSON.parse(storedUser);
-        setUser({
-          username: parsedUser.username,
-          referral_code: parsedUser.referral_code,
-          points: parsedUser.points ?? 0,
-          profile_pic: parsedUser.profile_pic ?? null,
+        const userInfo: UserButtonData = {
+          username: userData.username || userData.email || "User",
+          referral_code: userData.referral_code || null,
+          points: typeof userData.points === "number" ? userData.points : 0,
+          profile_pic: userData.profile_pic || null,
+        };
+
+        // Update localStorage with fresh data
+        const { userData: currentUserData } = getAuthData();
+        if (currentUserData) {
+          const updatedUserData = { ...currentUserData, ...userInfo };
+          localStorage.setItem("user", JSON.stringify(updatedUserData));
+        }
+
+        setUser(userInfo);
+        console.log("User data refreshed successfully:", userInfo);
+      } catch (error: any) {
+        console.log("Backend profile fetch failed, using local data", {
+          status: error.response?.status,
+          message: error.message,
         });
+
+        // If endpoint not found (404), use local data
+        if (error.response?.status === 404) {
+          const { userData } = getAuthData();
+          if (userData) {
+            const userInfo: UserButtonData = {
+              username: userData.username || userData.email || "User",
+              referral_code: userData.referral_code || null,
+              points: userData.points ?? 0,
+              profile_pic: userData.profile_pic || null,
+            };
+            setUser(userInfo);
+            console.log("Using local user data:", userInfo);
+          }
+          return;
+        }
+
+        // For other errors, handle them
+        if (error.response?.status === 401 || error.response?.status === 403) {
+          console.log("Token expired or invalid, redirecting to login");
+          clearAuthData();
+          router.push("/signin");
+          return;
+        }
+
+        // Fallback to localStorage for any other error
+        const { userData } = getAuthData();
+        if (userData) {
+          const userInfo: UserButtonData = {
+            username: userData.username || userData.email || "User",
+            referral_code: userData.referral_code || null,
+            points: userData.points ?? 0,
+            profile_pic: userData.profile_pic || null,
+          };
+          setUser(userInfo);
+          console.log("Using fallback local data:", userInfo);
+        }
       }
+    } catch (error) {
+      console.error("Error in fetchUserData:", error);
     } finally {
       setLoading(false);
     }
@@ -129,7 +143,6 @@ if (!pic)
     setRefreshing(true);
     try {
       await fetchUserData(false);
-      // Show success notification
       console.log("Data refreshed successfully!");
     } catch (error) {
       console.error("Failed to refresh data:", error);
@@ -139,13 +152,13 @@ if (!pic)
   };
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const { token } = getAuthData();
     if (token) {
       fetchUserData();
 
       // Set up polling to refresh user data every 30 seconds
       const interval = setInterval(() => {
-        const currentToken = localStorage.getItem("token");
+        const { token: currentToken } = getAuthData();
         if (currentToken) {
           fetchUserData(false);
         }
@@ -159,8 +172,7 @@ if (!pic)
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
+    clearAuthData();
     router.push("/signin");
   };
 
@@ -176,15 +188,14 @@ if (!pic)
   // Show sign in button if no user
   if (!user) {
     // Try to get user data from localStorage as fallback
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
+    const { userData } = getAuthData();
+    if (userData) {
       try {
-        const parsedUser = JSON.parse(storedUser);
         const fallbackUser: UserButtonData = {
-          username: parsedUser.username || parsedUser.email || "User",
-          referral_code: parsedUser.referral_code || null,
-          points: typeof parsedUser.points === "number" ? parsedUser.points : 0,
-          profile_pic: parsedUser.profile_pic || null,
+          username: userData.username || userData.email || "User",
+          referral_code: userData.referral_code || null,
+          points: typeof userData.points === "number" ? userData.points : 0,
+          profile_pic: userData.profile_pic || null,
         };
         setUser(fallbackUser);
         return null; // Let the component re-render with user data
@@ -205,12 +216,12 @@ if (!pic)
       <DropdownMenuTrigger asChild>
         <Button
           variant={"ghost"}
-          className="flex items-center gap-2 rounded-full pl-2 pr-3 h-10"
+          className="flex items-center gap-2 rounded-full pl-2 pr-3 h-10 shadow-md hover:shadow-lg transition-shadow"
         >
           <img
             src={getProfilePicUrl(user.profile_pic)}
             alt="Profile"
-            className="w-8 h-8 rounded-full object-cover ring-1 ring-border"
+            className="w-8 h-8 rounded-full object-cover ring-1 ring-border shadow-sm"
           />
           <span className="max-w-[120px] truncate text-sm font-medium">
             {user.username}
@@ -223,7 +234,7 @@ if (!pic)
           <img
             src={getProfilePicUrl(user.profile_pic)}
             alt="Profile"
-            className="w-10 h-10 rounded-full object-cover ring-1 ring-border"
+            className="w-10 h-10 rounded-full object-cover ring-1 ring-border shadow-sm"
           />
           <div className="min-w-0">
             <p className="text-sm font-semibold truncate">{user.username}</p>
@@ -263,6 +274,14 @@ if (!pic)
             className="flex items-center cursor-pointer"
           >
             <Settings className="size-4 mr-2" /> Edit Profile
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link
+            href="/transaction-history"
+            className="flex items-center cursor-pointer"
+          >
+            <Settings className="size-4 mr-2" /> My Tickets
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem

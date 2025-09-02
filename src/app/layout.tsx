@@ -3,6 +3,7 @@ import { Roboto } from "next/font/google";
 import "./globals.css";
 import Navbar from "./core-components/navbar";
 import Footer from "./core-components/footer";
+import AutoRedirect from "@/components/core-components/auto-redirect";
 
 const roboto = Roboto({
   variable: "--font-roboto",
@@ -23,6 +24,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={roboto.className}>
+        <AutoRedirect />
         <div className="px-36">
           <Navbar />
           <div className="pt-4 pb-15">{children}</div>
