@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import {
   Calendar,
@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { apiCall } from "@/helper/axios";
 
 interface SidebarProps {
   className?: string;
@@ -40,10 +41,7 @@ const menuItems = [
         title: "Create Event",
         href: "/event-organizer/event-creation",
       },
-      {
-        title: "Event Analytics",
-        href: "/event-organizer/event-management/analytics",
-      },
+      // Removed "Edit Event" submenu; edit is accessible from each event card
     ],
   },
   {
@@ -60,35 +58,15 @@ const menuItems = [
         title: "Pending Approval",
         href: "/event-organizer/pending-approval",
       },
-      {
-        title: "Transaction Stats",
-        href: "/event-organizer/transaction-management/stats",
-      },
+      // Removed "Transaction Stats"
     ],
   },
+  // Removed Reports & Analytics and Documents menus
   {
-    title: "Attendee Management",
-    icon: Users,
-    href: "/event-organizer/attendees",
-    description: "Manage event attendees",
-  },
-  {
-    title: "Reports & Analytics",
-    icon: BarChart3,
-    href: "/event-organizer/reports",
-    description: "View detailed reports",
-  },
-  {
-    title: "Documents",
-    icon: FileText,
-    href: "/event-organizer/documents",
-    description: "Manage event documents",
-  },
-  {
-    title: "Settings",
+    title: "Edit Organizer Profile",
     icon: Settings,
-    href: "/event-organizer/settings",
-    description: "Account and app settings",
+    href: "/event-organizer/edit-profile",
+    description: "Update organizer account settings",
   },
 ];
 
@@ -96,8 +74,35 @@ export default function EOSidebar({ className }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [expandedMenu, setExpandedMenu] = useState<string | null>(null);
+  const [profilePicUrl, setProfilePicUrl] = useState<string>("");
   const router = useRouter();
   const pathname = usePathname();
+
+  const getProfilePicUrl = (pic?: string | null) => {
+    if (!pic)
+      return "https://i.pinimg.com/736x/1c/c5/35/1cc535901e32f18db87fa5e340a18aff.jpg";
+    if (pic.startsWith("http")) return pic;
+    return `http://localhost:4400/${pic}`;
+  };
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const res = await apiCall.get("/auth/keep");
+        const data = res.data.data || res.data;
+        setProfilePicUrl(getProfilePicUrl(data?.profile_pic));
+      } catch (e) {
+        const raw = localStorage.getItem("user");
+        if (raw) {
+          try {
+            const u = JSON.parse(raw);
+            setProfilePicUrl(getProfilePicUrl(u?.profile_pic));
+          } catch {}
+        }
+      }
+    };
+    fetchProfile();
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -118,6 +123,18 @@ export default function EOSidebar({ className }: SidebarProps) {
       return pathname === href;
     }
     return pathname.startsWith(href);
+  };
+
+  const isSubItemActive = (subItem: { title: string; href: string }) => {
+    // All Events → highlight only on exact list page
+    if (subItem.title === "All Events") {
+      return pathname === "/event-organizer/event-management";
+    }
+    // Edit Event → highlight only on edit routes
+    if (subItem.title === "Edit Event") {
+      return pathname.includes("/event-organizer/event-management/edit/");
+    }
+    return isActive(subItem.href);
   };
 
   const handleNavigation = (href: string) => {
@@ -169,7 +186,11 @@ export default function EOSidebar({ className }: SidebarProps) {
           <div className="flex h-16 items-center justify-between px-4 border-b border-gray-200">
             {!isCollapsed && (
               <div className="flex items-center space-x-2">
-                <Calendar className="h-8 w-8 text-[#00481a]" />
+                <img
+                  src="/TicketNest-nobg.png"
+                  alt="TicketNest Logo"
+                  className="h-8 w-8 object-contain"
+                />
                 <div>
                   <h1 className="text-lg font-bold text-gray-900">
                     Event Organizer
@@ -241,11 +262,11 @@ export default function EOSidebar({ className }: SidebarProps) {
                     <div className="ml-4 mt-1 space-y-1">
                       {item.subItems?.map((subItem) => (
                         <button
-                          key={subItem.href}
+                          key={`${subItem.href}-${subItem.title}`}
                           onClick={() => handleNavigation(subItem.href)}
                           className={cn(
                             "w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200",
-                            isActive(subItem.href)
+                            isSubItemActive(subItem)
                               ? "bg-[#97d753] text-[#00481a]"
                               : "text-gray-600 hover:bg-[#c6ee9a] hover:text-[#00481a]"
                           )}
@@ -263,19 +284,34 @@ export default function EOSidebar({ className }: SidebarProps) {
 
           {/* Footer */}
           <div className="border-t border-gray-200 p-4">
-            <Button
-              onClick={handleLogout}
-              variant="ghost"
+            <div
               className={cn(
-                "w-full text-red-600 hover:text-red-700 hover:bg-red-50",
-                isCollapsed && "justify-center"
+                "flex items-center",
+                isCollapsed ? "justify-center" : "justify-between"
               )}
             >
-              <LogOut
-                className={cn("h-5 w-5", isCollapsed ? "mr-0" : "mr-3")}
+              <img
+                src={profilePicUrl || "/TicketNest-nobg.png"}
+                alt="Organizer Profile"
+                className={cn(
+                  "h-8 w-8 rounded-full object-cover border",
+                  isCollapsed ? "mr-0" : "mr-3"
+                )}
               />
-              {!isCollapsed && "Logout"}
-            </Button>
+              <Button
+                onClick={handleLogout}
+                variant="ghost"
+                className={cn(
+                  "text-red-600 hover:text-red-700 hover:bg-red-50",
+                  isCollapsed ? "p-2" : ""
+                )}
+              >
+                <LogOut
+                  className={cn("h-5 w-5", isCollapsed ? "mr-0" : "mr-2")}
+                />
+                {!isCollapsed && "Logout"}
+              </Button>
+            </div>
           </div>
         </div>
       </div>

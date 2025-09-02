@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -25,7 +25,7 @@ import {
   Calendar,
   MapPin,
 } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
 import EOSidebar from "../core-components/eo-sidebar";
@@ -94,15 +94,29 @@ export default function TransactionManagementPage() {
   const [showRejectModal, setShowRejectModal] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pathname = usePathname();
 
   useEffect(() => {
     const status = searchParams.get("status");
-    if (status) {
-      setStatusFilter(status);
-    }
+    const q = searchParams.get("q");
+    if (status) setStatusFilter(status);
+    if (q !== null) setSearchTerm(q);
     fetchTransactions();
     fetchStats();
   }, [searchParams]);
+
+  // Keep URL in sync when filters change
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (!searchTerm) params.delete("q");
+    else params.set("q", searchTerm);
+    if (!statusFilter || statusFilter === "all") params.delete("status");
+    else params.set("status", statusFilter);
+    const query = params.toString();
+    router.replace(query ? `${pathname}?${query}` : pathname, {
+      scroll: false,
+    });
+  }, [searchTerm, statusFilter]);
 
   useEffect(() => {
     filterTransactions();
@@ -158,6 +172,13 @@ export default function TransactionManagementPage() {
 
     setFilteredTransactions(filtered);
   };
+
+  // Compute total revenue from SUCCESS transactions only
+  const totalRevenueSuccess = useMemo(() => {
+    return transactions
+      .filter((t) => t.status === "SUCCESS")
+      .reduce((sum, t) => sum + (t.total_price || 0), 0);
+  }, [transactions]);
 
   const handleAcceptTransaction = async (transactionId: number) => {
     try {
@@ -339,12 +360,10 @@ export default function TransactionManagementPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-xl font-bold text-[#00481a] break-words">
-                    {stats.total_revenue
-                      ? formatCurrency(stats.total_revenue)
-                      : "Rp 0"}
+                    {formatCurrency(totalRevenueSuccess)}
                   </div>
                   <p className="text-sm text-gray-600">
-                    From successful transactions
+                    From successful transactions only
                   </p>
                 </CardContent>
               </Card>

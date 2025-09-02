@@ -27,7 +27,7 @@ import {
   CheckCircle,
   Gift,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
 import EOSidebar from "../core-components/eo-sidebar";
@@ -55,10 +55,37 @@ export default function EventManagementPage() {
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
 
   useEffect(() => {
     fetchOrganizerEvents();
   }, []);
+
+  // Initialize from query
+  useEffect(() => {
+    const q = searchParams.get("q");
+    const cat = searchParams.get("category");
+    const st = searchParams.get("status");
+    if (q !== null) setSearchTerm(q);
+    if (cat) setCategoryFilter(cat);
+    if (st) setStatusFilter(st);
+  }, [searchParams]);
+
+  // Sync to URL when filters change
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (!searchTerm) params.delete("q");
+    else params.set("q", searchTerm);
+    if (!categoryFilter || categoryFilter === "all") params.delete("category");
+    else params.set("category", categoryFilter);
+    if (!statusFilter || statusFilter === "all") params.delete("status");
+    else params.set("status", statusFilter);
+    const query = params.toString();
+    router.replace(query ? `${pathname}?${query}` : pathname, {
+      scroll: false,
+    });
+  }, [searchTerm, categoryFilter, statusFilter]);
 
   useEffect(() => {
     filterEvents();

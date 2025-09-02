@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -42,6 +42,12 @@ interface Event {
   attendees?: number;
 }
 
+interface Txn {
+  id: number;
+  status: string;
+  total_price: number;
+}
+
 export default function EventOrganizerPage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
@@ -53,6 +59,7 @@ export default function EventOrganizerPage() {
     totalRevenue: 0,
     activeEvents: 0,
   });
+  const [transactions, setTransactions] = useState<Txn[]>([]);
   const [showStatistics, setShowStatistics] = useState(false);
   const router = useRouter();
 
@@ -89,6 +96,8 @@ export default function EventOrganizerPage() {
   useEffect(() => {
     if (!authLoading) {
       fetchOrganizerEvents();
+      fetchOrganizerStats();
+      fetchOrganizerTransactions();
     }
   }, [authLoading]);
 
@@ -166,6 +175,38 @@ export default function EventOrganizerPage() {
     }
   };
 
+  const fetchOrganizerTransactions = async () => {
+    try {
+      const res = await apiCall.get("/transaction/organizer");
+      setTransactions(res.data.transactions || []);
+    } catch (e) {
+      console.error("Error fetching organizer transactions", e);
+    }
+  };
+
+  const totalRevenueSuccess = useMemo(() => {
+    return (transactions || [])
+      .filter((t: Txn) => t.status === "SUCCESS")
+      .reduce((sum, t) => sum + (t.total_price || 0), 0);
+  }, [transactions]);
+
+  const revenueText = useMemo(
+    () => formatCurrency(totalRevenueSuccess),
+    [totalRevenueSuccess]
+  );
+  const revenueNumericText = useMemo(
+    () => revenueText.replace(/^Rp\s?/, ""),
+    [revenueText]
+  );
+  const revenueSizeClass = useMemo(() => {
+    const len = revenueNumericText.length;
+    if (len <= 8) return "text-3xl"; // e.g., 12.345.678
+    if (len <= 10) return "text-2xl"; // e.g., 123.456.789
+    if (len <= 13) return "text-xl"; // e.g., 1.234.567.890
+    if (len <= 16) return "text-lg"; // e.g., 12.345.678.901
+    return "text-base";
+  }, [revenueNumericText]);
+
   const handleCreateEvent = () => {
     router.push("/event-organizer/event-creation");
   };
@@ -206,7 +247,7 @@ export default function EventOrganizerPage() {
     return { status: "Completed", color: "bg-gray-100 text-gray-800" };
   };
 
-  const formatCurrency = (amount: number) => {
+  function formatCurrency(amount: number) {
     if (!amount || amount === 0) {
       return "Rp 0";
     }
@@ -218,7 +259,7 @@ export default function EventOrganizerPage() {
     })
       .format(amount)
       .replace(/\s/g, "");
-  };
+  }
 
   // Show loading while checking auth
   if (authLoading) {
@@ -337,22 +378,24 @@ export default function EventOrganizerPage() {
                 </CardContent>
               </Card>
 
-              <Card className="h-full bg-white/70 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
+              <Card className="h-full bg-white/70 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 overflow-hidden">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
+                  <CardTitle className="text-sm font-medium leading-tight">
                     Total Revenue
                   </CardTitle>
                   <div className="text-[#00481a] font-semibold text-lg">Rp</div>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">
+                  <div
+                    className={`font-bold ${revenueSizeClass} whitespace-nowrap leading-tight`}
+                  >
                     {statsLoading ? (
                       <div className="animate-pulse bg-gray-200 h-8 w-16 rounded"></div>
                     ) : (
-                      formatCurrency(stats.totalRevenue)
+                      revenueNumericText
                     )}
                   </div>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-muted-foreground truncate">
                     From successful transactions
                   </p>
                 </CardContent>
