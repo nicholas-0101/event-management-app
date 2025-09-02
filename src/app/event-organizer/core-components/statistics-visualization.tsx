@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   LineChart,
   Line,
@@ -27,43 +27,41 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Calendar,
-  TrendingUp,
-  Users,
-  DollarSign,
-  BarChart3,
-} from "lucide-react";
-import {
-  format,
-  parseISO,
-  startOfYear,
-  startOfMonth,
-  startOfDay,
-  eachYearOfInterval,
-  addMonths,
-  addDays,
-} from "date-fns";
+import { Input } from "@/components/ui/input";
+import { BarChart3, TrendingUp, Users, DollarSign } from "lucide-react";
+import { format, addMonths } from "date-fns";
 import { id } from "date-fns/locale";
+import { apiCall } from "@/helper/axios";
 
 interface Event {
   id: number;
   event_name: string;
-  event_description: string;
-  event_location: string;
-  event_start_date: string;
-  event_end_date: string;
-  total_seats: number;
-  available_seats: number;
-  event_category: string;
-  event_thumbnail: string;
-  created_at: string;
-  revenue?: number;
-  attendees?: number;
+}
+
+interface TicketLine {
+  qty: number;
+  subtotal_price: number;
+  ticket: {
+    ticket_type: string;
+    price: number;
+    event: {
+      id: number;
+      event_name: string;
+      event_start_date?: string;
+    };
+  };
+}
+
+interface OrganizerTransaction {
+  id: number;
+  status: string;
+  total_price: number;
+  transaction_date_time: string;
+  tickets: TicketLine[];
 }
 
 interface StatisticsVisualizationProps {
-  events: Event[];
+  events: any[]; // kept for compatibility (unused for aggregation now)
   stats: {
     totalEvents: number;
     totalSeats: number;
@@ -78,278 +76,117 @@ export default function StatisticsVisualization({
   events,
   stats,
 }: StatisticsVisualizationProps) {
-  const [timeRange, setTimeRange] = useState("year");
-  const [chartType, setChartType] = useState("events");
-  const [yearData, setYearData] = useState<any[]>([]);
-  const [monthData, setMonthData] = useState<any[]>([]);
-  const [dayData, setDayData] = useState<any[]>([]);
+  const [timeRange, setTimeRange] = useState("month"); // default monthly
+  const [metric, setMetric] = useState<"attendees" | "revenue">("attendees");
+  const [transactions, setTransactions] = useState<OrganizerTransaction[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedEventId, setSelectedEventId] = useState<string>("all");
+  const [eventOptions, setEventOptions] = useState<
+    { id: number; name: string }[]
+  >([]);
 
   useEffect(() => {
-    if (events.length > 0) {
-      generateYearlyData();
-      generateMonthlyData();
-      generateDailyData();
-    }
-  }, [events]);
+    const fetchTx = async () => {
+      try {
+        const res = await apiCall.get("/transaction/organizer");
+        const txs: OrganizerTransaction[] = res.data.transactions || [];
+        setTransactions(txs);
+        // Build event options from tickets
+        const map = new Map<number, string>();
+        txs.forEach((t) =>
+          t.tickets.forEach((tt) => {
+            if (tt.ticket?.event)
+              map.set(tt.ticket.event.id, tt.ticket.event.event_name);
+          })
+        );
+        setEventOptions(
+          Array.from(map.entries()).map(([id, name]) => ({ id, name }))
+        );
+      } catch (e) {
+        console.error("Failed to fetch organizer transactions", e);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTx();
+  }, []);
 
-  const generateYearlyData = () => {
-    const yearStats = new Map();
-
-    // Get date range from events
-    const dates = events
-      .map((e) => new Date(e.event_start_date))
-      .sort((a, b) => a.getTime() - b.getTime());
-    const startYear = dates[0] ? startOfYear(dates[0]) : new Date();
-    const endYear = dates[dates.length - 1]
-      ? startOfYear(dates[dates.length - 1])
-      : new Date();
-
-    const years = eachYearOfInterval({ start: startYear, end: endYear });
-
-    years.forEach((year) => {
-      const yearStr = format(year, "yyyy");
-      yearStats.set(yearStr, {
-        year: yearStr,
-        events: 0,
-        revenue: 0,
-        attendees: 0,
-        seats: 0,
-      });
-    });
-
-    events.forEach((event) => {
-      const eventYear = format(new Date(event.event_start_date), "yyyy");
-      const current = yearStats.get(eventYear) || {
-        year: eventYear,
-        events: 0,
-        revenue: 0,
-        attendees: 0,
-        seats: 0,
-      };
-
-      current.events += 1;
-      current.revenue += event.revenue || 0;
-      current.attendees += event.total_seats - event.available_seats || 0;
-      current.seats += event.total_seats;
-
-      yearStats.set(eventYear, current);
-    });
-
-    setYearData(Array.from(yearStats.values()));
-  };
-
-  const generateMonthlyData = () => {
-    const monthStats = new Map();
-    const currentDate = new Date();
-
-    // Generate last 12 months
+  // Build last 12 months labels
+  const last12Months = useMemo(() => {
+    const now = new Date();
+    const list: { key: string; label: string }[] = [];
     for (let i = 11; i >= 0; i--) {
-      const date = addMonths(currentDate, -i);
-      const monthKey = format(date, "yyyy-MM");
-      const monthName = format(date, "MMM yyyy", { locale: id });
-
-      monthStats.set(monthKey, {
-        month: monthName,
-        events: 0,
-        revenue: 0,
-        attendees: 0,
-        seats: 0,
-      });
+      const d = addMonths(now, -i);
+      const key = format(d, "yyyy-MM");
+      const label = format(d, "MMM yyyy", { locale: id });
+      list.push({ key, label });
     }
+    return list;
+  }, []);
 
-    events.forEach((event) => {
-      const eventMonth = format(new Date(event.event_start_date), "yyyy-MM");
-      const current = monthStats.get(eventMonth);
-
-      if (current) {
-        current.events += 1;
-        current.revenue += event.revenue || 0;
-        current.attendees += (event.total_seats - event.available_seats) || 0;
-        current.seats += event.total_seats;
-      }
-    });
-
-    setMonthData(Array.from(monthStats.values()));
-  };
-
-  const generateDailyData = () => {
-    const dayStats = new Map();
-    const currentDate = new Date();
-
-    // Generate last 30 days
-    for (let i = 29; i >= 0; i--) {
-      const date = addDays(currentDate, -i);
-      const dayKey = format(date, "yyyy-MM-dd");
-      const dayName = format(date, "dd MMM", { locale: id });
-
-      dayStats.set(dayKey, {
-        day: dayName,
-        events: 0,
-        revenue: 0,
-        attendees: 0,
-        seats: 0,
-      });
+  // Determine active event names for series when viewing All Events
+  const activeEventNames = useMemo(() => {
+    if (selectedEventId !== "all") {
+      const ev = eventOptions.find(
+        (e) => String(e.id) === selectedEventId
+      )?.name;
+      return ev ? [ev] : [];
     }
-
-    events.forEach((event) => {
-      const eventDay = format(new Date(event.event_start_date), "yyyy-MM-dd");
-      const current = dayStats.get(eventDay);
-
-      if (current) {
-        current.events += 1;
-        current.revenue += event.revenue || 0;
-        current.attendees += (event.total_seats - event.available_seats) || 0;
-        current.seats += event.total_seats;
-      }
-    });
-
-    setDayData(Array.from(dayStats.values()));
-  };
-
-  const getCurrentData = () => {
-    switch (timeRange) {
-      case "year":
-        return yearData;
-      case "month":
-        return monthData;
-      case "day":
-        return dayData;
-      default:
-        return yearData;
-    }
-  };
-
-  const getChartData = () => {
-    const data = getCurrentData();
-    return data.map((item) => ({
-      name: item.year || item.month || item.day,
-      events: item.events,
-      revenue: item.revenue,
-      attendees: item.attendees,
-      seats: item.seats,
-    }));
-  };
-
-  const renderChart = () => {
-    const data = getChartData();
-    const dataKey =
-      chartType === "events"
-        ? "events"
-        : chartType === "revenue"
-        ? "revenue"
-        : chartType === "attendees"
-        ? "attendees"
-        : "seats";
-
-    if (chartType === "pie") {
-      return (
-        <ResponsiveContainer width="100%" height={400}>
-          <PieChart>
-            <Pie
-              data={data}
-              cx="50%"
-              cy="50%"
-              labelLine={false}
-              label={({ name, percent }) =>
-                `${name} ${((percent || 0) * 100).toFixed(0)}%`
-              }
-              outerRadius={80}
-              fill="#8884d8"
-              dataKey={dataKey}
-            >
-              {data.map((entry, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={COLORS[index % COLORS.length]}
-                />
-              ))}
-            </Pie>
-            <Tooltip />
-            <Legend />
-          </PieChart>
-        </ResponsiveContainer>
-      );
-    }
-
-    if (chartType === "area") {
-      return (
-        <ResponsiveContainer width="100%" height={400}>
-          <AreaChart data={data}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Area
-              type="monotone"
-              dataKey={dataKey}
-              stroke="#6FB229"
-              fill="#97d753"
-              fillOpacity={0.6}
-            />
-          </AreaChart>
-        </ResponsiveContainer>
-      );
-    }
-
-    if (chartType === "line") {
-      return (
-        <ResponsiveContainer width="100%" height={400}>
-          <LineChart data={data}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Line
-              type="monotone"
-              dataKey={dataKey}
-              stroke="#6FB229"
-              strokeWidth={3}
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      );
-    }
-
-    // Default bar chart
-    return (
-      <ResponsiveContainer width="100%" height={400}>
-        <BarChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="name" />
-          <YAxis />
-          <Tooltip />
-          <Legend />
-          <Bar dataKey={dataKey} fill="#6FB229" />
-        </BarChart>
-      </ResponsiveContainer>
+    const set = new Set<string>();
+    transactions.forEach((t) =>
+      t.tickets.forEach((tt) => {
+        const name = tt.ticket?.event?.event_name;
+        if (name) set.add(name);
+      })
     );
-  };
+    return Array.from(set.values());
+  }, [transactions, selectedEventId, eventOptions]);
 
-  const getChartTitle = () => {
-    const timeLabels: Record<string, string> = {
-      year: "Yearly",
-      month: "Monthly",
-      day: "Daily",
-    };
+  // Aggregate monthly stats from SUCCESS transactions
+  const monthlyData = useMemo(() => {
+    const buckets = new Map<string, any>();
+    last12Months.forEach(({ key, label }) => {
+      const base: any = { monthKey: key, name: label };
+      activeEventNames.forEach((ev) => (base[ev] = 0));
+      buckets.set(key, base);
+    });
 
-    const metricLabels: Record<string, string> = {
-      events: "Events",
-      revenue: "Revenue",
-      attendees: "Attendees",
-      seats: "Seats",
-      pie: "Distribution",
-      area: "Trends",
-      line: "Trends",
-    };
+    const isAll = selectedEventId === "all";
 
-    return `${timeLabels[timeRange] || "Yearly"} ${metricLabels[chartType] || "Events"} Statistics`;
-  };
+    transactions
+      .filter((t) => t.status === "SUCCESS")
+      .forEach((t) => {
+        const monthKey = format(new Date(t.transaction_date_time), "yyyy-MM");
+        const rec = buckets.get(monthKey);
+        if (!rec) return;
+        t.tickets.forEach((tt) => {
+          const evId = tt.ticket?.event?.id;
+          const evName = tt.ticket?.event?.event_name;
+          if (!evId || !evName) return;
+          if (!isAll && String(evId) !== selectedEventId) return;
+          const amount =
+            metric === "revenue" ? tt.subtotal_price || 0 : tt.qty || 0;
+          if (rec[evName] === undefined) rec[evName] = 0; // in case event had no previous bucket init
+          rec[evName] += amount;
+        });
+      });
+
+    return last12Months.map(({ key }) => buckets.get(key));
+  }, [transactions, last12Months, selectedEventId, metric, activeEventNames]);
+
+  const chartTitle = useMemo(() => {
+    const metricLabel =
+      metric === "revenue" ? "Total Revenue" : "Total Attendees";
+    if (selectedEventId === "all")
+      return `${metricLabel} per Month (Per Event)`;
+    const ev =
+      eventOptions.find((e) => String(e.id) === selectedEventId)?.name ||
+      "Selected Event";
+    return `${metricLabel} per Month - ${ev}`;
+  }, [metric, selectedEventId, eventOptions]);
 
   return (
     <div className="space-y-6">
-      {/* Controls */}
       <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -358,112 +195,99 @@ export default function StatisticsVisualization({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-wrap gap-4 items-center">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
             <div className="flex items-center gap-2">
-              <span className="text-sm font-medium">Time Range:</span>
-              <Select value={timeRange} onValueChange={setTimeRange}>
-                <SelectTrigger className="w-32">
-                  <SelectValue />
+              <span className="text-sm font-medium">Event:</span>
+              <Select
+                value={selectedEventId}
+                onValueChange={setSelectedEventId}
+              >
+                <SelectTrigger className="w-full md:w-56">
+                  <SelectValue placeholder="All Events" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="year">Yearly</SelectItem>
-                  <SelectItem value="month">Monthly</SelectItem>
-                  <SelectItem value="day">Daily</SelectItem>
+                  <SelectItem value="all">All Events</SelectItem>
+                  {eventOptions.map((ev) => (
+                    <SelectItem key={ev.id} value={String(ev.id)}>
+                      {ev.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="text-sm font-medium">Chart Type:</span>
-              <Select value={chartType} onValueChange={setChartType}>
-                <SelectTrigger className="w-32">
+              <span className="text-sm font-medium">Metric:</span>
+              <Select value={metric} onValueChange={(v) => setMetric(v as any)}>
+                <SelectTrigger className="w-full md:w-56">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="events">Events</SelectItem>
-                  <SelectItem value="revenue">Revenue</SelectItem>
-                  <SelectItem value="attendees">Attendees</SelectItem>
-                  <SelectItem value="seats">Seats</SelectItem>
-                  <SelectItem value="pie">Pie Chart</SelectItem>
-                  <SelectItem value="area">Area Chart</SelectItem>
-                  <SelectItem value="line">Line Chart</SelectItem>
+                  <SelectItem value="attendees">Total Attended</SelectItem>
+                  <SelectItem value="revenue">Total Revenue</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+
+            <div className="text-sm text-gray-600">
+              {selectedEventId === "all" && metric === "attendees"
+                ? "Default: menampilkan event dengan attended terbanyak tiap bulan"
+                : "Menampilkan agregasi per bulan sesuai filter"}
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Chart */}
       <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl">
         <CardHeader>
           <CardTitle className="text-lg font-semibold text-gray-900">
-            {getChartTitle()}
+            {chartTitle}
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {getCurrentData().length > 0 ? (
-            renderChart()
-          ) : (
+          {loading ? (
             <div className="flex items-center justify-center h-64 text-gray-500">
-              <div className="text-center">
-                <BarChart3 className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                <p>No data available for the selected time range</p>
-              </div>
+              Loading chart...
             </div>
+          ) : selectedEventId === "all" ? (
+            <ResponsiveContainer width="100%" height={400}>
+              <BarChart data={monthlyData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                {activeEventNames.map((ev, idx) => (
+                  <Bar
+                    key={ev}
+                    dataKey={ev}
+                    name={ev}
+                    fill={COLORS[idx % COLORS.length]}
+                  />
+                ))}
+              </BarChart>
+            </ResponsiveContainer>
+          ) : (
+            <ResponsiveContainer width="100%" height={400}>
+              <BarChart data={monthlyData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                {activeEventNames.map((ev, idx) => (
+                  <Bar
+                    key={ev}
+                    dataKey={ev}
+                    name={ev}
+                    fill={COLORS[idx % COLORS.length]}
+                  />
+                ))}
+              </BarChart>
+            </ResponsiveContainer>
           )}
         </CardContent>
       </Card>
-
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <Calendar className="h-4 w-4 text-[#6FB229]" />
-              <span className="text-sm font-medium">Total Events</span>
-            </div>
-            <div className="text-2xl font-bold mt-2">{stats.totalEvents}</div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <DollarSign className="h-4 w-4 text-[#6FB229]" />
-              <span className="text-sm font-medium">Total Revenue</span>
-            </div>
-            <div className="text-2xl font-bold mt-2">
-              {new Intl.NumberFormat("id-ID", {
-                style: "currency",
-                currency: "IDR",
-              }).format(stats.totalRevenue)}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <Users className="h-4 w-4 text-[#6FB229]" />
-              <span className="text-sm font-medium">Total Seats</span>
-            </div>
-            <div className="text-2xl font-bold mt-2">
-              {stats.totalSeats.toLocaleString()}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-[#6FB229]" />
-              <span className="text-sm font-medium">Active Events</span>
-            </div>
-            <div className="text-2xl font-bold mt-2">{stats.activeEvents}</div>
-          </CardContent>
-        </Card>
-      </div>
     </div>
   );
 }
