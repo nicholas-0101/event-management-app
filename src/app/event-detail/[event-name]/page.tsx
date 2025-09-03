@@ -6,9 +6,16 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { apiCall } from "@/helper/axios";
-import { CalendarDaysIcon, LoaderIcon, MapPin, SearchX } from "lucide-react";
+import {
+  CalendarDaysIcon,
+  LoaderIcon,
+  MapPin,
+  SearchX,
+  Star,
+} from "lucide-react";
 import Link from "next/link";
 
+// --- Types ---
 interface ITicket {
   ticket_type: string;
   ticket_price: number;
@@ -25,6 +32,18 @@ interface IEvent {
   event_start_date: string;
   event_end_date: string;
   tickets: ITicket[];
+}
+
+interface IReview {
+  id: number;
+  rating: number;
+  review_text?: string;
+  review_date: string;
+  user: {
+    id: number;
+    username: string;
+    profile_pic?: string;
+  };
 }
 
 function formatDate(date: string | Date) {
@@ -64,15 +83,18 @@ export default function EventDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [hasReviewed, setHasReviewed] = useState(false);
 
-  const handleReviewSubmitted = () => {
-    setHasReviewed(true);
-  };
+  // --- New State for Reviews ---
+  const [reviews, setReviews] = useState<IReview[]>([]);
+  const [avgRating, setAvgRating] = useState<number>(0);
 
+  // check if already reviewed
   useEffect(() => {
     if (!event) return;
     const reviewed = localStorage.getItem(`reviewed_event_${event.id}`);
     if (reviewed) setHasReviewed(true);
   }, [event]);
+
+  // fetch event
   useEffect(() => {
     if (!eventNameParam) return;
 
@@ -91,7 +113,7 @@ export default function EventDetailPage() {
         }));
 
         setEvent({
-          id: data.id, // or data.event_id depending on backend response
+          id: data.id,
           ...data,
           tickets,
         });
@@ -109,6 +131,23 @@ export default function EventDetailPage() {
 
     fetchEvent();
   }, [eventNameParam]);
+
+  // fetch reviews after event is loaded
+  useEffect(() => {
+    if (!event) return;
+
+    const fetchReviews = async () => {
+      try {
+        const res = await apiCall.get(`/review/event/${event.id}`);
+        setReviews(res.data.reviews);
+        setAvgRating(res.data.avgRating);
+      } catch (err) {
+        console.error("Failed to fetch reviews:", err);
+      }
+    };
+
+    fetchReviews();
+  }, [event]);
 
   if (loading)
     return (
@@ -129,7 +168,7 @@ export default function EventDetailPage() {
   const isEventEnded = new Date(event.event_end_date) < now;
 
   return (
-    <div className="max-w-5xl mx-auto p-6">
+    <div className="max-w-5xl mx-auto p-6 space-y-10">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
         {/* Left: Event Details */}
         <div className="lg:col-span-2 space-y-6">
@@ -154,16 +193,70 @@ export default function EventDetailPage() {
               {event.event_location}
             </p>
             <p className="text-sm text-gray-500 flex gap-1">
-              {" "}
               <CalendarDaysIcon size={20} />
               {formatDate(event.event_start_date)} -{" "}
               {formatDate(event.event_end_date)}
             </p>
           </div>
+
+          {/* Reviews Section */}
+          {isEventEnded && (
+            <div className="mt-10">
+              <h2 className="text-2xl font-semibold text-[#09431C] mb-4 flex gap-1">
+                Reviews (Avg: {avgRating}{" "}
+                <Star color="#FDC700" fill="#FDC700" className="mt-1" />)
+              </h2>
+              {reviews.length === 0 ? (
+                <p className="text-gray-500">No reviews yet.</p>
+              ) : (
+                <div className="space-y-4">
+                  {reviews.map((rev) => (
+                    <Card key={rev.id} className="p-4 rounded-lg shadow">
+                      <div className="flex items-center gap-3 mb-2">
+                        {rev.user.profile_pic ? (
+                          <Image
+                            src={
+                              rev.user.profile_pic ||
+                              "https://i.pinimg.com/736x/1c/c5/35/1cc535901e32f18db87fa5e340a18aff.jpg"
+                            }
+                            alt={rev.user.username}
+                            width={40}
+                            height={40}
+                            className="w-10 h-10 rounded-full object-cover border border-gray-200"
+                          />
+                        ) : (
+                          <div className="w-10 h-10 rounded-full bg-gray-300" />
+                        )}
+                        <div>
+                          <p className="font-semibold">{rev.user.username}</p>
+                          <div className="flex">
+                            {Array.from({ length: 5 }).map((_, i) => (
+                              <Star
+                                key={i}
+                                className={`w-4 h-4 ${
+                                  i < rev.rating
+                                    ? "text-yellow-400 fill-yellow-400"
+                                    : "text-gray-300"
+                                }`}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                      {rev.review_text && (
+                        <p className="text-gray-700">{rev.review_text}</p>
+                      )}
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Right: Tickets + Actions */}
         <div className="lg:col-span-1 flex flex-col">
+          {/* Tickets */}
           <div>
             <h2 className="text-3xl font-semibold mb-4 text-[#09431C]">
               🎟 Tickets
