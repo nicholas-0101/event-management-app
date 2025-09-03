@@ -136,7 +136,7 @@ export default function EventManagementPage() {
   };
 
   const handleCreateEvent = () =>
-    router.push("/event-organizer/event-management/create");
+    router.push("/event-organizer/event-creation");
   const handleEditEvent = (id: number) =>
     router.push(`/event-organizer/event-management/edit/${id}`);
   const handleViewEvent = (id: number) =>

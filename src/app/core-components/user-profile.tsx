@@ -205,7 +205,7 @@ const UserButton: React.FC = () => {
     }
 
     return (
-      <Button asChild className="rounded-full px-5">
+      <Button asChild className="rounded-full px-5 bg-[#6FB229] hover:bg-[#09431C]">
         <Link href="/signin">Sign in</Link>
       </Button>
     );
