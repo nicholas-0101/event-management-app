@@ -62,7 +62,17 @@ export default function EventDetailPage() {
   const [event, setEvent] = useState<IEvent | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [hasReviewed, setHasReviewed] = useState(false);
 
+  const handleReviewSubmitted = () => {
+    setHasReviewed(true);
+  };
+
+  useEffect(() => {
+    if (!event) return;
+    const reviewed = localStorage.getItem(`reviewed_event_${event.id}`);
+    if (reviewed) setHasReviewed(true);
+  }, [event]);
   useEffect(() => {
     if (!eventNameParam) return;
 
@@ -184,9 +194,20 @@ export default function EventDetailPage() {
           {/* Button */}
           <div className="mt-6">
             {isEventEnded ? (
-              <Button className="w-full bg-[#6FB229] hover:bg-[#09431C] rounded-lg">
-                Rate Event
-              </Button>
+              hasReviewed ? (
+                <Button
+                  disabled
+                  className="w-full bg-[#6FB229] cursor-not-allowed rounded-lg"
+                >
+                  Already Reviewed
+                </Button>
+              ) : (
+                <Link href={`/review/${event.id}`} passHref>
+                  <Button className="w-full bg-[#6FB229] hover:bg-[#09431C] rounded-lg cursor-pointer">
+                    Rate Event
+                  </Button>
+                </Link>
+              )
             ) : event.tickets.every((t) => t.available_qty === 0) ? (
               <Button
                 className="w-full bg-[#6FB229] cursor-not-allowed rounded-lg"
