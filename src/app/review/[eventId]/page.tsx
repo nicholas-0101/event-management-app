@@ -151,7 +151,7 @@ export default function CreateReviewPage() {
       if (eventName) {
         router.push(`/event-detail/${slugify(eventName, { lower: true })}`);
       } else {
-        router.push("/"); 
+        router.back(); 
       }
     } catch (err) {
       console.error(err);

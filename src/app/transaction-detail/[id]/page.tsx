@@ -304,22 +304,22 @@ export default function TransactionDetailPage() {
 
         <div className="flex flex-col gap-4">
           <div className="flex gap-4">
-            <Button
-              type="button"
-              disabled={
-                loadingCancel ||
-                expired ||
-                !transaction ||
-                ["EXPIRED", "SUCCESS", "REJECTED", "CANCELLED"].includes(
-                  transaction.status
-                )
-              }
-              className="w-full flex-1 border-2 border-[#6FB229] bg-transparent hover:bg-[#6FB229]/20 text-[#6FB229] rounded-lg cursor-pointer"
-              onClick={handleCancel}
-            >
-              {loadingCancel ? "Cancelling..." : "Cancel Transaction"}
-            </Button>
-
+            {transaction && transaction.tickets[0] && (
+              <Button
+                type="button"
+                className="w-full flex-4 border-2 border-[#6FB229] bg-transparent hover:bg-[#6FB229]/20 text-[#6FB229] rounded-lg cursor-pointer"
+                onClick={() =>
+                  router.push(
+                    `/event-detail/${slugify(
+                      transaction.tickets[0].ticket.event.event_name,
+                      { lower: true }
+                    )}`
+                  )
+                }
+              >
+                Show Event Detail
+              </Button>
+            )}
             <Button
               type="button"
               disabled={
@@ -334,30 +334,26 @@ export default function TransactionDetailPage() {
                   "WAITING_CONFIRMATION",
                 ].includes(transaction.status)
               }
-              className="w-full flex-1 bg-[#6FB229] hover:bg-[#09431C] rounded-lg cursor-pointer"
+              className="w-full flex-4 bg-[#6FB229] hover:bg-[#09431C] rounded-lg cursor-pointer"
               onClick={handleSubmit}
             >
               {loadingUpload ? "Uploading..." : "Upload Payment Proof"}
             </Button>
-          </div>
-
-          <div>
-            {transaction && transaction.tickets[0] && (
-              <Button
-                type="button"
-                className="w-full bg-[#09431C] hover:bg-[#6FB229] rounded-lg cursor-pointer"
-                onClick={() =>
-                  router.push(
-                    `/event-detail/${slugify(
-                      transaction.tickets[0].ticket.event.event_name,
-                      { lower: true }
-                    )}`
-                  )
-                }
-              >
-                Show Event Detail
-              </Button>
-            )}
+            <Button
+              type="button"
+              disabled={
+                loadingCancel ||
+                expired ||
+                !transaction ||
+                ["EXPIRED", "SUCCESS", "REJECTED", "CANCELLED"].includes(
+                  transaction.status
+                )
+              }
+              className="w-full flex-1 border-2 border-red-400 bg-transparent hover:bg-red-400/20 text-red-400 rounded-lg cursor-pointer"
+              onClick={handleCancel}
+            >
+              {loadingCancel ? "Cancelling..." : "Cancel"}
+            </Button>
           </div>
         </div>
       </Card>
