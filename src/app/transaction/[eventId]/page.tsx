@@ -412,6 +412,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Card } from "@/components/ui/card";
 
 interface IEventTicket {
   id: number;
@@ -527,7 +528,7 @@ export default function CreateTransactionPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br p-6">
       <div className="flex justify-center w-full">
-        <section className="w-full max-w-2xl p-6 mt-8 bg-white shadow rounded-3xl">
+        <Card className="w-full max-w-2xl p-6 mt-8 bg-white shadow rounded-3xl ouline-1 outline-neutral-600">
           <h1 className="text-3xl font-bold mb-6 text-center text-[#09431C] w-full">
             Create Transaction
           </h1>
@@ -653,7 +654,7 @@ export default function CreateTransactionPage() {
                     <Button
                       type="button"
                       variant="link"
-                      className="w-full text-[#6FB229]"
+                      className="w-full text-[#6FB229] cursor-pointer"
                       onClick={() =>
                         setFieldValue("tickets", [
                           ...values.tickets,
@@ -667,13 +668,13 @@ export default function CreateTransactionPage() {
 
                   {/* Voucher Dropdown */}
                   <div className="flex flex-col gap-2 w-full">
-                    <Label>Voucher (optional)</Label>
+                    <Label>Voucher</Label>
                     <Select
                       onValueChange={(val) => setFieldValue("voucherId", Number(val))}
                       value={values.voucherId ? String(values.voucherId) : ""}
                     >
                       <SelectTrigger className="w-full rounded-lg">
-                        <SelectValue placeholder="Select a voucher" />
+                        <SelectValue placeholder="Use voucher" />
                       </SelectTrigger>
                       <SelectContent>
                         {vouchers.length > 0 ? (
@@ -693,13 +694,13 @@ export default function CreateTransactionPage() {
 
                   {/* Coupon Dropdown */}
                   <div className="flex flex-col gap-2 w-full">
-                    <Label>Coupon (optional)</Label>
+                    <Label>Coupon</Label>
                     <Select
                       onValueChange={(val) => setFieldValue("couponId", Number(val))}
                       value={values.couponId ? String(values.couponId) : ""}
                     >
                       <SelectTrigger className="w-full rounded-lg">
-                        <SelectValue placeholder="Select a coupon" />
+                        <SelectValue placeholder="Use coupon" />
                       </SelectTrigger>
                       <SelectContent>
                         {coupons.length > 0 ? (
@@ -719,13 +720,13 @@ export default function CreateTransactionPage() {
 
                   {/* Point Dropdown */}
                   <div className="flex flex-col gap-2 w-full">
-                    <Label>Point (optional)</Label>
+                    <Label>Point</Label>
                     <Select
                       onValueChange={(val) => setFieldValue("pointId", Number(val))}
                       value={values.pointId ? String(values.pointId) : ""}
                     >
                       <SelectTrigger className="w-full rounded-lg">
-                        <SelectValue placeholder="Select a point" />
+                        <SelectValue placeholder="Use point" />
                       </SelectTrigger>
                       <SelectContent>
                         {points.length > 0 ? (
@@ -749,7 +750,7 @@ export default function CreateTransactionPage() {
                   <Button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-[#6FB229] hover:bg-[#09431C] rounded-lg"
+                    className="w-full bg-[#6FB229] hover:bg-[#09431C] rounded-lg cursor-pointer"
                   >
                     {loading ? "Creating..." : "Create Transaction"}
                   </Button>
@@ -757,7 +758,7 @@ export default function CreateTransactionPage() {
               </Form>
             )}
           </Formik>
-        </section>
+        </Card>
       </div>
     </div>
   );

@@ -1,106 +1,3 @@
-// "use client";
-// import { useState } from "react";
-// import { useRouter, useParams } from "next/navigation";
-// import { apiCall } from "@/helper/axios";
-// import { Button } from "@/components/ui/button";
-// import { Input } from "@/components/ui/input";
-// import { Label } from "@/components/ui/label";
-
-// export default function CreateVoucherPage() {
-//   const router = useRouter();
-//   const params = useParams();
-//   const eventId = params.eventId;
-
-//   const [code, setCode] = useState("");
-//   const [discount, setDiscount] = useState<string>(""); // start empty
-//   const [startDate, setStartDate] = useState("");
-//   const [endDate, setEndDate] = useState("");
-//   const [loading, setLoading] = useState(false);
-
-//   const handleSubmit = async (e: React.FormEvent) => {
-//     e.preventDefault();
-//     setLoading(true);
-
-//     try {
-//       await apiCall.post(`/voucher/create/${eventId}`, {
-//         voucher_code: code,
-//         discount_value: Number(discount),
-//         voucher_start_date: startDate,
-//         voucher_end_date: endDate,
-//       });
-//       alert("Voucher created successfully!");
-//       router.back();
-//     } catch (err: any) {
-//       console.error(err.response?.data || err.message);
-//       alert(
-//         "Failed to create voucher: " +
-//           (err.response?.data?.message || err.message)
-//       );
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   return (
-//     <div className="max-w-md mx-auto mt-10 p-6 bg-white shadow rounded-3xl">
-//       <h1 className="text-3xl font-bold mb-4 text-center text-[#09431C]">Create Voucher</h1>
-
-//       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-//         <div className="flex flex-col gap-2">
-//           <Label>Voucher Code</Label>
-//           <Input
-//             placeholder="Create an unique code"
-//             value={code}
-//             onChange={(e) => setCode(e.target.value)}
-//             required
-//             className="rounded-lg"
-//           />
-//         </div>
-
-//         <div className="flex flex-col gap-2">
-//           <Label>Voucher Discount</Label>
-//           <Input
-//             type="number"
-//             placeholder="Discount (in %)"
-//             value={discount}
-//             onChange={(e) => setDiscount(e.target.value)}
-//             required
-//             className="rounded-lg"
-//             min={0}
-//             max={100}
-//           />
-//         </div>
-
-//         <div className="flex flex-col gap-2">
-//           <Label>Voucher Start Date</Label>
-//           <Input
-//             type="date"
-//             value={startDate}
-//             onChange={(e) => setStartDate(e.target.value)}
-//             required
-//             className="rounded-lg"
-//           />
-//         </div>
-
-//         <div className="flex flex-col gap-2">
-//           <Label>Voucher Expired Date</Label>
-//           <Input
-//             type="date"
-//             value={endDate}
-//             onChange={(e) => setEndDate(e.target.value)}
-//             required
-//             className="rounded-lg"
-//           />
-//         </div>
-
-//         <Button type="submit" disabled={loading} className="bg-[#6FB229] hover:bg-[#09431C] rounded-lg">
-//           {loading ? "Creating..." : "Create Voucher"}
-//         </Button>
-//       </form>
-//     </div>
-//   );
-// }
-
 "use client";
 import { useState } from "react";
 import { useRouter, useParams } from "next/navigation";
@@ -125,6 +22,7 @@ export default function CreateVoucherPage() {
   const params = useParams();
   const eventId = params.eventId as string;
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const initialValues = {
     voucher_code: "",
@@ -142,14 +40,12 @@ export default function CreateVoucherPage() {
         voucher_start_date: values.voucher_start_date,
         voucher_end_date: values.voucher_end_date,
       });
+      setErrorMessage(null);
       alert("Voucher created successfully!");
-      router.replace("/event-organizer");
+      router.replace("/event-organizer/event-management");
     } catch (err: any) {
-      console.error(err.response?.data || err.message);
-      alert(
-        "Failed to create voucher: " +
-          (err.response?.data?.message || err.message)
-      );
+      console.error(err.response?.data?.message);
+      setErrorMessage(err.response?.data?.message || err.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
@@ -204,40 +100,6 @@ export default function CreateVoucherPage() {
                 className="text-red-400 text-sm italic"
               />
             </div>
-
-            {/* <div className="flex flex-col gap-2">
-              <Label>Voucher Start Date</Label>
-              <Field
-                as={Input}
-                type="date"
-                name="voucher_start_date"
-                value={values.voucher_start_date}
-                onChange={handleChange}
-                className="rounded-lg"
-              />
-              <ErrorMessage
-                name="voucher_start_date"
-                component="div"
-                className="text-red-400 text-sm italic"
-              />
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <Label>Voucher Expired Date</Label>
-              <Field
-                as={Input}
-                type="date"
-                name="voucher_end_date"
-                value={values.voucher_end_date}
-                onChange={handleChange}
-                className="rounded-lg"
-              />
-              <ErrorMessage
-                name="voucher_end_date"
-                component="div"
-                className="text-red-400 text-sm italic"
-              />
-            </div> */}
 
             {/* Voucher Start Date */}
             <div className="flex flex-col gap-2">
@@ -340,6 +202,12 @@ export default function CreateVoucherPage() {
                 className="text-red-400 text-sm italic"
               />
             </div>
+
+            {errorMessage && (
+              <p className="text-red-400 text-sm italic">
+                {errorMessage}
+              </p>
+            )}
 
             <Button
               type="submit"

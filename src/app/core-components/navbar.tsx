@@ -8,7 +8,7 @@ export default function Navbar() {
   const pathname = usePathname();
 
   // list of routes where navbar should be hidden
-  const hiddenRoutes = ["/signin", "/signup", "/verify", "/pre-verify"];
+  const hiddenRoutes = ["/signin", "/signup", "/verify", "/pre-verify", "/event-organizer"];
   const hideNavbar = hiddenRoutes.some((route) => pathname.startsWith(route));
   if (hideNavbar) {
     return null;
