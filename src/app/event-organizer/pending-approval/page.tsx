@@ -68,6 +68,55 @@ interface Transaction {
   }>;
 }
 
+// Transform raw SQL data to expected structure
+const transformTransactionData = (rawData: any[]): Transaction[] => {
+  if (!Array.isArray(rawData)) return [];
+
+  // Group by transaction ID to handle multiple tickets per transaction
+  const transactionMap = new Map<number, any>();
+
+  rawData.forEach((row: any) => {
+    const transactionId = row.id;
+
+    if (!transactionMap.has(transactionId)) {
+      // Create base transaction structure
+      transactionMap.set(transactionId, {
+        id: row.id,
+        user_id: row.user_id,
+        status: row.status,
+        total_price: row.total_price,
+        payment_proof_url: row.payment_proof_url,
+        transaction_date_time: row.transaction_date_time,
+        is_accepted: row.is_accepted,
+        user: {
+          id: row.user_id,
+          username: row.username,
+          email: row.email,
+        },
+        tickets: [],
+      });
+    }
+
+    // Add ticket to existing transaction
+    const transaction = transactionMap.get(transactionId);
+    transaction.tickets.push({
+      qty: row.qty,
+      subtotal_price: row.subtotal_price,
+      ticket: {
+        ticket_type: row.ticket_type,
+        price: row.price,
+        event: {
+          event_name: row.event_name,
+          event_location: row.event_location,
+          event_start_date: row.event_start_date || row.transaction_date_time, // Fallback
+        },
+      },
+    });
+  });
+
+  return Array.from(transactionMap.values());
+};
+
 export default function PendingApprovalPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [filteredTransactions, setFilteredTransactions] = useState<
@@ -97,10 +146,15 @@ export default function PendingApprovalPage() {
 
   const fetchPendingTransactions = async () => {
     try {
-      const response = await apiCall.get("/transaction/organizer");
-      const allTransactions = response.data.transactions || [];
+      const response = await apiCall.get("/transaction/organizer/simple");
+
+      // Transform raw SQL data to expected structure
+      const transformedTransactions = transformTransactionData(
+        response.data.transactions || response.data
+      );
+
       // Filter only pending transactions (WAITING_CONFIRMATION)
-      const pendingTransactions = allTransactions.filter(
+      const pendingTransactions = transformedTransactions.filter(
         (transaction: Transaction) =>
           transaction.status === "WAITING_CONFIRMATION"
       );

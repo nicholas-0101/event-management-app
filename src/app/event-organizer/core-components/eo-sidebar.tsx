@@ -14,6 +14,7 @@ import {
   Plus,
   BarChart3,
   FileText,
+  UserCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -60,6 +61,12 @@ const menuItems = [
       },
       // Removed "Transaction Stats"
     ],
+  },
+  {
+    title: "Attended Management",
+    icon: UserCheck,
+    href: "/event-organizer/attendees",
+    description: "Manage event attendees and check-ins",
   },
   // Removed Reports & Analytics and Documents menus
   {
