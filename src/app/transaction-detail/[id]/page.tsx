@@ -222,7 +222,7 @@ export default function TransactionDetailPage() {
             <div className="space-y-2">
               <div className="flex justify-between">
                 <span className="font-semibold">Points Used</span>
-                <span>{transaction.points_used}</span>
+                <span>{transaction.points_used.toLocaleString("id-ID")}</span>
               </div>
               <div className="flex justify-between">
                 <span className="font-semibold">Discount Coupon</span>
