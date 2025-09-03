@@ -6,6 +6,7 @@ import {
   Line,
   BarChart,
   Bar,
+  Customized,
   PieChart,
   Pie,
   Cell,
@@ -29,7 +30,7 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { BarChart3, TrendingUp, Users, DollarSign } from "lucide-react";
-import { format, addMonths } from "date-fns";
+import { format, addMonths, addDays, subYears } from "date-fns";
 import { id } from "date-fns/locale";
 import { apiCall } from "@/helper/axios";
 import { formatCurrency } from "@/lib/utils";
@@ -71,7 +72,20 @@ interface StatisticsVisualizationProps {
   };
 }
 
-const COLORS = ["#6FB229", "#97d753", "#c6ee9a", "#00481a", "#09431C"];
+const COLORS = [
+  "#2563EB", // blue-600
+  "#10B981", // emerald-500
+  "#F59E0B", // amber-500
+  "#EF4444", // red-500
+  "#8B5CF6", // violet-500
+  "#06B6D4", // cyan-500
+  "#F43F5E", // rose-500
+  "#22C55E", // green-500
+  "#A855F7", // purple-500
+  "#EAB308", // yellow-500
+  "#3B82F6", // blue-500
+  "#0EA5E9", // sky-500
+];
 
 // Transform raw SQL data to expected structure - SAME AS TRANSACTION MANAGEMENT
 const transformTransactionData = (rawData: any[]): OrganizerTransaction[] => {
@@ -118,7 +132,7 @@ export default function StatisticsVisualization({
   events,
   stats,
 }: StatisticsVisualizationProps) {
-  const [timeRange, setTimeRange] = useState("month"); // default monthly
+  const [timeRange, setTimeRange] = useState<"day" | "month" | "year">("month");
   const [metric, setMetric] = useState<"attendees" | "revenue">("attendees");
   const [transactions, setTransactions] = useState<OrganizerTransaction[]>([]);
   const [loading, setLoading] = useState(true);
@@ -164,18 +178,34 @@ export default function StatisticsVisualization({
     fetchTx();
   }, []);
 
-  // Build last 12 months labels
-  const last12Months = useMemo(() => {
+  // Build labels based on timeRange
+  const bucketsList = useMemo(() => {
     const now = new Date();
     const list: { key: string; label: string }[] = [];
-    for (let i = 11; i >= 0; i--) {
-      const d = addMonths(now, -i);
-      const key = format(d, "yyyy-MM");
-      const label = format(d, "MMM yyyy", { locale: id });
-      list.push({ key, label });
+    if (timeRange === "day") {
+      for (let i = 29; i >= 0; i--) {
+        const d = addDays(now, -i);
+        const key = format(d, "yyyy-MM-dd");
+        const label = format(d, "dd MMM", { locale: id });
+        list.push({ key, label });
+      }
+    } else if (timeRange === "year") {
+      const start = subYears(now, 4);
+      for (let y = start.getFullYear(); y <= now.getFullYear(); y++) {
+        const key = String(y);
+        const label = key;
+        list.push({ key, label });
+      }
+    } else {
+      for (let i = 11; i >= 0; i--) {
+        const d = addMonths(now, -i);
+        const key = format(d, "yyyy-MM");
+        const label = format(d, "MMM yyyy", { locale: id });
+        list.push({ key, label });
+      }
     }
     return list;
-  }, []);
+  }, [timeRange]);
 
   // Determine active event names for series when viewing All Events
   const activeEventNames = useMemo(() => {
@@ -195,10 +225,10 @@ export default function StatisticsVisualization({
     return Array.from(set.values());
   }, [transactions, selectedEventId, eventOptions]);
 
-  // Aggregate monthly stats from SUCCESS transactions - SAME LOGIC AS TRANSACTION MANAGEMENT
+  // Aggregate stats from SUCCESS transactions based on selected time range
   const monthlyData = useMemo(() => {
     const buckets = new Map<string, any>();
-    last12Months.forEach(({ key, label }) => {
+    bucketsList.forEach(({ key, label }) => {
       const base: any = { monthKey: key, name: label };
       activeEventNames.forEach((ev) => (base[ev] = 0));
       buckets.set(key, base);
@@ -211,8 +241,14 @@ export default function StatisticsVisualization({
 
     successTransactions.forEach((t) => {
       try {
-        const monthKey = format(new Date(t.transaction_date_time), "yyyy-MM");
-        const rec = buckets.get(monthKey);
+        const dt = new Date(t.transaction_date_time);
+        const key =
+          timeRange === "day"
+            ? format(dt, "yyyy-MM-dd")
+            : timeRange === "year"
+            ? format(dt, "yyyy")
+            : format(dt, "yyyy-MM");
+        const rec = buckets.get(key);
         if (!rec) {
           return;
         }
@@ -244,8 +280,15 @@ export default function StatisticsVisualization({
       }
     });
 
-    return last12Months.map(({ key }) => buckets.get(key));
-  }, [transactions, last12Months, selectedEventId, metric, activeEventNames]);
+    return bucketsList.map(({ key }) => buckets.get(key));
+  }, [
+    transactions,
+    bucketsList,
+    selectedEventId,
+    metric,
+    activeEventNames,
+    timeRange,
+  ]);
 
   // Calculate total revenue from SUCCESS transactions - SAME AS TRANSACTION MANAGEMENT
   const totalRevenueSuccess = useMemo(() => {
@@ -269,21 +312,85 @@ export default function StatisticsVisualization({
   const chartTitle = useMemo(() => {
     const metricLabel =
       metric === "revenue" ? "Total Revenue" : "Total Attendees";
+    const rangeLabel =
+      timeRange === "day"
+        ? "per Day"
+        : timeRange === "year"
+        ? "per Year"
+        : "per Month";
     if (selectedEventId === "all")
-      return `${metricLabel} per Month (Per Event)`;
+      return `${metricLabel} ${rangeLabel} (Per Event)`;
     const selectedEvent = eventOptions.find(
       (e) => String(e.id) === selectedEventId
     );
-    return `${metricLabel} per Month - ${
+    return `${metricLabel} ${rangeLabel} - ${
       selectedEvent?.name || "Selected Event"
     }`;
-  }, [metric, selectedEventId, eventOptions]);
+  }, [metric, selectedEventId, eventOptions, timeRange]);
+
+  // Custom overlay to draw subtle borders per month row (y-band)
+  const MonthRowBorders: React.FC<any> = (props) => {
+    try {
+      const {
+        yAxisMap,
+        offset,
+        chartWidth,
+        width: compWidth,
+      } = props || ({} as any);
+      const yAxis: any = yAxisMap
+        ? (Object.values(yAxisMap) as any[])[0]
+        : null;
+      const scale = yAxis?.scale as any;
+      const bandwidth =
+        typeof scale?.bandwidth === "function" ? scale.bandwidth() : 0;
+      if (!scale || !bandwidth) return null;
+      const left = offset?.left ?? 0;
+      const right = offset?.right ?? 0;
+      const fullWidth = compWidth ?? chartWidth ?? 0;
+      const width = fullWidth - left - right;
+      return (
+        <g>
+          {monthlyData.map((d: any, idx: number) => {
+            const y = scale(d?.name);
+            if (typeof y !== "number") return null;
+            const yBottom = y + bandwidth;
+            return (
+              <g key={idx}>
+                {idx === 0 && width > 0 && (
+                  <line
+                    x1={left}
+                    x2={left + width}
+                    y1={y}
+                    y2={y}
+                    stroke="#000000"
+                    strokeWidth={2}
+                  />
+                )}
+                {width > 0 && (
+                  <line
+                    x1={left}
+                    x2={left + width}
+                    y1={yBottom}
+                    y2={yBottom}
+                    stroke="#000000"
+                    strokeWidth={2}
+                  />
+                )}
+              </g>
+            );
+          })}
+        </g>
+      );
+    } catch (e) {
+      return null;
+    }
+  };
 
   return (
     <div className="space-y-6">
-      {/* Statistics Controls - Simplified without card */}
-      <div className="bg-white/70 backdrop-blur-sm border-0 shadow-xl p-6 rounded-lg">
-        <h3 className="flex items-center gap-2 mb-4">
+      {/* Controls */}
+      <div className="rounded-xl border border-gray-100 bg-white/80 backdrop-blur p-6 shadow-sm">
+        <h3 className="flex items-center gap-2 mb-4 text-sm font-semibold tracking-wide text-gray-800">
           <BarChart3 className="h-5 w-5 text-[#6FB229]" />
           Statistics Visualization
         </h3>
@@ -318,16 +425,27 @@ export default function StatisticsVisualization({
             </Select>
           </div>
 
-          <div className="text-sm text-gray-600">
-            {selectedEventId === "all" && metric === "attendees"
-              ? "Default: menampilkan event dengan attended terbanyak tiap bulan"
-              : "Menampilkan agregasi per bulan sesuai filter"}
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium">Date:</span>
+            <Select
+              value={timeRange}
+              onValueChange={(v) => setTimeRange(v as any)}
+            >
+              <SelectTrigger className="w-full md:w-56">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="day">Day</SelectItem>
+                <SelectItem value="month">Monthly</SelectItem>
+                <SelectItem value="year">Year</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </div>
 
-      {/* Chart Section - Simplified without card */}
-      <div className="bg-white/70 backdrop-blur-sm border-0 shadow-xl p-6 rounded-lg">
+      {/* Chart Section */}
+      <div className="rounded-xl border border-gray-100 bg-white/80 backdrop-blur p-6 shadow-sm">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">
           {chartTitle}
         </h3>
@@ -375,19 +493,51 @@ export default function StatisticsVisualization({
           }
 
           return (
-            <ResponsiveContainer width="100%" height={400}>
-              <BarChart data={monthlyData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
+            <ResponsiveContainer width="100%" height={540}>
+              <BarChart
+                data={monthlyData}
+                margin={{ top: 16, right: 24, left: 12, bottom: 80 }}
+                barCategoryGap={"10%"}
+                barGap={0}
+              >
+                <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+                <XAxis
+                  dataKey="name"
+                  tickLine={false}
+                  axisLine={{ stroke: "#E5E7EB" }}
+                  interval={timeRange === "day" ? 2 : 0}
+                  angle={-35}
+                  textAnchor="end"
+                  height={110}
+                  tick={{ fontSize: 20 }}
+                />
+                <YAxis
+                  tickLine={false}
+                  axisLine={{ stroke: "#E5E7EB" }}
+                  tickFormatter={(v) =>
+                    metric === "revenue"
+                      ? formatCurrency(Number(v))
+                      : Number(v).toLocaleString("id-ID")
+                  }
+                  tick={{ fontSize: 20 }}
+                />
+                <Tooltip
+                  cursor={{ fill: "#F9FAFB" }}
+                  formatter={(value: any) =>
+                    metric === "revenue"
+                      ? formatCurrency(Number(value))
+                      : Number(value).toLocaleString("id-ID")
+                  }
+                />
+                <Legend wrapperStyle={{ fontSize: 20 }} />
                 {activeEventNames.map((ev, idx) => (
                   <Bar
                     key={ev}
                     dataKey={ev}
                     name={ev}
                     fill={COLORS[idx % COLORS.length]}
+                    radius={[6, 6, 0, 0]}
+                    maxBarSize={240}
                   />
                 ))}
               </BarChart>
