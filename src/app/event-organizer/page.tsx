@@ -281,8 +281,16 @@ export default function EventOrganizerPage() {
     router.push(`/event-organizer/event-management/edit/${eventId}`);
   };
 
-  const handleViewEvent = (eventId: number) => {
-    router.push(`/event-organizer/event-management/view/${eventId}`);
+  const slugify = (name: string) =>
+    name
+      .toString()
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, "-")
+      .replace(/[^a-z0-9-]/g, "")
+      .replace(/--+/g, "-");
+  const handleViewEvent = (eventName: string) => {
+    router.push(`/event-organizer/event-detail/${slugify(eventName)}`);
   };
 
   const handleDeleteEvent = async (eventId: number) => {
@@ -331,7 +339,7 @@ export default function EventOrganizerPage() {
   if (authLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#6FB229]"></div>
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#09431C]"></div>
       </div>
     );
   }
@@ -340,7 +348,7 @@ export default function EventOrganizerPage() {
     return (
       <div className="flex items-center justify-center min-h-screen bg-white">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-4 border-[#00481a] border-t-transparent mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-[#09431C] border-t-transparent mx-auto mb-4"></div>
           <p className="text-gray-600 text-lg font-medium">Loading events...</p>
         </div>
       </div>
@@ -356,8 +364,8 @@ export default function EventOrganizerPage() {
           {/* Header */}
           <div className="bg-white/80 backdrop-blur-sm shadow-lg border-b border-gray-200/50 rounded-lg mt-8 mb-8">
             <div className="px-6 py-8">
-              <div className="flex items-center justify-between">
-                <div>
+              <div className="flex items-start sm:items-center justify-between gap-3 flex-col sm:flex-row">
+                <div className="w-full sm:w-auto text-center sm:text-left">
                   <h1 className="text-3xl font-bold text-[#09431C]">
                     Event Organizer Dashboard
                   </h1>
@@ -365,18 +373,18 @@ export default function EventOrganizerPage() {
                     Manage your events and track performance
                   </p>
                 </div>
-                <div className="flex gap-3">
+                <div className="flex gap-3 flex-wrap w-full sm:w-auto justify-center sm:justify-end">
                   <Button
                     variant="outline"
                     onClick={() => setShowStatistics(!showStatistics)}
-                    className="border-2 border-[#00481a] hover:border-[#97d753] hover:bg-[#c6ee9a] text-[#00481a] hover:text-[#00481a] font-medium"
+                    className="border-2 border-[#00481a] hover:border-[#97d753] hover:bg-[#c6ee9a] text-[#00481a] hover:text-[#00481a] font-medium w-full sm:w-auto"
                   >
                     <BarChart3 className="w-4 h-4 mr-2" />
                     {showStatistics ? "Hide Statistics" : "View Statistics"}
                   </Button>
                   <Button
                     onClick={handleCreateEvent}
-                    className="bg-[#09431C] hover:bg-[#09431C]/90 text-white"
+                    className="bg-[#09431C] hover:bg-[#09431C]/90 text-white w-full sm:w-auto"
                   >
                     <Plus className="w-4 h-4 mr-2" />
                     Create New Event
@@ -385,7 +393,7 @@ export default function EventOrganizerPage() {
                     variant="outline"
                     onClick={fetchOrganizerStats}
                     disabled={statsLoading}
-                    className="border-2 border-[#00481a] hover:border-[#97d753] hover:bg-[#c6ee9a] text-[#00481a] hover:text-[#00481a] font-medium"
+                    className="border-2 border-[#00481a] hover:border-[#97d753] hover:bg-[#c6ee9a] text-[#00481a] hover:text-[#00481a] font-medium w-full sm:w-auto"
                   >
                     <BarChart3 className="w-4 h-4 mr-2" />
                     {statsLoading ? "Refreshing..." : "Refresh Stats"}
@@ -397,7 +405,7 @@ export default function EventOrganizerPage() {
 
           {/* Stats Cards */}
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
               <Card className="h-full bg-white/70 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">
@@ -466,27 +474,6 @@ export default function EventOrganizerPage() {
                   </p>
                 </CardContent>
               </Card>
-
-              <Card className="h-full bg-white/70 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    Active Events
-                  </CardTitle>
-                  <div className="text-[#00481a] font-semibold">●</div>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    {statsLoading ? (
-                      <div className="animate-pulse bg-gray-200 h-8 w-16 rounded"></div>
-                    ) : (
-                      stats.activeEvents
-                    )}
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    Upcoming & ongoing
-                  </p>
-                </CardContent>
-              </Card>
             </div>
 
             {/* Statistics Visualization */}
@@ -540,7 +527,7 @@ export default function EventOrganizerPage() {
                     </p>
                     <Button
                       onClick={handleCreateEvent}
-                      className="bg-[#09431C] hover:bg-[#09431C]/90 text-white"
+                      className="bg-[#09431C] hover:bg-[#09431C]/90 text-white w-full sm:w-auto"
                     >
                       <Plus className="w-4 h-4 mr-2" />
                       Create Event
@@ -548,7 +535,7 @@ export default function EventOrganizerPage() {
                   </CardContent>
                 </Card>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                   {events.map((event) => {
                     const eventStatus = getEventStatus(
                       event.event_start_date,
@@ -586,7 +573,7 @@ export default function EventOrganizerPage() {
 
                         <CardHeader className="pb-2">
                           <div className="flex items-start justify-between">
-                            <CardTitle className="text-lg line-clamp-2 group-hover:text-[#00481a] transition-colors duration-300">
+                            <CardTitle className="text-base sm:text-lg line-clamp-2 group-hover:text-[#00481a] transition-colors duration-300">
                               {event.event_name}
                             </CardTitle>
                             <Badge className={eventStatus.color}>
@@ -633,8 +620,8 @@ export default function EventOrganizerPage() {
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => handleViewEvent(event.id)}
-                              className="border-2 border-[#00481a] hover:border-[#97d753] hover:bg-[#c6ee9a] text-[#00481a] hover:text-[#00481a] font-medium py-1.5 px-1 text-xs"
+                              onClick={() => handleViewEvent(event.event_name)}
+                              className="border-2 border-[#00481a] hover:border-[#97d753] hover:bg-[#c6ee9a] text-[#00481a] hover:text-[#00481a] font-medium py-2 px-2 text-xs"
                             >
                               <Eye className="w-3 h-3" />
                             </Button>
@@ -642,7 +629,7 @@ export default function EventOrganizerPage() {
                               variant="outline"
                               size="sm"
                               onClick={() => handleEditEvent(event.id)}
-                              className="border-2 border-[#00481a] hover:border-[#97d753] hover:bg-[#c6ee9a] text-[#00481a] hover:text-[#00481a] font-medium py-1.5 px-1 text-xs"
+                              className="border-2 border-[#00481a] hover:border-[#97d753] hover:bg-[#c6ee9a] text-[#00481a] hover:text-[#00481a] font-medium py-2 px-2 text-xs"
                             >
                               <Edit className="w-3 h-3" />
                             </Button>
@@ -650,7 +637,7 @@ export default function EventOrganizerPage() {
                               variant="outline"
                               size="sm"
                               onClick={() => handleCreateVoucher(event.id)}
-                              className="border-2 border-purple-300 hover:border-purple-500 hover:bg-purple-50 text-purple-700 hover:text-purple-800 font-medium py-1.5 px-1 text-xs"
+                              className="border-2 border-purple-300 hover:border-purple-500 hover:bg-purple-50 text-purple-700 hover:text-purple-800 font-medium py-2 px-2 text-xs"
                             >
                               <Gift className="w-3 h-3" />
                             </Button>
@@ -658,7 +645,7 @@ export default function EventOrganizerPage() {
                               variant="outline"
                               size="sm"
                               onClick={() => handleDeleteEvent(event.id)}
-                              className="border-2 border-red-300 hover:border-red-500 hover:bg-red-50 text-red-700 hover:text-red-800 font-medium py-1.5 px-1 text-xs"
+                              className="border-2 border-red-300 hover:border-red-500 hover:bg-red-50 text-red-700 hover:text-red-800 font-medium py-2 px-2 text-xs"
                             >
                               <Trash2 className="w-3 h-3" />
                             </Button>

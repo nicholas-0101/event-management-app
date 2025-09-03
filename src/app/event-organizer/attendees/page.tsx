@@ -258,7 +258,7 @@ export default function AttendeesPage() {
 
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20">
-            <div className="animate-spin rounded-full h-16 w-16 border-4 border-[#00481a] border-t-transparent mb-4" />
+            <div className="animate-spin rounded-full h-16 w-16 border-4 border-[#09431C] border-t-transparent mb-4" />
             <p className="text-gray-600 text-lg font-medium">
               Loading attendees...
             </p>

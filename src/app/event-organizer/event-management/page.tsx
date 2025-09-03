@@ -139,8 +139,16 @@ export default function EventManagementPage() {
     router.push("/event-organizer/event-creation");
   const handleEditEvent = (id: number) =>
     router.push(`/event-organizer/event-management/edit/${id}`);
-  const handleViewEvent = (id: number) =>
-    router.push(`/event-organizer/event-management/view/${id}`);
+  const slugify = (name: string) =>
+    name
+      .toString()
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, "-")
+      .replace(/[^a-z0-9-]/g, "")
+      .replace(/--+/g, "-");
+  const handleViewEvent = (name: string) =>
+    router.push(`/event-organizer/event-detail/${slugify(name)}`);
 
   const handleDeleteEvent = async (id: number) => {
     if (confirm("Are you sure you want to delete this event?")) {
@@ -198,7 +206,7 @@ export default function EventManagementPage() {
     return (
       <div className="flex items-center justify-center min-h-screen bg-white">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-[#09431C] border-t-transparent mx-auto mb-4"></div>
           <p className="text-gray-600 text-lg font-medium">Loading events...</p>
         </div>
       </div>
@@ -501,7 +509,7 @@ export default function EventManagementPage() {
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => handleViewEvent(event.id)}
+                              onClick={() => handleViewEvent(event.event_name)}
                               className="border-2 border-[#00481a] hover:border-[#97d753] hover:bg-[#c6ee9a] text-[#00481a] hover:text-[#00481a] font-medium py-1.5 px-1 text-xs"
                             >
                               <Eye className="w-3 h-3" />
