@@ -206,7 +206,10 @@ const UserButton: React.FC = () => {
     }
 
     return (
-      <Button asChild className="rounded-full px-5 bg-[#6FB229] hover:bg-[#09431C]">
+      <Button
+        asChild
+        className="rounded-full px-5 bg-[#6FB229] hover:bg-[#09431C]"
+      >
         <Link href="/signin">Sign in</Link>
       </Button>
     );
@@ -217,7 +220,7 @@ const UserButton: React.FC = () => {
       <DropdownMenuTrigger asChild>
         <Button
           variant={"ghost"}
-          className="flex items-center gap-2 rounded-full pl-2 pr-3 h-10 shadow-md hover:shadow-lg transition-shadow"
+          className="flex items-center gap-2 rounded-full pl-2 pr-3 h-10 w-20 md:w-35 hover:shadow-md transition-shadow"
         >
           <img
             src={getProfilePicUrl(user.profile_pic)}
@@ -277,14 +280,7 @@ const UserButton: React.FC = () => {
             <Settings className="size-4 mr-2" /> Edit Profile
           </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link
-            href="/transaction-history"
-            className="flex items-center cursor-pointer"
-          >
-            <Settings className="size-4 mr-2" /> My Tickets
-          </Link>
-        </DropdownMenuItem>
+
         <DropdownMenuItem
           variant="destructive"
           onClick={handleLogout}

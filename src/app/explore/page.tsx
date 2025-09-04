@@ -49,7 +49,14 @@ export default function ExplorePage() {
       const res = await apiCall.get<{ success: boolean; data: Event[] }>(
         "/event"
       );
-      setEvents(res.data.data);
+      const now = new Date();
+
+      // filter ended events
+      const activeEvents = res.data.data.filter(
+        (event) => new Date(event.event_end_date) > now
+      );
+
+      setEvents(activeEvents);
     } catch (error) {
       console.log("failed to fetch event", error);
     } finally {
