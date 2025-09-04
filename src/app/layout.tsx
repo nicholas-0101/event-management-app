@@ -25,7 +25,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={roboto.className}>
         <AutoRedirect />
-        <div className="px-36">
+        <div className="px-4 sm:px-10 md:px-20 lg:px-36">
           <Navbar />
           <div className="pt-4 pb-15">{children}</div>
           <Footer />

@@ -81,7 +81,7 @@ export default function ExplorePage() {
         <div className="flex justify-center items-center">
           <SearchBar onSearch={setSearch} />
         </div>
-        <div className="flex justify-between w-full mx-auto">
+        <div className="flex w-full mx-auto items-center gap-4 overflow-x-auto lg:justify-between lg:overflow-visible">
           <DateFilter onDateChange={setDateRange}/>
           <CategoryFilter
             activeCategory={activeCategory}
@@ -101,7 +101,7 @@ export default function ExplorePage() {
       <div className="flex justify-center items-center">
         <SearchBar onSearch={setSearch} />
       </div>
-      <div className="flex justify-between w-full mx-auto">
+      <div className="flex w-full mx-auto items-center gap-4 overflow-x-auto lg:justify-between lg:overflow-visible">
         <DateFilter onDateChange={setDateRange}/>
         <CategoryFilter
           activeCategory={activeCategory}
@@ -114,7 +114,7 @@ export default function ExplorePage() {
             <SearchX color="#525252" size={200} /> Events Not Found
           </p>
         ) : (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
             {filteredEvents.map((event) => (
               <EventCard
                 key={event.id}

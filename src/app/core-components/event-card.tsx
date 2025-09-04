@@ -49,7 +49,7 @@ export default function EventCard({
 }: CardItemProps) {
   return (
     <a href={href}>
-      <Card className="rounded-3xl shadow-md overflow-hidden hover:shadow-lg transition flex flex-col gap-4 pb-5 w-98">
+      <Card className="rounded-3xl shadow-md overflow-hidden hover:shadow-lg transition flex flex-col gap-4 pb-5 w-full md:w-73 lg:w-90 xl:w-92 2xl:w-98">
         <div className="relative w-full h-40">
           <Image src={thumbnail} alt={title} fill className="object-cover" />
         </div>
@@ -59,7 +59,7 @@ export default function EventCard({
               <CardTitle className="text-lg font-semibold p-0">
                 {title}
               </CardTitle>
-              <Badge className="rounded-full">{category}</Badge>
+              <Badge className="rounded-full h-6 bg-[#09431c]">{category}</Badge>
             </div>
             <span className="rounded-full bg-transparent text-neutral-500 font-medium text-sm">
               {formatDate(dateStart)} - {formatDate(dateEnd)}
