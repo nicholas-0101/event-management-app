@@ -173,7 +173,8 @@ const UserButton: React.FC = () => {
 
   const handleLogout = () => {
     clearAuthData();
-    // router.push("/");
+    router.push("/");
+    window.location.reload();
   };
 
   // Show loading state
@@ -216,7 +217,7 @@ const UserButton: React.FC = () => {
       <DropdownMenuTrigger asChild>
         <Button
           variant={"ghost"}
-          className="flex items-center gap-2 rounded-full pl-2 pr-3 h-6 w-20 md:h-10 md:w-35 hover:shadow-md"
+          className="flex items-center gap-2 rounded-full pl-2 pr-3 h-10 shadow-md hover:shadow-lg transition-shadow"
         >
           <img
             src={getProfilePicUrl(user.profile_pic)}
@@ -274,6 +275,14 @@ const UserButton: React.FC = () => {
             className="flex items-center cursor-pointer"
           >
             <Settings className="size-4 mr-2" /> Edit Profile
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link
+            href="/transaction-history"
+            className="flex items-center cursor-pointer"
+          >
+            <Settings className="size-4 mr-2" /> My Tickets
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem

@@ -24,9 +24,12 @@ import {
 } from "@/components/ui/select";
 import { apiCall } from "@/helper/axios";
 import EOSidebar from "../core-components/eo-sidebar";
+import { useRouter } from "next/navigation";
 
 export default function EventCreationPage() {
   const [date, setDate] = useState<DateRange | undefined>();
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   return (
     <div className="min-h-screen bg-gradient-to-br">
@@ -43,6 +46,7 @@ export default function EventCreationPage() {
             validationSchema={eventCreationSchema}
             onSubmit={async (values, { resetForm }) => {
               try {
+                setLoading(true);
                 const formData = new FormData();
 
                 // text fields
@@ -93,8 +97,14 @@ export default function EventCreationPage() {
 
                 resetForm();
                 alert("Event created successfully!");
-              } catch (error) {
+                router.push("/event-organizer")
+              } catch (error: any) {
                 console.error("Event creation failed", error);
+                const message =
+                  error.response?.data?.message || "Failed to create event";
+                alert(message);
+              } finally {
+                setLoading(false);
               }
             }}
           >
@@ -367,9 +377,10 @@ export default function EventCreationPage() {
                 <div className="lg:col-span-3">
                   <Button
                     type="submit"
+                    disabled={loading}
                     className="w-full bg-[#6FB229] hover:bg-[#09431C] rounded-lg"
                   >
-                    Create Event
+                    {loading ? "Creating..." : "Create Event"}
                   </Button>
                 </div>
               </Form>

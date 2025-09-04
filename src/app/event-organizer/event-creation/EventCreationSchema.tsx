@@ -110,9 +110,8 @@ export const eventCreationSchema = Yup.object().shape({
           .nullable().min(0, "*price can't negative")
           .required("*price is required"),
         ticket_quota: Yup.number()
-          .nullable().min(1, "*quota must be at least 1")
+          .nullable().min(0, "*quota can't negative")
           .required("*quota is required"),
-        
       })
     )
     .min(1, "*at least one ticket is required"),
