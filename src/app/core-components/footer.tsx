@@ -11,7 +11,7 @@ export default function Footer() {
   if (hideFooter) {
     return null;
   }
-  
+
   return (
     <footer className="w-full text-neutral-600 pb-10">
       <hr className="my-8 border-t border-gray-600 w-full mx-0" />
@@ -43,29 +43,19 @@ export default function Footer() {
                 Events
               </Link>
             </li>
-            <li>
-              <Link href="/about" className="hover:underline">
-                About
-              </Link>
-            </li>
-            <li>
-              <Link href="/contact" className="hover:underline">
-                Contact
-              </Link>
-            </li>
           </ul>
         </div>
 
         <div className="flex flex-col md:items-end">
           <h3 className="text-lg font-semibold mb-3">Follow Us</h3>
           <div className="flex gap-4">
-            <a href="#" className="hover:text-[#00481a]">
+            <a href="https://www.facebook.com/" className="hover:text-[#00481a]">
               <FaFacebook size={32} />
             </a>
-            <a href="#" className="hover:text-[#00481a]">
+            <a href="https://www.instagram.com/" className="hover:text-[#00481a]">
               <FaInstagram size={32} />
             </a>
-            <a href="#" className="hover:text-[#00481a]">
+            <a href="https://x.com/" className="hover:text-[#00481a]">
               <FaTwitter size={32} />
             </a>
           </div>

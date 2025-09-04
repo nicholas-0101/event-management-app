@@ -16,28 +16,28 @@ export default function Navbar() {
 
   return (
     <nav className="relative top-0 w-full h-20 pt-4 bg-white">
-      <div className="flex items-center justify-between h-full">
+      <div className="flex items-center justify-between h-full gap-2">
         {/* logo */}
         <Link href={"/"}>
-          <img src="/TicketNest-nobg.png" className="h-10 w-auto" />
+          <img src="/TicketNest-nobg.png" className="h-4 w-auto md:h-10 md:w-auto" />
         </Link>
 
         {/* links */}
-        <div className="flex gap-10 items-center">
+        <div className="flex gap-4 md:gap-10 items-center">
           <Link href="/explore">
-            <Button variant="link" className="cursor-pointer p-0">
+            <Button variant="link" className="cursor-pointer p-0 text-xs md:text-sm">
               Explore
             </Button>
           </Link>
           <Link href="/transaction-history">
-            <Button variant="link" className="cursor-pointer p-0">
+            <Button variant="link" className="cursor-pointer p-0 text-xs md:text-sm">
               My Tickets
             </Button>
           </Link>
 
           {/* User button */}
           <div className="flex gap-2">
-            <UserButton />
+            <UserButton/>
           </div>
         </div>
       </div>

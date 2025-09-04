@@ -224,7 +224,7 @@ export default function Signin() {
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full p-2 bg-[#6FB229] hover:bg-[#09431C] rounded-lg disabled:opacity-50"
+                  className="w-full p-2 bg-[#6FB229] hover:bg-[#09431C] rounded-lg disabled:opacity-50 cursor-pointer"
                 >
                   {isSubmitting ? "Signing In..." : "Sign In"}
                 </Button>
@@ -234,7 +234,7 @@ export default function Signin() {
         </Formik>
 
         {/* Footer */}
-        <div className="flex justify-center mt-4">
+        <div className="flex flex-col items-center md:flex-row justify-center mt-4">
           <p className="text-[#09431C] flex flex-col justify-center">
             Don't have an account?
           </p>

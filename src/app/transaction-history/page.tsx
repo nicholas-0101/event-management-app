@@ -89,7 +89,7 @@ export default function TransactionHistoryPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br p-6 pt-4 flex flex-col items-center gap-6">
-      <h1 className="text-3xl font-bold text-[#09431C]">Transaction History</h1>
+      <h1 className="text-3xl font-bold text-[#09431C] text-center">Transaction History</h1>
 
       {loading ? (
         <p className="pt-4 text-neutral-600 text-center text-3xl font-medium flex flex-col gap-2 justify-center items-center">
@@ -106,7 +106,7 @@ export default function TransactionHistoryPage() {
             key={transaction.id}
             className="w-full max-w-xl p-6 bg-white rounded-3xl shadow flex flex-col gap-4"
           >
-            <div className="flex justify-between items-center">
+            <div className="flex md:flex-row flex-col gap-2 md:justify-between items-center">
               <p>
                 <strong>Username:</strong> {transaction.user.username}
               </p>
@@ -140,7 +140,7 @@ export default function TransactionHistoryPage() {
               <span>Rp {transaction.total_price.toLocaleString("id-ID")}</span>
             </div>
 
-            <div className="flex gap-4 mt-2">
+            <div className="flex flex-col sm:flex-row gap-4 mt-2">
               <Button
                 type="button"
                 className="w-full flex-1 border-2 border-[#6FB229] bg-transparent hover:bg-[#6FB229]/20 text-[#6FB229] rounded-lg cursor-pointer"

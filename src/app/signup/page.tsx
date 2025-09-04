@@ -321,13 +321,13 @@ export default function Signup() {
                     <Input
                       type="text"
                       name="referral"
-                      placeholder="Input referral code to get bonus points"
+                      placeholder="Input referral code"
                       value={values.referral}
                       onChange={handleChange}
                       className="w-full p-2 border rounded-lg"
                     />
                     <p className="text-xs text-gray-500">
-                      Using a referral code will give you bonus points and the
+                      Using a referral code will give you bonus coupon and the
                       referrer will also receive points!
                     </p>
                     {(errors.referral && touched.referral) || fieldError.referral ? (
@@ -388,7 +388,7 @@ export default function Signup() {
                   <Button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full p-2 bg-[#6FB229] hover:bg-[#09431C] rounded-lg disabled:opacity-50"
+                    className="w-full p-2 bg-[#6FB229] hover:bg-[#09431C] rounded-lg disabled:opacity-50 cursor-pointer"
                   >
                     {isLoading ? "Creating Account..." : "Sign Up"}
                   </Button>
@@ -398,7 +398,7 @@ export default function Signup() {
           }}
         </Formik>
 
-        <div className="flex justify-center mt-4">
+        <div className="flex flex-col items-center md:flex-row justify-center mt-4">
           <p className="text-[#09431C] flex flex-col justify-center">
             Already have an account?
           </p>

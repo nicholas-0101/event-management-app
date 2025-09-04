@@ -379,7 +379,7 @@ export default function EditProfile() {
   return (
     <div className="min-h-screen bg-background py-8 px-4">
       <div className="max-w-4xl mx-auto">
-        <Card>
+        <Card className="pt-6">
           <CardHeader className="border-b">
             <div className="flex items-center gap-4">
               <div className="relative">
@@ -419,30 +419,38 @@ export default function EditProfile() {
             )}
 
             <Tabs defaultValue="profile" className="w-full">
-              <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger
-                  value="profile"
-                  className="flex items-center gap-2"
-                >
-                  <User className="w-4 h-4" />
-                  Profile
-                </TabsTrigger>
-                <TabsTrigger value="photo" className="flex items-center gap-2">
-                  <Camera className="w-4 h-4" />
-                  Photo
-                </TabsTrigger>
-                <TabsTrigger value="email" className="flex items-center gap-2">
-                  <Mail className="w-4 h-4" />
-                  Change Email
-                </TabsTrigger>
-                <TabsTrigger
-                  value="password"
-                  className="flex items-center gap-2"
-                >
-                  <Lock className="w-4 h-4" />
-                  Change Password
-                </TabsTrigger>
-              </TabsList>
+              <div className="w-full overflow-x-auto">
+                <TabsList className="grid w-full grid-cols-4 min-w-max whitespace-nowrap">
+                  <TabsTrigger
+                    value="profile"
+                    className="flex items-center gap-2"
+                  >
+                    <User className="w-4 h-4" />
+                    Edit Profile
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="photo"
+                    className="flex items-center gap-2"
+                  >
+                    <Camera className="w-4 h-4" />
+                    Profile Picture
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="email"
+                    className="flex items-center gap-2"
+                  >
+                    <Mail className="w-4 h-4" />
+                    Change Email
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="password"
+                    className="flex items-center gap-2"
+                  >
+                    <Lock className="w-4 h-4" />
+                    Change Password
+                  </TabsTrigger>
+                </TabsList>
+              </div>
 
               {/* Profile Tab */}
               <TabsContent value="profile" className="space-y-4">
@@ -519,7 +527,7 @@ export default function EditProfile() {
                           <img
                             src={getProfilePicUrl(userData.profile_pic)}
                             alt="Profile"
-                            className="w-20 h-20 rounded-full object-cover border-2 border-gray-200"
+                            className="w-16 h-16 md:w-20 md:h-20 rounded-full object-cover border-2 border-gray-200"
                           />
                         </div>
                         <div className="text-sm text-muted-foreground">
@@ -628,7 +636,7 @@ export default function EditProfile() {
                         onChange={(e) =>
                           setChangeEmailForm({ newEmail: e.target.value })
                         }
-                        placeholder="Enter your new email address"
+                        placeholder="New email address"
                         required
                       />
                       <p className="text-xs text-muted-foreground">
@@ -674,7 +682,7 @@ export default function EditProfile() {
                               oldPassword: e.target.value,
                             })
                           }
-                          placeholder="Enter your current password"
+                          placeholder="Current password"
                           required
                         />
                         <Button
@@ -706,7 +714,7 @@ export default function EditProfile() {
                               newPassword: e.target.value,
                             })
                           }
-                          placeholder="Enter your new password"
+                          placeholder="New password"
                           required
                         />
                         <Button
@@ -743,7 +751,7 @@ export default function EditProfile() {
                               confirmPassword: e.target.value,
                             })
                           }
-                          placeholder="Confirm your new password"
+                          placeholder="Confirm new password"
                           required
                         />
                         <Button

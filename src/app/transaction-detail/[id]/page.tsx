@@ -180,12 +180,12 @@ export default function TransactionDetailPage() {
         {transaction && (
           <div className="space-y-10">
             <div className="space-y-4">
-              <div className="flex justify-between">
+              <div className="flex md:flex-row flex-col gap-2 md:justify-between">
                 <p>
                   <strong>Username:</strong> {transaction.user.username}
                 </p>
                 <Badge
-                  className={`rounded-full  text-sm font-semibold ${
+                  className={`rounded-full h-6 text-sm font-semibold ${
                     transaction.status === "WAITING_PAYMENT" ||
                     transaction.status === "WAITING_CONFIRMATION"
                       ? "bg-yellow-200 text-yellow-700 outline-2 outline-yellow-600"
@@ -207,7 +207,7 @@ export default function TransactionDetailPage() {
                 <ul className="list-disc pl-5">
                   {transaction.tickets.map((t) => (
                     <li key={t.ticket_id} className="text-white">
-                      <div className="text-black justify-between flex font-bold text-lg">
+                      <div className="text-black justify-between flex font-bold md:text-lg">
                         <span>
                           {t.ticket.event.event_name} - {t.ticket.ticket_type}
                         </span>
@@ -233,10 +233,10 @@ export default function TransactionDetailPage() {
                 <span>{transaction.discount_voucher}%</span>
               </div>
               <div className="flex justify-between">
-                <span className="font-semibold text-[#6FB229] text-xl">
+                <span className="font-semibold text-[#6FB229] md:text-xl">
                   Total Price
                 </span>
-                <span className="font-semibold text-[#6FB229] text-xl">
+                <span className="font-semibold text-[#6FB229] md:text-xl">
                   Rp {transaction.total_price.toLocaleString("id-ID")}
                 </span>
               </div>
@@ -303,7 +303,7 @@ export default function TransactionDetailPage() {
         </div>
 
         <div className="flex flex-col gap-4">
-          <div className="flex gap-4">
+          <div className="flex flex-col sm:flex-row gap-4">
             {transaction && transaction.tickets[0] && (
               <Button
                 type="button"
