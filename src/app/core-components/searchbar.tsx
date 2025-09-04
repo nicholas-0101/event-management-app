@@ -16,7 +16,7 @@ export default function SearchBar({ onSearch, delay = 500 }: SearchBarProps) {
       if (value.length >= 3) {
         onSearch(value);
       } else {
-        onSearch("")
+        onSearch("");
       }
     }, delay);
 

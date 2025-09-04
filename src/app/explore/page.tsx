@@ -82,7 +82,7 @@ export default function ExplorePage() {
           <SearchBar onSearch={setSearch} />
         </div>
         <div className="flex justify-between w-full mx-auto">
-          <DateFilter onDateChange={setDateRange}/>
+          <DateFilter onDateChange={setDateRange} />
           <CategoryFilter
             activeCategory={activeCategory}
             setActiveCategory={setActiveCategory}
@@ -102,7 +102,7 @@ export default function ExplorePage() {
         <SearchBar onSearch={setSearch} />
       </div>
       <div className="flex justify-between w-full mx-auto">
-        <DateFilter onDateChange={setDateRange}/>
+        <DateFilter onDateChange={setDateRange} />
         <CategoryFilter
           activeCategory={activeCategory}
           setActiveCategory={setActiveCategory}
