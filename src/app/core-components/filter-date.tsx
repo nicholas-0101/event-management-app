@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -14,11 +14,19 @@ import { format } from "date-fns";
 
 interface DateFilterProps {
   onDateChange: (range: DateRange | undefined) => void;
+  initialRange?: DateRange;
 }
 
-export default function DateFilter({ onDateChange }: DateFilterProps) {
+export default function DateFilter({
+  onDateChange,
+  initialRange,
+}: DateFilterProps) {
   const [open, setOpen] = useState(false);
-  const [date, setDate] = useState<DateRange | undefined>();
+  const [date, setDate] = useState<DateRange | undefined>(initialRange);
+
+  useEffect(() => {
+    setDate(initialRange); 
+  }, [initialRange]);
 
   return (
     <div className="flex flex-col gap-3">
