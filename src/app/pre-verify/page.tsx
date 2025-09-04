@@ -95,8 +95,6 @@ export default function PreVerifyPage() {
                 Please check your email for verification
               </p>
             </div>
-
-           
           </Card>
         </div>
       </main>

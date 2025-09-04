@@ -469,11 +469,11 @@ export default function TransactionManagementPage() {
                     <CreditCard className="h-5 w-5 text-[#00481a]" />
                   </div>
                 </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold text-gray-900">
+                <CardContent className="flex flex-col items-center justify-center gap-1 px-2 pb-5 pt-2">
+                  <div className="text-3xl font-bold text-gray-900 text-center">
                     {stats.total}
                   </div>
-                  <p className="text-sm text-gray-600">All time</p>
+                  <p className="text-sm text-gray-600 text-center">All time</p>
                 </CardContent>
               </Card>
 
@@ -486,11 +486,13 @@ export default function TransactionManagementPage() {
                     <Clock className="h-5 w-5 text-[#00481a]" />
                   </div>
                 </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold text-[#00481a]">
+                <CardContent className="flex flex-col items-center justify-center gap-1 px-2 pb-5 pt-2">
+                  <div className="text-3xl font-bold text-[#00481a] text-center">
                     {stats.waiting_confirmation}
                   </div>
-                  <p className="text-sm text-gray-600">Need review</p>
+                  <p className="text-sm text-gray-600 text-center">
+                    Need review
+                  </p>
                 </CardContent>
               </Card>
 
@@ -503,11 +505,11 @@ export default function TransactionManagementPage() {
                     <div className="text-white font-bold text-sm">Rp</div>
                   </div>
                 </CardHeader>
-                <CardContent>
-                  <div className="text-xl font-bold text-[#00481a] break-words">
+                <CardContent className="flex flex-col items-center justify-center gap-1 px-2 pb-5 pt-2">
+                  <div className="text-2xl font-bold text-[#00481a] break-words text-center">
                     {formatCurrency(totalRevenueSuccess)}
                   </div>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-gray-600 text-center">
                     From successful transactions only
                   </p>
                 </CardContent>
@@ -522,13 +524,15 @@ export default function TransactionManagementPage() {
                     <div className="text-white font-bold text-sm">Rp</div>
                   </div>
                 </CardHeader>
-                <CardContent>
-                  <div className="text-xl font-bold text-[#00481a] break-words">
+                <CardContent className="flex flex-col items-center justify-center gap-1 px-2 pb-5 pt-2">
+                  <div className="text-2xl font-bold text-[#00481a] break-words text-center">
                     {stats.pending_revenue
                       ? formatCurrency(stats.pending_revenue)
                       : "Rp 0"}
                   </div>
-                  <p className="text-sm text-gray-600">Awaiting approval</p>
+                  <p className="text-sm text-gray-600 text-center">
+                    Awaiting approval
+                  </p>
                 </CardContent>
               </Card>
             </div>
@@ -541,45 +545,52 @@ export default function TransactionManagementPage() {
                   Filters & Search
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-                    <Input
-                      placeholder="Search by user or event..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-12 py-3 border-gray-200 focus:border-[#00481a] focus:ring-[#00481a] text-lg"
-                    />
+              <CardContent className="p-4 md:p-6 min-h-[120px] flex items-center">
+                <div className="flex flex-col md:flex-row gap-4 md:gap-6 items-center justify-center w-full">
+                  <div className="flex-1">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                      <Input
+                        placeholder="Search by user or event..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-12 py-2 border-gray-200 focus:border-[#00481a] focus:ring-[#00481a] text-lg"
+                      />
+                    </div>
                   </div>
 
-                  <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger className="py-3 border-gray-200 focus:border-[#00481a] focus:ring-[#00481a] text-lg">
-                      <SelectValue placeholder="All Status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Status</SelectItem>
-                      <SelectItem value="WAITING_PAYMENT">
-                        Waiting Payment
-                      </SelectItem>
-                      <SelectItem value="WAITING_CONFIRMATION">
-                        Waiting Confirmation
-                      </SelectItem>
-                      <SelectItem value="SUCCESS">Success</SelectItem>
-                      <SelectItem value="REJECTED">Rejected</SelectItem>
-                      <SelectItem value="EXPIRED">Expired</SelectItem>
-                      <SelectItem value="CANCELLED">Cancelled</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <div className="w-full md:w-64 flex-shrink-0">
+                    <Select
+                      value={statusFilter}
+                      onValueChange={setStatusFilter}
+                    >
+                      <SelectTrigger className="w-full py-2 border-gray-200 focus:border-[#00481a] focus:ring-[#00481a] text-lg">
+                        <SelectValue placeholder="All Status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Status</SelectItem>
+                        <SelectItem value="WAITING_PAYMENT">
+                          Waiting Payment
+                        </SelectItem>
+                        <SelectItem value="WAITING_CONFIRMATION">
+                          Waiting Confirmation
+                        </SelectItem>
+                        <SelectItem value="SUCCESS">Success</SelectItem>
+                        <SelectItem value="REJECTED">Rejected</SelectItem>
+                        <SelectItem value="EXPIRED">Expired</SelectItem>
+                        <SelectItem value="CANCELLED">Cancelled</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-                  <div className="flex items-center justify-end">
+                  <div className="w-full md:w-auto flex items-center justify-end">
                     <Button
                       variant="outline"
                       onClick={() => {
                         setSearchTerm("");
                         setStatusFilter("all");
                       }}
-                      className="border-2 border-[#00481a] hover:border-[#97d753] hover:bg-[#c6ee9a] text-[#00481a] hover:text-[#00481a] font-medium py-3 px-6 transition-all duration-300"
+                      className="border-2 border-[#00481a] hover:border-[#97d753] hover:bg-[#c6ee9a] text-[#00481a] hover:text-[#00481a] font-medium py-2 px-6 transition-all duration-300 w-full md:w-auto"
                     >
                       Clear Filters
                     </Button>

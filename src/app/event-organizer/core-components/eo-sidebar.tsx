@@ -114,7 +114,7 @@ export default function EOSidebar({ className }: SidebarProps) {
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    router.push("/auth/signin");
+    router.push("/signin");
   };
 
   const toggleMenu = (title: string) => {
