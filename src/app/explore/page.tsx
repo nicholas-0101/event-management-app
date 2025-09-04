@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import SearchBar from "../core-components/searchbar";
 import DateFilter from "../core-components/filter-date";
 import CategoryFilter from "../core-components/filter-category";
@@ -8,6 +9,7 @@ import { LoaderIcon, SearchX } from "lucide-react";
 import EventCard from "../core-components/event-card";
 import slugify from "slugify";
 import { DateRange } from "react-day-picker";
+import { parseISO } from "date-fns";
 
 type Event = {
   id: number;
@@ -20,11 +22,27 @@ type Event = {
 };
 
 export default function ExplorePage() {
-  const [search, setSearch] = useState("");
-  const [activeCategory, setActiveCategory] = useState("All Types");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const [search, setSearch] = useState(searchParams.get("q") || "");
+  const [activeCategory, setActiveCategory] = useState(
+    searchParams.get("category") || "All Types"
+  );
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
-  const [dateRange, setDateRange] = useState<DateRange | undefined>();
+
+  const initialFrom = searchParams.get("from");
+  const initialTo = searchParams.get("to");
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(() => {
+    if (initialFrom) {
+      return {
+        from: parseISO(initialFrom),
+        to: initialTo ? parseISO(initialTo) : undefined,
+      };
+    }
+    return undefined;
+  });
 
   const fetchEvents = async () => {
     try {
@@ -42,6 +60,24 @@ export default function ExplorePage() {
   useEffect(() => {
     fetchEvents();
   }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams();
+
+    if (search) params.set("q", search);
+    if (activeCategory && activeCategory !== "All Types") {
+      params.set("category", activeCategory);
+    }
+    if (dateRange?.from) {
+      params.set("from", dateRange.from.toISOString());
+    }
+    if (dateRange?.to) {
+      params.set("to", dateRange.to.toISOString());
+    }
+
+    const query = params.toString();
+    router.replace(`/explore${query ? `?${query}` : ""}`);
+  }, [search, activeCategory, dateRange, router]);
 
   const filteredEvents = useMemo(() => {
     return events.filter((event) => {
@@ -79,10 +115,10 @@ export default function ExplorePage() {
     return (
       <section className="flex flex-col gap-6">
         <div className="flex justify-center items-center">
-          <SearchBar onSearch={setSearch} />
+          <SearchBar onSearch={setSearch} initialValue={search} />
         </div>
         <div className="flex w-full mx-auto items-center gap-4 overflow-x-auto lg:justify-between lg:overflow-visible">
-          <DateFilter onDateChange={setDateRange}/>
+          <DateFilter onDateChange={setDateRange} initialRange={dateRange} />
           <CategoryFilter
             activeCategory={activeCategory}
             setActiveCategory={setActiveCategory}
@@ -99,10 +135,10 @@ export default function ExplorePage() {
   return (
     <section className="flex flex-col gap-6">
       <div className="flex justify-center items-center">
-        <SearchBar onSearch={setSearch} />
+        <SearchBar onSearch={setSearch} initialValue={search} />
       </div>
       <div className="flex w-full mx-auto items-center gap-4 overflow-x-auto lg:justify-between lg:overflow-visible">
-        <DateFilter onDateChange={setDateRange}/>
+        <DateFilter onDateChange={setDateRange} initialRange={dateRange} />
         <CategoryFilter
           activeCategory={activeCategory}
           setActiveCategory={setActiveCategory}
