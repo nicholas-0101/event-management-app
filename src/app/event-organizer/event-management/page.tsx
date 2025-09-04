@@ -26,7 +26,15 @@ import {
   Clock,
   CheckCircle,
   Gift,
+  MoreHorizontal,
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
@@ -255,11 +263,13 @@ export default function EventManagementPage() {
                     <Calendar className="h-5 w-5 text-[#00481a]" />
                   </div>
                 </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold text-gray-900">
+                <CardContent className="flex flex-col items-center justify-center gap-1 px-2 pb-5 pt-2">
+                  <div className="text-3xl font-bold text-gray-900 text-center">
                     {events.length}
                   </div>
-                  <p className="text-sm text-gray-600">All time events</p>
+                  <p className="text-sm text-gray-600 text-center">
+                    All time events
+                  </p>
                 </CardContent>
               </Card>
 
@@ -272,13 +282,15 @@ export default function EventManagementPage() {
                     <Users className="h-5 w-5 text-[#00481a]" />
                   </div>
                 </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold text-gray-900">
+                <CardContent className="flex flex-col items-center justify-center gap-1 px-2 pb-5 pt-2">
+                  <div className="text-3xl font-bold text-gray-900 text-center">
                     {events
                       .reduce((sum, event) => sum + event.total_seats, 0)
                       .toLocaleString()}
                   </div>
-                  <p className="text-sm text-gray-600">Combined capacity</p>
+                  <p className="text-sm text-gray-600 text-center">
+                    Combined capacity
+                  </p>
                 </CardContent>
               </Card>
 
@@ -291,15 +303,17 @@ export default function EventManagementPage() {
                     <TrendingUp className="h-5 w-5 text-[#00481a]" />
                   </div>
                 </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold text-gray-900">
+                <CardContent className="flex flex-col items-center justify-center gap-1 px-2 pb-5 pt-2">
+                  <div className="text-3xl font-bold text-gray-900 text-center">
                     {
                       events.filter(
                         (event) => new Date(event.event_start_date) > new Date()
                       ).length
                     }
                   </div>
-                  <p className="text-sm text-gray-600">Upcoming & ongoing</p>
+                  <p className="text-sm text-gray-600 text-center">
+                    Upcoming & ongoing
+                  </p>
                 </CardContent>
               </Card>
 
@@ -312,32 +326,34 @@ export default function EventManagementPage() {
                     <Filter className="h-5 w-5 text-[#00481a]" />
                   </div>
                 </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold text-gray-900">
+                <CardContent className="flex flex-col items-center justify-center gap-1 px-2 pb-5 pt-2">
+                  <div className="text-3xl font-bold text-gray-900 text-center">
                     {filteredEvents.length}
                   </div>
-                  <p className="text-sm text-gray-600">Current results</p>
+                  <p className="text-sm text-gray-600 text-center">
+                    Current results
+                  </p>
                 </CardContent>
               </Card>
             </div>
 
             {/* Filters Section */}
             <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl">
-              <CardHeader className="pb-4">
+              <CardHeader className="pb-3">
                 <CardTitle className="text-xl font-semibold text-gray-900 flex items-center">
                   <Filter className="w-5 h-5 mr-2 text-[#00481a]" />
                   Filter & Search Events
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <CardContent className="py-3 px-4 md:px-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
                   <div className="relative">
-                    <Search className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                     <Input
                       placeholder="Search events by name or location..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-12 py-3 border-gray-200 focus:border-[#00481a] focus:ring-[#00481a] text-lg"
+                      className="pl-12 pr-3 py-2 border-gray-200 focus:border-[#00481a] focus:ring-[#00481a] text-base"
                     />
                   </div>
 
@@ -345,7 +361,7 @@ export default function EventManagementPage() {
                     value={categoryFilter}
                     onValueChange={setCategoryFilter}
                   >
-                    <SelectTrigger className="py-3 border-gray-200 focus:border-[#00481a] focus:ring-[#00481a] text-lg">
+                    <SelectTrigger className="py-2 border-gray-200 focus:border-[#00481a] focus:ring-[#00481a] text-base">
                       <SelectValue placeholder="All Categories" />
                     </SelectTrigger>
                     <SelectContent>
@@ -358,7 +374,7 @@ export default function EventManagementPage() {
                   </Select>
 
                   <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger className="py-3 border-gray-200 focus:border-[#00481a] focus:ring-[#00481a] text-lg">
+                    <SelectTrigger className="py-2 border-gray-200 focus:border-[#00481a] focus:ring-[#00481a] text-base">
                       <SelectValue placeholder="All Status" />
                     </SelectTrigger>
                     <SelectContent>
@@ -504,40 +520,46 @@ export default function EventManagementPage() {
                             {occupancyRate.toFixed(1)}% occupied
                           </p>
 
-                          {/* Action Buttons */}
-                          <div className="grid grid-cols-4 gap-1 pt-2 mt-auto">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleViewEvent(event.event_name)}
-                              className="border-2 border-[#00481a] hover:border-[#97d753] hover:bg-[#c6ee9a] text-[#00481a] hover:text-[#00481a] font-medium py-1.5 px-1 text-xs"
-                            >
-                              <Eye className="w-3 h-3" />
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleEditEvent(event.id)}
-                              className="border-2 border-[#00481a] hover:border-[#97d753] hover:bg-[#c6ee9a] text-[#00481a] hover:text-[#00481a] font-medium py-1.5 px-1 text-xs"
-                            >
-                              <Edit className="w-3 h-3" />
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleCreateVoucher(event.id)}
-                              className="border-2 border-purple-300 hover:border-purple-500 hover:bg-purple-50 text-purple-700 hover:text-purple-800 font-medium py-1.5 px-1 text-xs"
-                            >
-                              <Gift className="w-3 h-3" />
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleDeleteEvent(event.id)}
-                              className="border-2 border-red-300 hover:border-red-500 hover:bg-red-50 text-red-700 hover:text-red-800 font-medium py-1.5 px-1 text-xs"
-                            >
-                              <Trash2 className="w-3 h-3" />
-                            </Button>
+                          {/* Actions Dropdown */}
+                          <div className="flex justify-end pt-2 mt-auto">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="border-2 border-gray-300 hover:border-gray-400 text-gray-700"
+                                >
+                                  <MoreHorizontal className="w-4 h-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem
+                                  onClick={() =>
+                                    handleViewEvent(event.event_name)
+                                  }
+                                >
+                                  <Eye className="w-4 h-4 mr-2" /> View
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => handleEditEvent(event.id)}
+                                >
+                                  <Edit className="w-4 h-4 mr-2" /> Edit
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => handleCreateVoucher(event.id)}
+                                >
+                                  <Gift className="w-4 h-4 mr-2" /> Create
+                                  Voucher
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem
+                                  variant="destructive"
+                                  onClick={() => handleDeleteEvent(event.id)}
+                                >
+                                  <Trash2 className="w-4 h-4 mr-2" /> Delete
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
                           </div>
                         </CardContent>
                       </Card>

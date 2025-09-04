@@ -15,7 +15,15 @@ import {
   BarChart3,
   Gift,
   CreditCard,
+  MoreHorizontal,
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
@@ -404,7 +412,7 @@ export default function EventOrganizerPage() {
           </div>
 
           {/* Stats Cards */}
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="py-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
               <Card className="h-full bg-white/70 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -415,15 +423,15 @@ export default function EventOrganizerPage() {
                     <Calendar className="h-4 w-4 text-[#00481a]" />
                   </div>
                 </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
+                <CardContent className="flex flex-col items-center justify-center gap-1 px-2 py-3">
+                  <div className="text-2xl font-bold text-center">
                     {statsLoading ? (
                       <div className="animate-pulse bg-gray-200 h-8 w-16 rounded"></div>
                     ) : (
                       stats.totalEvents
                     )}
                   </div>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-muted-foreground text-center">
                     All time events
                   </p>
                 </CardContent>
@@ -438,15 +446,15 @@ export default function EventOrganizerPage() {
                     <Users className="h-4 w-4 text-[#00481a]" />
                   </div>
                 </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
+                <CardContent className="flex flex-col items-center justify-center gap-1 px-2 py-3">
+                  <div className="text-2xl font-bold text-center">
                     {statsLoading ? (
                       <div className="animate-pulse bg-gray-200 h-8 w-16 rounded"></div>
                     ) : (
                       stats.totalSeats.toLocaleString()
                     )}
                   </div>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-muted-foreground text-center">
                     Combined capacity
                   </p>
                 </CardContent>
@@ -459,9 +467,9 @@ export default function EventOrganizerPage() {
                   </CardTitle>
                   <div className="text-[#00481a] font-semibold text-lg">Rp</div>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="flex flex-col items-center justify-center gap-1 px-2 py-3">
                   <div
-                    className={`font-bold ${revenueSizeClass} whitespace-nowrap leading-tight`}
+                    className={`font-bold ${revenueSizeClass} whitespace-nowrap leading-tight text-center`}
                   >
                     {statsLoading ? (
                       <div className="animate-pulse bg-gray-200 h-8 w-16 rounded"></div>
@@ -469,7 +477,7 @@ export default function EventOrganizerPage() {
                       revenueNumericText
                     )}
                   </div>
-                  <p className="text-xs text-muted-foreground truncate">
+                  <p className="text-xs text-muted-foreground truncate text-center">
                     From successful transactions
                   </p>
                 </CardContent>
@@ -615,40 +623,45 @@ export default function EventOrganizerPage() {
                             {occupancyRate.toFixed(1)}% occupied
                           </p>
 
-                          {/* Action Buttons */}
-                          <div className="grid grid-cols-4 gap-1 pt-2 mt-auto">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleViewEvent(event.event_name)}
-                              className="border-2 border-[#00481a] hover:border-[#97d753] hover:bg-[#c6ee9a] text-[#00481a] hover:text-[#00481a] font-medium py-2 px-2 text-xs"
-                            >
-                              <Eye className="w-3 h-3" />
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleEditEvent(event.id)}
-                              className="border-2 border-[#00481a] hover:border-[#97d753] hover:bg-[#c6ee9a] text-[#00481a] hover:text-[#00481a] font-medium py-2 px-2 text-xs"
-                            >
-                              <Edit className="w-3 h-3" />
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleCreateVoucher(event.id)}
-                              className="border-2 border-purple-300 hover:border-purple-500 hover:bg-purple-50 text-purple-700 hover:text-purple-800 font-medium py-2 px-2 text-xs"
-                            >
-                              <Gift className="w-3 h-3" />
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleDeleteEvent(event.id)}
-                              className="border-2 border-red-300 hover:border-red-500 hover:bg-red-50 text-red-700 hover:text-red-800 font-medium py-2 px-2 text-xs"
-                            >
-                              <Trash2 className="w-3 h-3" />
-                            </Button>
+                          {/* Actions Dropdown */}
+                          <div className="flex justify-end pt-2 mt-auto">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="border-2 border-gray-300 hover:border-gray-400 text-gray-700"
+                                >
+                                  <MoreHorizontal className="w-4 h-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem
+                                  onClick={() =>
+                                    handleViewEvent(event.event_name)
+                                  }
+                                >
+                                  <Eye className="w-4 h-4 mr-2" /> View
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => handleEditEvent(event.id)}
+                                >
+                                  <Edit className="w-4 h-4 mr-2" /> Edit
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => handleCreateVoucher(event.id)}
+                                >
+                                  <Gift className="w-4 h-4 mr-2" /> Create
+                                  Voucher
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem
+                                  onClick={() => handleDeleteEvent(event.id)}
+                                >
+                                  <Trash2 className="w-4 h-4 mr-2" /> Delete
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
                           </div>
                         </CardContent>
                       </Card>

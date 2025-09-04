@@ -4,6 +4,21 @@ import type { NextRequest } from "next/server";
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // Mobile redirect for event-organizer routes
+  if (pathname.startsWith("/event-organizer")) {
+    const ua = request.headers.get("user-agent")?.toLowerCase() || "";
+    const isMobile =
+      /mobile|android|iphone|ipad|phone|blackberry|opera mini|windows phone/.test(
+        ua
+      );
+
+    if (isMobile) {
+      return NextResponse.redirect(
+        new URL("/mobile-not-supported", request.url)
+      );
+    }
+  }
+
   // Get token and user data from cookies or headers
   const token =
     request.cookies.get("token")?.value ||
@@ -30,7 +45,10 @@ export function middleware(request: NextRequest) {
       const userData = JSON.parse(userDataCookie);
 
       // If user is organizer, redirect to event-organizer from main site
-      if (userData.role === "ORGANIZER" && !pathname.startsWith("/event-organizer")) {
+      if (
+        userData.role === "ORGANIZER" &&
+        !pathname.startsWith("/event-organizer")
+      ) {
         return NextResponse.redirect(new URL("/event-organizer", request.url));
       }
 

@@ -342,15 +342,15 @@ export default function PendingApprovalPage() {
                     <Clock className="h-5 w-5 text-yellow-600" />
                   </div>
                 </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold text-gray-900">
+                <CardContent className="flex flex-col items-center justify-center gap-1 px-2 pb-5 pt-2">
+                  <div className="text-3xl font-bold text-gray-900 text-center">
                     {
                       transactions.filter(
                         (t) => t.status === "WAITING_CONFIRMATION"
                       ).length
                     }
                   </div>
-                  <p className="text-sm text-gray-600">Awaiting approval</p>
+                  <p className="text-sm text-gray-600 text-center">Awaiting approval</p>
                 </CardContent>
               </Card>
 
@@ -363,15 +363,15 @@ export default function PendingApprovalPage() {
                     <CreditCard className="h-5 w-5 text-[#00481a]" />
                   </div>
                 </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-gray-900">
+                <CardContent className="flex flex-col items-center justify-center gap-1 px-2 pb-5 pt-2">
+                  <div className="text-2xl font-bold text-gray-900 text-center">
                     {formatCurrency(
                       transactions
                         .filter((t) => t.status === "WAITING_CONFIRMATION")
                         .reduce((sum, t) => sum + t.total_price, 0)
                     )}
                   </div>
-                  <p className="text-sm text-gray-600">Pending amount</p>
+                  <p className="text-sm text-gray-600 text-center">Pending amount</p>
                 </CardContent>
               </Card>
 
@@ -384,48 +384,49 @@ export default function PendingApprovalPage() {
                     <Filter className="h-5 w-5 text-[#00481a]" />
                   </div>
                 </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold text-gray-900">
+                <CardContent className="flex flex-col items-center justify-center gap-1 px-2 pb-5 pt-2">
+                  <div className="text-3xl font-bold text-gray-900 text-center">
                     {filteredTransactions.length}
                   </div>
-                  <p className="text-sm text-gray-600">Current results</p>
+                  <p className="text-sm text-gray-600 text-center">Current results</p>
                 </CardContent>
               </Card>
             </div>
 
             {/* Filters Section */}
             <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl">
-              <CardHeader className="pb-4">
+              <CardHeader className="pb-2">
                 <CardTitle className="text-xl font-semibold text-gray-900 flex items-center">
                   <Filter className="w-5 h-5 mr-2 text-[#00481a]" />
                   Filter & Search Transactions
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-                    <Input
-                      placeholder="Search by user name, email, or event..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-12 py-3 border-gray-200 focus:border-[#00481a] focus:ring-[#00481a] text-lg"
-                    />
+              <CardContent className="py-3 px-4 md:px-6">
+                <div className="flex flex-col md:flex-row gap-4 md:gap-6 w-full">
+                  <div className="flex-1">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <Input
+                        placeholder="Search by user name, email, or event..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-10 pr-3 py-2 text-sm border-gray-200 focus:border-[#00481a] focus:ring-[#00481a]"
+                      />
+                    </div>
                   </div>
-
-                  <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger className="py-3 border-gray-200 focus:border-[#00481a] focus:ring-[#00481a] text-lg">
-                      <SelectValue placeholder="Filter by status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Status</SelectItem>
-                      <SelectItem value="WAITING_CONFIRMATION">
-                        Waiting Confirmation
-                      </SelectItem>
-                      <SelectItem value="SUCCESS">Success</SelectItem>
-                      <SelectItem value="REJECTED">Rejected</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <div className="w-full md:w-60 flex-shrink-0">
+                    <Select value={statusFilter} onValueChange={setStatusFilter}>
+                      <SelectTrigger className="w-full py-2 text-sm border-gray-200 focus:border-[#00481a] focus:ring-[#00481a]">
+                        <SelectValue placeholder="Filter by status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Status</SelectItem>
+                        <SelectItem value="WAITING_CONFIRMATION">Waiting Confirmation</SelectItem>
+                        <SelectItem value="SUCCESS">Success</SelectItem>
+                        <SelectItem value="REJECTED">Rejected</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               </CardContent>
             </Card>

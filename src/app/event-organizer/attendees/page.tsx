@@ -206,8 +206,8 @@ export default function AttendeesPage() {
     <div className="min-h-screen bg-gradient-to-br from-[#f6ffea] to-[#e9ffd1]">
       <EOSidebar />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div className="flex items-center justify-between mb-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div className="flex items-center justify-between mb-10">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">
               Attendee Management
@@ -222,23 +222,24 @@ export default function AttendeesPage() {
         </div>
 
         <Card className="mb-6">
-          <CardContent className="pt-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="col-span-1 md:col-span-2">
-                <div className="relative">
+          <CardContent className="p-4 md:p-6">
+            <div className="flex flex-col md:flex-row gap-4 md:gap-6 items-stretch">
+              <div className="flex-1">
+                <div className="relative h-full">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                   <Input
                     placeholder="Cari nama atau email attendee..."
-                    className="pl-9"
+                    className="pl-10 pr-3 py-2 h-full"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                   />
                 </div>
               </div>
-              <div className="col-span-1">
-                <div className="relative">
+              <div className="w-full md:w-72">
+                <div className="relative h-full">
+                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                   <select
-                    className="w-full appearance-none bg-white border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#97d753]"
+                    className="w-full appearance-none bg-white border border-gray-300 rounded-md pl-10 pr-3 py-2 h-full text-sm focus:outline-none focus:ring-2 focus:ring-[#97d753]"
                     value={selectedEventId}
                     onChange={(e) => setSelectedEventId(e.target.value)}
                   >
@@ -249,7 +250,6 @@ export default function AttendeesPage() {
                       </option>
                     ))}
                   </select>
-                  <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                 </div>
               </div>
             </div>
