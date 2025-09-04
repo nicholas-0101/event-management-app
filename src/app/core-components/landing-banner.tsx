@@ -6,9 +6,7 @@ import { Card } from "@/components/ui/card";
 import {
   Carousel,
   CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
+  CarouselItem
 } from "@/components/ui/carousel";
 
 const slides = [
@@ -50,8 +48,6 @@ export default function HeroBanner({ setActiveCategory }: Props) {
             </CarouselItem>
           ))}
         </CarouselContent>
-        <CarouselPrevious className="border-0 bg-transparent shadow-none" />
-        <CarouselNext className="border-0 bg-transparent shadow-none" />
       </Carousel>
     </div>
   );

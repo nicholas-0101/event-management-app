@@ -136,7 +136,7 @@ export default function TransactionHistoryPage() {
             </div>
 
             <div className="flex justify-between font-semibold text-[#6FB229] text-lg">
-              <span>Total Price:</span>
+              <span>Total Price</span>
               <span>Rp {transaction.total_price.toLocaleString("id-ID")}</span>
             </div>
 

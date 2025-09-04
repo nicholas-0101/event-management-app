@@ -217,7 +217,7 @@ export default function EventCreationPage() {
                       as={Textarea}
                       id="event_description"
                       name="event_description"
-                      placeholder="Write about the event..."
+                      placeholder="Write about the event and payment details..."
                       className="w-full h-32 rounded-lg"
                     />
                     {errors.event_description && touched.event_description && (
