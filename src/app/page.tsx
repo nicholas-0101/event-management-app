@@ -1,5 +1,6 @@
 "use client";
-import { useState, useEffect, useMemo } from "react";
+
+import { Suspense, useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import SearchBar from "./core-components/searchbar";
@@ -23,7 +24,7 @@ type Event = {
   event_price: number;
 };
 
-export default function LandingPage() {
+function LandingPageContent() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -65,19 +66,16 @@ export default function LandingPage() {
     router.replace(`${pathname}?${params.toString()}`);
   }, [search, activeCategory, dateRange, pathname, router]);
 
+  // fetch events
   const fetchEvents = async () => {
     try {
       const res = await apiCall.get<{ success: boolean; data: Event[] }>(
         "/event"
       );
-
       const now = new Date();
-
-      // filter ended events
       const activeEvents = res.data.data.filter(
         (event) => new Date(event.event_end_date) > now
       );
-
       setEvents(activeEvents);
     } catch (error) {
       console.error("Failed to fetch events:", error);
@@ -136,17 +134,12 @@ export default function LandingPage() {
     return (
       <section>
         <div className="flex flex-col gap-6">
-          {/* Search bar */}
           <div className="flex justify-center">
             <SearchBar onSearch={setSearch} initialValue={search} />
           </div>
-
-          {/* Hero Banner */}
           <div className="flex justify-center">
             <HeroBanner setActiveCategory={setActiveCategory} />
           </div>
-
-          {/* Filters - responsive */}
           <div className="flex w-full mx-auto items-center gap-4 overflow-x-auto lg:justify-between lg:overflow-visible">
             <DateFilter onDateChange={setDateRange} initialRange={dateRange} />
             <CategoryFilter
@@ -155,8 +148,6 @@ export default function LandingPage() {
             />
           </div>
         </div>
-
-        {/* Loader */}
         <p className="pt-4 text-neutral-600 text-center text-3xl font-medium flex flex-col gap-2 justify-center items-center">
           <LoaderIcon color="#525252" size={200} />
           Loading events...
@@ -219,5 +210,22 @@ export default function LandingPage() {
         )}
       </div>
     </section>
+  );
+}
+
+// suspense
+export default function LandingPage() {
+  return (
+    <Suspense
+      fallback={
+        <section>
+          <p className="pt-4 text-neutral-600 text-center text-2xl font-medium flex justify-center items-center">
+            Loading page...
+          </p>
+        </section>
+      }
+    >
+      <LandingPageContent />
+    </Suspense>
   );
 }
