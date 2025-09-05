@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, Suspense } from "react";
 import EOSidebar from "../core-components/eo-sidebar";
 import { apiCall } from "@/helper/axios";
 import { Input } from "@/components/ui/input";
@@ -75,7 +75,7 @@ const chipColor = (type: string) => {
   return "bg-[#eef2ff] border-[#c7d2fe] text-[#1e3a8a]";
 };
 
-export default function AttendeesPage() {
+function AttendeesContent() {
   const [loading, setLoading] = useState<boolean>(true);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [search, setSearch] = useState<string>("");
@@ -347,5 +347,25 @@ export default function AttendeesPage() {
         )}
       </div>
     </div>
+  );
+}
+
+// Suspense wrapper
+export default function AttendeesPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-[#f6ffea] to-[#e9ffd1]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-4 border-[#09431C] border-t-transparent mx-auto mb-4" />
+            <p className="text-gray-600 text-lg font-medium">
+              Loading attendees...
+            </p>
+          </div>
+        </div>
+      }
+    >
+      <AttendeesContent />
+    </Suspense>
   );
 }
