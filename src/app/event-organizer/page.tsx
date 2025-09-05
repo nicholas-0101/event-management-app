@@ -16,6 +16,7 @@ import {
   Gift,
   CreditCard,
   MoreHorizontal,
+  Star,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -122,6 +123,17 @@ const transformTransactionData = (rawData: any[]): Transaction[] => {
   return Array.from(transactionMap.values());
 };
 
+const getUserIdFromToken = (token: string): number | null => {
+  try {
+    const payload = token.split(".")[1];
+    const decodedPayload = JSON.parse(atob(payload));
+    return decodedPayload.id || null;
+  } catch (err) {
+    console.error("Failed to decode JWT", err);
+    return null;
+  }
+};
+
 export default function EventOrganizerPage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
@@ -135,7 +147,33 @@ export default function EventOrganizerPage() {
   });
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [showStatistics, setShowStatistics] = useState(false);
+  const [avgRating, setAvgRating] = useState<number | null>(null);
+  const [loadingRating, setLoadingRating] = useState(true);
   const router = useRouter();
+
+  useEffect(() => {
+    const fetchAvgRating = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+
+        const userId = getUserIdFromToken(token);
+        if (!userId) return;
+
+        const { data } = await apiCall.get(`/review/organizer/${userId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        setAvgRating(data.avgRating);
+      } catch (err) {
+        console.error("Failed to fetch organizer reviews:", err);
+      } finally {
+        setLoadingRating(false); // always stop loading
+      }
+    };
+
+    fetchAvgRating();
+  }, []);
 
   useEffect(() => {
     const checkAuth = () => {
@@ -377,8 +415,18 @@ export default function EventOrganizerPage() {
                   <h1 className="text-3xl font-bold text-[#09431C]">
                     Event Organizer Dashboard
                   </h1>
-                  <p className="text-gray-600 mt-1">
-                    Manage your events and track performance
+                  <p className="text-2xl font-bold text-[#09431C] flex gap-2">
+                    {loadingRating ? (
+                      "Loading average rating..."
+                    ) : (
+                      <>
+                        Average Rating:{" "}
+                        <span className="font-semibold">
+                          {avgRating?.toFixed(1) ?? "0"}
+                        </span>
+                        <Star fill="#FDC700" color="#FDC700" className="mt-1"/>
+                      </>
+                    )}
                   </p>
                 </div>
                 <div className="flex gap-3 flex-wrap w-full sm:w-auto justify-center sm:justify-end">

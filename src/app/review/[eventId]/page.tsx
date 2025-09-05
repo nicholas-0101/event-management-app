@@ -8,6 +8,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { apiCall } from "@/helper/axios";
 import { Star } from "lucide-react";
 import slugify from "slugify";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 export default function CreateReviewPage() {
   const { eventId } = useParams();
@@ -18,6 +26,10 @@ export default function CreateReviewPage() {
   const [hoverRating, setHoverRating] = useState<number>(0);
   const [review_text, setReview_text] = useState("");
   const [loading, setLoading] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogTitle, setDialogTitle] = useState("Notice");
+  const [dialogMessage, setDialogMessage] = useState("");
+  const [dialogAction, setDialogAction] = useState<(() => void) | null>(null);
 
   // fetch event detail to get the event name
   useEffect(() => {
@@ -33,11 +45,49 @@ export default function CreateReviewPage() {
     if (eventId) fetchEventName();
   }, [eventId]);
 
+  // const handleSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+
+  //   if (rating < 1) {
+  //     alert("Please select at least 1 star.");
+  //     return;
+  //   }
+
+  //   try {
+  //     setLoading(true);
+  //     const token = localStorage.getItem("token");
+
+  //     await apiCall.post(
+  //       `/review/${eventId}`,
+  //       { review_text, rating },
+  //       { headers: { Authorization: `Bearer ${token}` } }
+  //     );
+
+  //     alert("Review submitted successfully!");
+  //     localStorage.setItem(`reviewed_event_${eventId}`, "true");
+
+  //     if (eventName) {
+  //       router.push(`/event-detail/${slugify(eventName, { lower: true })}`);
+  //     } else {
+  //       router.back();
+  //     }
+  //   } catch (err: any) {
+  //     console.error("Submit review error:", err);
+
+  //     const message = err.response?.data?.message || "Failed to submit review.";
+  //     alert(message);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (rating < 1) {
-      alert("Please select at least 1 star.");
+      setDialogTitle("Validation Error");
+      setDialogMessage("Please select at least 1 star.");
+      setDialogOpen(true);
       return;
     }
 
@@ -51,68 +101,101 @@ export default function CreateReviewPage() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      alert("Review submitted successfully!");
       localStorage.setItem(`reviewed_event_${eventId}`, "true");
 
-      if (eventName) {
-        router.push(`/event-detail/${slugify(eventName, { lower: true })}`);
-      } else {
-        router.back();
-      }
+      setDialogTitle("Success");
+      setDialogMessage("Review submitted successfully!");
+      setDialogAction(() => () => {
+        if (eventName) {
+          router.push(`/event-detail/${slugify(eventName, { lower: true })}`);
+        } else {
+          router.back();
+        }
+      });
+      setDialogOpen(true);
     } catch (err: any) {
       console.error("Submit review error:", err);
-
-      const message = err.response?.data?.message || "Failed to submit review.";
-      alert(message);
+      setDialogTitle("Error");
+      setDialogMessage(
+        err.response?.data?.message || "Failed to submit review."
+      );
+      setDialogAction(null);
+      setDialogOpen(true);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br p-6 pt-4 flex flex-col items-center gap-6">
-      <h1 className="text-3xl font-bold text-[#09431C]">
-        Review {eventName ? `: ${eventName}` : ""}
-      </h1>
+    <section>
+      <div className="min-h-screen bg-gradient-to-br p-6 pt-4 flex flex-col items-center gap-6">
+        <h1 className="text-3xl font-bold text-[#09431C]">
+          Review {eventName ? `: ${eventName}` : ""}
+        </h1>
 
-      <Card className="w-full max-w-xl p-6 bg-white rounded-3xl shadow flex flex-col gap-6">
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          {/* Star Rating */}
-          <div className="flex gap-2 items-center justify-center">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <Star
-                key={star}
-                className={`w-8 h-8 cursor-pointer transition-colors ${
-                  (hoverRating || rating) >= star
-                    ? "text-yellow-400 fill-yellow-400"
-                    : "text-gray-300"
-                }`}
-                onMouseEnter={() => setHoverRating(star)}
-                onMouseLeave={() => setHoverRating(0)}
-                onClick={() => setRating(star)}
+        <Card className="w-full max-w-xl p-6 bg-white rounded-3xl shadow flex flex-col gap-6">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            {/* Star Rating */}
+            <div className="flex gap-2 items-center justify-center">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <Star
+                  key={star}
+                  className={`w-8 h-8 cursor-pointer transition-colors ${
+                    (hoverRating || rating) >= star
+                      ? "text-yellow-400 fill-yellow-400"
+                      : "text-gray-300"
+                  }`}
+                  onMouseEnter={() => setHoverRating(star)}
+                  onMouseLeave={() => setHoverRating(0)}
+                  onClick={() => setRating(star)}
+                />
+              ))}
+            </div>
+
+            {/* Review Text */}
+            <div className="flex flex-col gap-2">
+              <Textarea
+                placeholder="Write your review..."
+                value={review_text}
+                onChange={(e) => setReview_text(e.target.value)}
+                className="rounded-lg border-gray-300 h-50"
               />
-            ))}
-          </div>
+            </div>
 
-          {/* Review Text */}
-          <div className="flex flex-col gap-2">
-            <Textarea
-              placeholder="Write your review..."
-              value={review_text}
-              onChange={(e) => setReview_text(e.target.value)}
-              className="rounded-lg border-gray-300 h-50"
-            />
-          </div>
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-[#6FB229] hover:bg-[#09431C] rounded-lg cursor-pointer"
+            >
+              {loading ? "Submitting..." : "Submit Review"}
+            </Button>
+          </form>
+        </Card>
+      </div>
 
-          <Button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-[#6FB229] hover:bg-[#09431C] rounded-lg cursor-pointer"
-          >
-            {loading ? "Submitting..." : "Submit Review"}
-          </Button>
-        </form>
-      </Card>
-    </div>
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="sm:max-w-md !rounded-3xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl text-[#09431C]">
+              {dialogTitle}
+            </DialogTitle>
+            <DialogDescription className="text-lg">
+              {dialogMessage}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              onClick={() => {
+                setDialogOpen(false);
+                dialogAction?.();
+              }}
+              className="bg-[#6FB229] hover:bg-[#09431C] rounded-lg"
+            >
+              OK
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </section>
   );
 }

@@ -25,11 +25,82 @@ import {
 import { apiCall } from "@/helper/axios";
 import EOSidebar from "../core-components/eo-sidebar";
 import { useRouter } from "next/navigation";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 export default function EventCreationPage() {
   const [date, setDate] = useState<DateRange | undefined>();
   const [loading, setLoading] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogMessage, setDialogMessage] = useState("");
   const router = useRouter();
+
+  const handleSubmit = async (values: IEventCreate, { resetForm }: any) => {
+    try {
+      setLoading(true);
+      const formData = new FormData();
+
+      // text fields
+      formData.append("event_name", values.event_name);
+      formData.append("event_description", values.event_description);
+      formData.append(
+        "event_start_date",
+        values.event_start_date
+          ? new Date(values.event_start_date).toISOString()
+          : ""
+      );
+      formData.append(
+        "event_end_date",
+        values.event_end_date
+          ? new Date(values.event_end_date).toISOString()
+          : ""
+      );
+      formData.append("event_location", values.event_location);
+      formData.append("event_category", values.event_category.toUpperCase());
+
+      // tickets
+      const tickets = values.tickets.map((ticket) => ({
+        ticket_type: ticket.ticket_type.toUpperCase(),
+        price: Number(ticket.ticket_price) || 0,
+        quota: Number(ticket.ticket_quota) || 0,
+        available_qty:
+          ticket.ticket_quota !== undefined
+            ? Number(ticket.ticket_quota)
+            : Number(ticket.ticket_quota) || 0,
+      }));
+      formData.append("tickets", JSON.stringify(tickets));
+
+      // file
+      if (values.event_thumbnail) {
+        formData.append("event_thumbnail", values.event_thumbnail);
+      }
+
+      // send to API
+      await apiCall.post("/event/create", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+
+      resetForm();
+      setDialogMessage("Event created successfully!");
+      setDialogOpen(true);
+    } catch (error: any) {
+      console.error("Event creation failed", error);
+      const message = error.response?.data?.message || "Failed to create event";
+      setDialogMessage(message);
+      setDialogOpen(true);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br">
@@ -44,69 +115,7 @@ export default function EventCreationPage() {
           <Formik
             initialValues={initialValues}
             validationSchema={eventCreationSchema}
-            onSubmit={async (values, { resetForm }) => {
-              try {
-                setLoading(true);
-                const formData = new FormData();
-
-                // text fields
-                formData.append("event_name", values.event_name);
-                formData.append("event_description", values.event_description);
-                formData.append(
-                  "event_start_date",
-                  values.event_start_date
-                    ? new Date(values.event_start_date).toISOString()
-                    : ""
-                );
-                formData.append(
-                  "event_end_date",
-                  values.event_end_date
-                    ? new Date(values.event_end_date).toISOString()
-                    : ""
-                );
-                formData.append("event_location", values.event_location);
-                formData.append(
-                  "event_category",
-                  values.event_category.toUpperCase()
-                );
-
-                // tickets → stringify & cast numbers
-                const tickets = values.tickets.map((ticket) => ({
-                  ticket_type: ticket.ticket_type.toUpperCase(),
-                  price: Number(ticket.ticket_price) || 0,
-                  quota: Number(ticket.ticket_quota) || 0,
-                  available_qty:
-                    ticket.ticket_quota !== undefined
-                      ? Number(ticket.ticket_quota)
-                      : Number(ticket.ticket_quota) || 0,
-                }));
-                formData.append("tickets", JSON.stringify(tickets));
-
-                // file
-                if (values.event_thumbnail) {
-                  formData.append("event_thumbnail", values.event_thumbnail);
-                }
-
-                // send to API
-                await apiCall.post("/event/create", formData, {
-                  headers: {
-                    "Content-Type": "multipart/form-data",
-                    Authorization: `Bearer ${localStorage.getItem("token")}`,
-                  },
-                });
-
-                resetForm();
-                alert("Event created successfully!");
-                router.push("/event-organizer")
-              } catch (error: any) {
-                console.error("Event creation failed", error);
-                const message =
-                  error.response?.data?.message || "Failed to create event";
-                alert(message);
-              } finally {
-                setLoading(false);
-              }
-            }}
+            onSubmit={handleSubmit}
           >
             {({ errors, touched, values, setFieldValue }) => (
               <Form className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -388,6 +397,28 @@ export default function EventCreationPage() {
           </Formik>
         </section>
       </div>
+
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="sm:max-w-md !rounded-3xl">
+          <DialogHeader>
+            <DialogTitle className="text-3xl text-[#09431C]">Create Event</DialogTitle>
+            <DialogDescription className="text-lg">{dialogMessage}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              onClick={() => {
+                setDialogOpen(false);
+                if (dialogMessage === "Event created successfully!") {
+                  router.push("/event-organizer"); 
+                }
+              }}
+              className=" bg-[#6FB229] hover:bg-[#09431C] rounded-lg"
+            >
+              OK
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
