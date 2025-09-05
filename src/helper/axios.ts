@@ -2,7 +2,7 @@ import axios from "axios";
 
 // Create axios instance with better error handling
 export const apiCall = axios.create({
-  baseURL: "http://localhost:4400", // http://localhost:4400  ||  https://event-management-api-sigma.vercel.app/
+  baseURL: "https://event-management-api-sigma.vercel.app", // http://localhost:4400  ||  https://event-management-api-sigma.vercel.app/
   timeout: 30000, // 30 second timeout
   headers: {
     "Content-Type": "application/json",
@@ -17,7 +17,7 @@ const maxRetries = 3;
 // Utility function to check backend connectivity
 export const checkBackendHealth = async (): Promise<boolean> => {
   try {
-    const response = await fetch("http://localhost:4400", { // http://localhost:4400  ||  https://event-management-api-sigma.vercel.app/
+    const response = await fetch("https://event-management-api-sigma.vercel.app", { // http://localhost:4400  ||  https://event-management-api-sigma.vercel.app/
       method: "GET",
       mode: "cors",
     });
