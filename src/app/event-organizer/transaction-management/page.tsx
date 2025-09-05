@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, Suspense } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -119,7 +119,7 @@ const transformTransactionData = (rawData: any[]): Transaction[] => {
   return Array.from(transactionMap.values());
 };
 
-export default function TransactionManagementPage() {
+function TransactionManagementContent() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [filteredTransactions, setFilteredTransactions] = useState<
     Transaction[]
@@ -872,5 +872,25 @@ export default function TransactionManagementPage() {
         </div>
       )}
     </div>
+  );
+}
+
+// Suspense wrapper
+export default function TransactionManagementPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center min-h-screen bg-white">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-4 border-[#09431C] border-t-transparent mx-auto mb-4"></div>
+            <p className="text-gray-600 text-lg font-medium">
+              Loading transaction management...
+            </p>
+          </div>
+        </div>
+      }
+    >
+      <TransactionManagementContent />
+    </Suspense>
   );
 }

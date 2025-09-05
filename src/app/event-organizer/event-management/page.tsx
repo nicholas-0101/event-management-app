@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -55,7 +55,7 @@ interface Event {
   created_at: string;
 }
 
-export default function EventManagementPage() {
+function EventManagementContent() {
   const [events, setEvents] = useState<Event[]>([]);
   const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
@@ -572,5 +572,25 @@ export default function EventManagementPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+// Suspense wrapper
+export default function EventManagementPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center min-h-screen bg-white">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-4 border-[#09431C] border-t-transparent mx-auto mb-4"></div>
+            <p className="text-gray-600 text-lg font-medium">
+              Loading events...
+            </p>
+          </div>
+        </div>
+      }
+    >
+      <EventManagementContent />
+    </Suspense>
   );
 }
