@@ -1,5 +1,6 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import SearchBar from "../core-components/searchbar";
 import DateFilter from "../core-components/filter-date";
@@ -22,6 +23,14 @@ type Event = {
 };
 
 export default function ExplorePage() {
+  return (
+    <Suspense fallback={<p>Loading...</p>}>
+      <ExploreContent />
+    </Suspense>
+  );
+}
+
+function ExploreContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
