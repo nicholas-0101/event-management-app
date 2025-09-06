@@ -14,6 +14,34 @@ const roboto = Roboto({
 export const metadata: Metadata = {
   title: "TicketNest",
   description: "Simplify Your Event",
+  keywords: ["events", "tickets", "concerts", "festivals", "TicketNest"],
+  icons: {
+    icon: "/favicon.ico",
+  },
+  openGraph: {
+    title: "TicketNest - Simplify Your Event",
+    description:
+      "Discover and book concerts, sports, festivals, and more with ease.",
+    url: "https://event-management-app-ivory.vercel.app",
+    siteName: "TicketNest",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "TicketNest Preview",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "TicketNest - Simplify Your Event",
+    description:
+      "Discover and book concerts, sports, festivals, and more with ease.",
+    images: ["/og-image.png"],
+  },
 };
 
 export default function RootLayout({
