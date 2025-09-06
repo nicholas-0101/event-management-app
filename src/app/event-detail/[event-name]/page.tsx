@@ -151,16 +151,16 @@ export default function EventDetailPage() {
 
   if (loading)
     return (
-      <p className="pt-4 text-neutral-600 text-center text-3xl font-medium flex flex-col gap-2 justify-center items-center">
-        <LoaderIcon color="#525252" size={200} />
-        Loading events...
-      </p>
+      <div className="flex flex-col items-center justify-center py-20">
+        <div className="animate-spin rounded-full h-16 w-16 border-4 border-[#09431C] border-t-transparent mb-4" />
+        <p className="text-gray-600 text-lg font-medium">Loading event...</p>
+      </div>
     );
   if (error) return <p className="p-6 text-red-500">{error}</p>;
   if (!event)
     return (
-      <p className="pt-4 text-neutral-600 text-center text-3xl font-medium flex flex-col gap-2 justify-center items-center">
-        <SearchX color="#525252" size={200} /> Events Not Found
+      <p className="pt-4 text-neutral-600 text-center text-lg font-medium flex flex-col gap-2 justify-center items-center">
+        <SearchX color="#09431C" size={60} /> Event Not Found
       </p>
     );
 
