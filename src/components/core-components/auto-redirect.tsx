@@ -54,18 +54,20 @@ export default function AutoRedirect() {
                 // Organizer should be redirected to event-organizer from main site
                 if (!pathname.startsWith("/event-organizer")) {
                   console.log(
-                    "🔄 AutoRedirect: Organizer detected, redirecting to /event-organizer"
+                    "🔄 AutoRedirect: Verified organizer detected, redirecting to /event-organizer"
                   );
                   router.replace("/event-organizer");
                   return;
                 }
               } else {
                 // Regular user can stay on main site
-                console.log("🔄 AutoRedirect: User can stay on main site");
+                console.log(
+                  "🔄 AutoRedirect: Verified user can stay on main site"
+                );
               }
             } else {
               // User not verified - only redirect to pre-verify if they're trying to access protected routes
-              // Allow unverified users to browse main site
+              // Allow unverified users to browse main site and complete verification
               if (pathname.startsWith("/event-organizer")) {
                 console.log(
                   "🔄 AutoRedirect: User not verified, redirecting to /pre-verify"
@@ -73,9 +75,9 @@ export default function AutoRedirect() {
                 router.replace("/pre-verify");
                 return;
               } else {
-                // Unverified user can browse main site
+                // Unverified user can browse main site and complete verification
                 console.log(
-                  "🔄 AutoRedirect: Unverified user can browse main site"
+                  "🔄 AutoRedirect: Unverified user can browse main site and complete verification"
                 );
               }
             }

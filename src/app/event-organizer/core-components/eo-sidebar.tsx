@@ -196,11 +196,7 @@ export default function EOSidebar({ className }: SidebarProps) {
           <div className="flex h-16 items-center justify-between px-4 border-b border-gray-200">
             {!isCollapsed && (
               <div className="flex items-center space-x-2">
-                <img
-                  src="/TicketNest-nobg.png"
-                  alt="TicketNest Logo"
-                  className="h-8 w-8 object-contain"
-                />
+                <img src="/TicketNest-nobg.png" className="h-8 w-auto" />
                 <div>
                   <h1 className="text-lg font-bold text-gray-900">
                     Event Organizer
@@ -302,7 +298,6 @@ export default function EOSidebar({ className }: SidebarProps) {
             >
               <img
                 src={profilePicUrl || "/TicketNest-nobg.png"}
-                alt="Organizer Profile"
                 className={cn(
                   "h-8 w-8 rounded-full object-cover border",
                   isCollapsed ? "mr-0" : "mr-3"

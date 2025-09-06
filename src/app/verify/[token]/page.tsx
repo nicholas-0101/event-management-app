@@ -25,8 +25,10 @@ export default function VerifyPage({ params }: { params: { token: string } }) {
         if (token && userData) {
           const user = JSON.parse(userData);
 
-          // If user is already verified and logged in, redirect based on role
+          // Only redirect if user is already verified AND this is not a verification page
+          // For verification pages, let the user complete the verification process
           if (user.is_verified) {
+            // User is already verified, redirect to appropriate page
             if (user.role === "ORGANIZER") {
               router.replace("/event-organizer");
             } else {
@@ -34,6 +36,7 @@ export default function VerifyPage({ params }: { params: { token: string } }) {
             }
             return;
           }
+          // If user is not verified, stay on verification page to complete verification
         }
       } catch (error) {
         console.error("Auth check error:", error);

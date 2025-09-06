@@ -350,7 +350,6 @@ function AttendeesContent() {
   );
 }
 
-// Suspense wrapper
 export default function AttendeesPage() {
   return (
     <Suspense

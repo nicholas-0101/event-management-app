@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -34,7 +34,7 @@ import {
   Eye,
   AlertCircle,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
 import EOSidebar from "../core-components/eo-sidebar";
@@ -117,14 +117,14 @@ const transformTransactionData = (rawData: any[]): Transaction[] => {
   return Array.from(transactionMap.values());
 };
 
-export default function PendingApprovalPage() {
+function PendingApprovalContent() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [filteredTransactions, setFilteredTransactions] = useState<
     Transaction[]
   >([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("WAITING_CONFIRMATION");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [selectedTransaction, setSelectedTransaction] =
     useState<Transaction | null>(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
@@ -135,10 +135,19 @@ export default function PendingApprovalPage() {
   const [processing, setProcessing] = useState(false);
   const [rejectionReason, setRejectionReason] = useState("");
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
 
   useEffect(() => {
     fetchPendingTransactions();
   }, []);
+
+  // Initialize filters from URL parameters
+  useEffect(() => {
+    const status = searchParams.get("status");
+
+    if (status) setStatusFilter(status);
+  }, [searchParams]);
 
   useEffect(() => {
     filterTransactions();
@@ -153,17 +162,33 @@ export default function PendingApprovalPage() {
         response.data.transactions || response.data
       );
 
-      // Filter only pending transactions (WAITING_CONFIRMATION)
-      const pendingTransactions = transformedTransactions.filter(
+      // Filter only relevant statuses for pending approval
+      const filteredTransactions = transformedTransactions.filter(
         (transaction: Transaction) =>
-          transaction.status === "WAITING_CONFIRMATION"
+          transaction.status === "WAITING_CONFIRMATION" ||
+          transaction.status === "SUCCESS" ||
+          transaction.status === "REJECTED"
       );
-      setTransactions(pendingTransactions);
+
+      setTransactions(filteredTransactions);
     } catch (error) {
       console.error("Error fetching pending transactions:", error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const updateURL = (status: string) => {
+    const params = new URLSearchParams(searchParams);
+
+    if (status && status !== "all") {
+      params.set("status", status);
+    } else {
+      params.delete("status");
+    }
+
+    const newURL = `${pathname}?${params.toString()}`;
+    router.replace(newURL);
   };
 
   const filterTransactions = () => {
@@ -221,10 +246,17 @@ export default function PendingApprovalPage() {
         await apiCall.post(
           `/transaction/organizer/accept/${selectedTransaction.id}`
         );
-        // Update local state - remove from pending list
-        setTransactions(
-          transactions.filter((t) => t.id !== selectedTransaction.id)
-        );
+        // Update local state - update status instead of removing
+        setTransactions((prevTransactions) => {
+          const updatedTransactions = prevTransactions.map((t) =>
+            t.id === selectedTransaction.id
+              ? { ...t, status: "SUCCESS", is_accepted: true }
+              : t
+          );
+          // Update filtered transactions immediately
+          setFilteredTransactions(updatedTransactions);
+          return updatedTransactions;
+        });
         alert(
           "Transaction accepted successfully! Email notification sent to user."
         );
@@ -239,10 +271,17 @@ export default function PendingApprovalPage() {
             rejection_reason: rejectionReason.trim(),
           }
         );
-        // Update local state - remove from pending list
-        setTransactions(
-          transactions.filter((t) => t.id !== selectedTransaction.id)
-        );
+        // Update local state - update status instead of removing
+        setTransactions((prevTransactions) => {
+          const updatedTransactions = prevTransactions.map((t) =>
+            t.id === selectedTransaction.id
+              ? { ...t, status: "REJECTED", is_accepted: false }
+              : t
+          );
+          // Update filtered transactions immediately
+          setFilteredTransactions(updatedTransactions);
+          return updatedTransactions;
+        });
         alert(
           "Transaction rejected successfully! Email notification sent to user."
         );
@@ -261,12 +300,18 @@ export default function PendingApprovalPage() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
+      case "WAITING_PAYMENT":
+        return "bg-blue-100 text-blue-800 border-blue-200";
       case "WAITING_CONFIRMATION":
         return "bg-yellow-100 text-yellow-800 border-yellow-200";
       case "SUCCESS":
         return "bg-green-100 text-green-800 border-green-200";
       case "REJECTED":
         return "bg-red-100 text-red-800 border-red-200";
+      case "EXPIRED":
+        return "bg-orange-100 text-orange-800 border-orange-200";
+      case "CANCELLED":
+        return "bg-gray-100 text-gray-800 border-gray-200";
       default:
         return "bg-gray-100 text-gray-800 border-gray-200";
     }
@@ -350,7 +395,9 @@ export default function PendingApprovalPage() {
                       ).length
                     }
                   </div>
-                  <p className="text-sm text-gray-600 text-center">Awaiting approval</p>
+                  <p className="text-sm text-gray-600 text-center">
+                    Awaiting approval
+                  </p>
                 </CardContent>
               </Card>
 
@@ -371,7 +418,9 @@ export default function PendingApprovalPage() {
                         .reduce((sum, t) => sum + t.total_price, 0)
                     )}
                   </div>
-                  <p className="text-sm text-gray-600 text-center">Pending amount</p>
+                  <p className="text-sm text-gray-600 text-center">
+                    Pending amount
+                  </p>
                 </CardContent>
               </Card>
 
@@ -388,7 +437,9 @@ export default function PendingApprovalPage() {
                   <div className="text-3xl font-bold text-gray-900 text-center">
                     {filteredTransactions.length}
                   </div>
-                  <p className="text-sm text-gray-600 text-center">Current results</p>
+                  <p className="text-sm text-gray-600 text-center">
+                    Current results
+                  </p>
                 </CardContent>
               </Card>
             </div>
@@ -415,13 +466,21 @@ export default function PendingApprovalPage() {
                     </div>
                   </div>
                   <div className="w-full md:w-60 flex-shrink-0">
-                    <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <Select
+                      value={statusFilter}
+                      onValueChange={(value) => {
+                        setStatusFilter(value);
+                        updateURL(value);
+                      }}
+                    >
                       <SelectTrigger className="w-full py-2 text-sm border-gray-200 focus:border-[#00481a] focus:ring-[#00481a]">
                         <SelectValue placeholder="Filter by status" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="all">All Status</SelectItem>
-                        <SelectItem value="WAITING_CONFIRMATION">Waiting Confirmation</SelectItem>
+                        <SelectItem value="WAITING_CONFIRMATION">
+                          Waiting Confirmation
+                        </SelectItem>
                         <SelectItem value="SUCCESS">Success</SelectItem>
                         <SelectItem value="REJECTED">Rejected</SelectItem>
                       </SelectContent>
@@ -566,6 +625,20 @@ export default function PendingApprovalPage() {
                               </Button>
                             </>
                           )}
+
+                          {transaction.status === "SUCCESS" && (
+                            <div className="flex-1 flex items-center justify-center bg-green-100 text-green-800 px-3 py-2 rounded-lg font-medium">
+                              <CheckCircle className="w-4 h-4 mr-2" />
+                              Accepted
+                            </div>
+                          )}
+
+                          {transaction.status === "REJECTED" && (
+                            <div className="flex-1 flex items-center justify-center bg-red-100 text-red-800 px-3 py-2 rounded-lg font-medium">
+                              <XCircle className="w-4 h-4 mr-2" />
+                              Rejected
+                            </div>
+                          )}
                         </div>
                       </CardContent>
                     </Card>
@@ -707,5 +780,24 @@ export default function PendingApprovalPage() {
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+export default function PendingApprovalPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center min-h-screen bg-white">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-4 border-[#09431C] border-t-transparent mx-auto mb-4"></div>
+            <p className="text-gray-600 text-lg font-medium">
+              Loading pending transactions...
+            </p>
+          </div>
+        </div>
+      }
+    >
+      <PendingApprovalContent />
+    </Suspense>
   );
 }
