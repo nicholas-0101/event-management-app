@@ -12,10 +12,10 @@ import {
   MapPin,
   SearchX,
   Star,
+  StarHalf,
 } from "lucide-react";
 import Link from "next/link";
 
-// --- Types ---
 interface ITicket {
   ticket_type: string;
   ticket_price: number;
@@ -67,6 +67,25 @@ function formatDate(date: string | Date) {
     month: "short",
     year: "numeric",
   }).format(new Date(year, month - 1, day));
+}
+
+function StarRating({ rating }: { rating: number }) {
+  const stars = [];
+
+  for (let i = 1; i <= 5; i++) {
+    if (rating >= i) {
+      // full star
+      stars.push(<Star key={i} size={20} color="#FDC700" fill="#FDC700" />);
+    } else if (rating >= i - 0.5) {
+      // half star
+      stars.push(<StarHalf key={i} size={20} color="#FDC700" fill="#FDC700" />);
+    } else {
+      // empty star
+      stars.push(<Star key={i} size={20} color="#FDC700" />);
+    }
+  }
+
+  return <div className="flex items-center gap-1">{stars}</div>;
 }
 
 export default function EventDetailPage() {
@@ -170,9 +189,7 @@ export default function EventDetailPage() {
   return (
     <div className="max-w-5xl mx-auto p-6 space-y-10">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-        {/* Left: Event Details */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Thumbnail */}
           <div className="relative w-full h-72 rounded-2xl overflow-hidden shadow-md">
             <Image
               src={event.event_thumbnail}
@@ -182,7 +199,6 @@ export default function EventDetailPage() {
             />
           </div>
 
-          {/* Event Info */}
           <div className="space-y-2">
             <h1 className="text-4xl font-black text-[#09431C]">
               {event.event_name}
@@ -199,24 +215,37 @@ export default function EventDetailPage() {
             </p>
           </div>
 
-          {/* Reviews Section */}
           {isEventEnded && (
             <div className="mt-10">
-              <h2 className="text-2xl font-semibold text-[#09431C] mb-4 flex gap-1">
+              {/* <h2 className="text-2xl font-semibold text-[#09431C] mb-4 flex gap-1">
                 Reviews (Avg: {avgRating}{" "}
                 <Star color="#FDC700" fill="#FDC700" className="mt-1" />)
+              </h2> */}
+
+              <h2 className="text-2xl font-semibold text-[#09431C] mb-4 flex-col gap-1 items-center">
+                Reviews{" "}
+                <span className="flex gap-1 text-lg">
+                  <StarRating rating={avgRating} /> ({avgRating.toFixed(1)})
+                </span>
               </h2>
               {reviews.length === 0 ? (
                 <p className="text-gray-500">No reviews yet.</p>
               ) : (
                 <div className="space-y-4">
                   {reviews.map((rev) => (
-                    <Card key={rev.id} className="p-4 rounded-lg shadow">
+                    <Card key={rev.id} className="p-4 rounded-xl shadow">
                       <div className="flex items-center gap-3 mb-2">
                         {rev.user.profile_pic ? (
                           <Image
+                            src={rev.user.profile_pic}
+                            alt={rev.user.username}
+                            width={40}
+                            height={40}
+                            className="w-10 h-10 rounded-full object-cover border border-gray-200"
+                          />
+                        ) : (
+                          <Image
                             src={
-                              rev.user.profile_pic ||
                               "https://i.pinimg.com/736x/1c/c5/35/1cc535901e32f18db87fa5e340a18aff.jpg"
                             }
                             alt={rev.user.username}
@@ -224,8 +253,6 @@ export default function EventDetailPage() {
                             height={40}
                             className="w-10 h-10 rounded-full object-cover border border-gray-200"
                           />
-                        ) : (
-                          <div className="w-10 h-10 rounded-full bg-gray-300" />
                         )}
                         <div>
                           <p className="font-semibold">{rev.user.username}</p>
@@ -254,9 +281,7 @@ export default function EventDetailPage() {
           )}
         </div>
 
-        {/* Right: Tickets + Actions */}
         <div className="lg:col-span-1 flex flex-col">
-          {/* Tickets */}
           <div>
             <h2 className="text-3xl font-semibold mb-4 text-[#09431C]">
               🎟 Tickets
@@ -284,7 +309,6 @@ export default function EventDetailPage() {
             </div>
           </div>
 
-          {/* Button */}
           <div className="mt-6">
             {isEventEnded ? (
               hasReviewed ? (

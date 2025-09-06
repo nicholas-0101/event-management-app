@@ -33,7 +33,7 @@ export default function SearchBar({
   }, [value, delay, onSearch]);
 
   return (
-    <div className="w-full sm:w-[28rem] md:w-[36rem] lg:w-[48rem] h-14 rounded-full shadow-md hover:shadow-lg transition shadow-gray-300/50 border border-gray-200 bg-white px-4 flex gap-2 items-center mx-2 sm:mx-0">
+    <div className="w-full sm:w-[28rem] md:w-[36rem] lg:w-[48rem] h-14 rounded-full shadow-md hover:shadow-lg transition duration-500 shadow-gray-300/50 border border-gray-200 bg-white px-4 flex gap-2 items-center mx-2 sm:mx-0">
       <Search color="#4E7C05" />
       <Input
         placeholder="Search events, artists, teams, and more"

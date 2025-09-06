@@ -33,14 +33,14 @@ export default function HeroBanner({ setActiveCategory }: Props) {
             <CarouselItem key={slide.id}>
               <div className="p-2">
                 <Card
-                  className="w-full shadow-none rounded-3xl md:rounded-4xl overflow-hidden"
+                  className="w-full shadow-none rounded-3xl md:rounded-4xl overflow-hidden group"
                   onClick={() => setActiveCategory(slide.category)}
                 >
                   <div className="relative w-full aspect-[71/25]">
                     <img
                       src={slide.img}
                       alt={`Slide ${slide.id}`}
-                      className="absolute inset-0 w-full h-full object-cover"
+                      className="absolute inset-0 w-full h-full object-cover transform transition-transform duration-500 ease-in-out group-hover:scale-105"
                     />
                   </div>
                 </Card>
