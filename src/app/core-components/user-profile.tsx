@@ -172,9 +172,11 @@ const UserButton: React.FC = () => {
   }, []);
 
   const handleLogout = () => {
+    // Clear all authentication data (localStorage and cookies)
     clearAuthData();
-    router.push("/");
-    window.location.reload();
+
+    // Force immediate redirect to landing page
+    window.location.href = "/";
   };
 
   // Show loading state

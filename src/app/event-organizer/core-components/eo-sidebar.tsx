@@ -19,6 +19,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { apiCall } from "@/helper/axios";
+import { clearAuthData } from "@/lib/auth-utils";
 
 interface SidebarProps {
   className?: string;
@@ -112,9 +113,11 @@ export default function EOSidebar({ className }: SidebarProps) {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    router.push("/signin");
+    // Clear all authentication data (localStorage and cookies)
+    clearAuthData();
+
+    // Force immediate redirect to landing page
+    window.location.href = "/";
   };
 
   const toggleMenu = (title: string) => {
