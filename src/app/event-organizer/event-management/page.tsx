@@ -575,7 +575,6 @@ function EventManagementContent() {
   );
 }
 
-// Suspense wrapper
 export default function EventManagementPage() {
   return (
     <Suspense

@@ -188,7 +188,7 @@ function TransactionManagementContent() {
 
   const fetchTransactions = async () => {
     try {
-      const response = await apiCall.get("/transaction/organizer/simple");
+      const response = await apiCall.get("/transaction/organizer/transactions");
 
       // Transform raw SQL data to expected structure
       const transformedTransactions = transformTransactionData(
@@ -875,7 +875,6 @@ function TransactionManagementContent() {
   );
 }
 
-// Suspense wrapper
 export default function TransactionManagementPage() {
   return (
     <Suspense
