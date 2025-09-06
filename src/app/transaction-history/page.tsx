@@ -102,7 +102,7 @@ export default function TransactionHistoryPage() {
         </div>
       ) : transactions.length === 0 ? (
         <p className="pt-4 text-neutral-600 text-center text-lg font-medium flex flex-col gap-2 justify-center items-center">
-          <SearchX color="#09431C" size={60} /> Transaction Not Found
+          <SearchX color="#09431C" size={60} /> Transactions Not Found
         </p>
       ) : (
         transactions.map((transaction) => (
