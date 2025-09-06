@@ -220,7 +220,7 @@ const UserButton: React.FC = () => {
       <DropdownMenuTrigger asChild>
         <Button
           variant={"ghost"}
-          className="flex items-center gap-2 rounded-full pl-2 pr-3 h-10 w-20 md:w-35 hover:shadow-md transition-shadow"
+          className="flex items-center gap-2 rounded-full pl-2 pr-3 h-10 w-20 md:w-35 hover:shadow-lg transition duration-500"
         >
           <img
             src={getProfilePicUrl(user.profile_pic)}
