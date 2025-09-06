@@ -48,7 +48,7 @@ const UserButton: React.FC = () => {
     if (!pic)
       return "https://i.pinimg.com/736x/1c/c5/35/1cc535901e32f18db87fa5e340a18aff.jpg";
     if (pic.startsWith("http")) return pic;
-    return `https://event-management-app-ivory.vercel.app/${pic}`;
+    return `https://event-management-api-sigma.vercel.app/${pic}`;
   };
 
   const fetchUserData = async (showLoading = true) => {
