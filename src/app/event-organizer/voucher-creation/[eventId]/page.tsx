@@ -41,26 +41,6 @@ export default function CreateVoucherPage() {
     voucher_end_date: null,
   };
 
-  // const handleSubmit = async (values: typeof initialValues) => {
-  //   setLoading(true);
-  //   try {
-  //     await apiCall.post(`/voucher/create/${eventId}`, {
-  //       voucher_code: values.voucher_code,
-  //       discount_value: Number(values.discount_value),
-  //       voucher_start_date: values.voucher_start_date,
-  //       voucher_end_date: values.voucher_end_date,
-  //     });
-  //     setErrorMessage(null);
-  //     alert("Voucher created successfully!");
-  //     router.replace("/event-organizer/event-management");
-  //   } catch (err: any) {
-  //     console.error(err.response?.data?.message);
-  //     setErrorMessage(err.response?.data?.message || err.message || "Something went wrong");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
   const handleSubmit = async (values: typeof initialValues) => {
     setLoading(true);
     try {
