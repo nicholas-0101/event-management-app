@@ -89,17 +89,21 @@ export default function TransactionHistoryPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br p-6 pt-4 flex flex-col items-center gap-6">
-      <h1 className="text-3xl font-bold text-[#09431C] text-center">Transaction History</h1>
+      <h1 className="text-3xl font-bold text-[#09431C] text-center">
+        Transaction History
+      </h1>
 
       {loading ? (
-        <p className="pt-4 text-neutral-600 text-center text-3xl font-medium flex flex-col gap-2 justify-center items-center">
-          <LoaderIcon color="#525252" size={200} />
-          Loading transactions...
-        </p>
-      ) : transactions.length === 0 ? (
-        <p className="pt-4 text-neutral-600 text-center text-3xl font-medium flex flex-col gap-2 justify-center items-center">
-            <SearchX color="#525252" size={200} /> No Transactions Found
+        <div className="flex flex-col items-center justify-center py-20">
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-[#09431C] border-t-transparent mb-4" />
+          <p className="text-gray-600 text-lg font-medium">
+            Loading transactions...
           </p>
+        </div>
+      ) : transactions.length === 0 ? (
+        <p className="pt-4 text-neutral-600 text-center text-lg font-medium flex flex-col gap-2 justify-center items-center">
+          <SearchX color="#09431C" size={60} /> Transaction Not Found
+        </p>
       ) : (
         transactions.map((transaction) => (
           <Card
@@ -159,7 +163,9 @@ export default function TransactionHistoryPage() {
               <Button
                 type="button"
                 className="w-full flex-1 bg-[#6FB229] hover:bg-[#09431C] rounded-lg cursor-pointer"
-                onClick={() => router.push(`/transaction-detail/${transaction.id}`)}
+                onClick={() =>
+                  router.push(`/transaction-detail/${transaction.id}`)
+                }
               >
                 View Transaction
               </Button>

@@ -45,42 +45,6 @@ export default function CreateReviewPage() {
     if (eventId) fetchEventName();
   }, [eventId]);
 
-  // const handleSubmit = async (e: React.FormEvent) => {
-  //   e.preventDefault();
-
-  //   if (rating < 1) {
-  //     alert("Please select at least 1 star.");
-  //     return;
-  //   }
-
-  //   try {
-  //     setLoading(true);
-  //     const token = localStorage.getItem("token");
-
-  //     await apiCall.post(
-  //       `/review/${eventId}`,
-  //       { review_text, rating },
-  //       { headers: { Authorization: `Bearer ${token}` } }
-  //     );
-
-  //     alert("Review submitted successfully!");
-  //     localStorage.setItem(`reviewed_event_${eventId}`, "true");
-
-  //     if (eventName) {
-  //       router.push(`/event-detail/${slugify(eventName, { lower: true })}`);
-  //     } else {
-  //       router.back();
-  //     }
-  //   } catch (err: any) {
-  //     console.error("Submit review error:", err);
-
-  //     const message = err.response?.data?.message || "Failed to submit review.";
-  //     alert(message);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
