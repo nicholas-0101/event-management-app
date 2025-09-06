@@ -49,14 +49,14 @@ export default function EventCard({
 }: CardItemProps) {
   return (
     <a href={href}>
-      <Card className="rounded-3xl shadow-md overflow-hidden hover:shadow-lg transition flex flex-col gap-4 pb-5 w-full md:w-73 lg:w-90 xl:w-92 2xl:w-98">
+      <Card className="rounded-3xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 group transform hover:scale-105 flex flex-col gap-4 pb-5 w-full md:w-73 lg:w-90 xl:w-92 2xl:w-98">
         <div className="relative w-full h-40">
-          <Image src={thumbnail} alt={title} fill className="object-cover" />
+          <Image src={thumbnail} alt={title} fill className="object-cover group-hover:scale-110 transition-all duration-300" />
         </div>
         <div className="flex flex-col gap-3">
           <CardHeader className="flex flex-col gap-1">
             <div className="flex justify-between w-full">
-              <CardTitle className="text-lg font-semibold p-0">
+              <CardTitle className="text-lg font-semibold p-0 line-clamp-1 group-hover:text-[#00481a] transition-colors duration-300">
                 {title}
               </CardTitle>
               <Badge className="rounded-full h-6 bg-[#09431c]">{category}</Badge>
