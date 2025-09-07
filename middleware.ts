@@ -7,15 +7,34 @@ export function middleware(request: NextRequest) {
   // Mobile redirect for event-organizer routes
   if (pathname.startsWith("/event-organizer")) {
     const ua = request.headers.get("user-agent")?.toLowerCase() || "";
-    const isMobile =
-      /mobile|android|iphone|ipad|phone|blackberry|opera mini|windows phone/.test(
+    // Client Hints: Chromium akan mengirimkan Sec-CH-UA-Mobile=?1 untuk mobile (jika tersedia)
+    const chMobile = request.headers.get("sec-ch-ua-mobile")?.toLowerCase();
+    const isClientHintsMobile = chMobile === "?1" || chMobile === "1";
+
+    // Perluas deteksi UA untuk menangkap tablet/desktop-mode iPad dan varian lain
+    const isUaMobile =
+      /\b(mobi|mobile|android|iphone|ipod|ipad|phone|blackberry|opera mini|windows phone|tablet)\b/.test(
         ua
       );
 
+    // Beberapa iPadOS dalam mode desktop memiliki UA mirip Mac tetapi tetap sentuh
+    // Deteksi konservatif: jika mengandung "mac os x" dan "ipad" tidak ada, jangan paksa mobile
+    const looksLikeDesktopMac =
+      ua.includes("macintosh") || ua.includes("mac os x");
+    const explicitlyIPad = ua.includes("ipad");
+
+    const isMobile =
+      isClientHintsMobile ||
+      isUaMobile ||
+      (explicitlyIPad && !looksLikeDesktopMac);
+
     if (isMobile) {
-      return NextResponse.redirect(
+      const redirectResponse = NextResponse.redirect(
         new URL("/mobile-not-supported", request.url)
       );
+      // Pastikan cache CDN membedakan mobile vs desktop
+      redirectResponse.headers.set("Vary", "User-Agent, Sec-CH-UA-Mobile");
+      return redirectResponse;
     }
   }
 
