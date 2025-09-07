@@ -4,6 +4,11 @@ import type { NextRequest } from "next/server";
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // Allow mobile-not-supported page to render without any redirect rules
+  if (pathname.startsWith("/mobile-not-supported")) {
+    return NextResponse.next();
+  }
+
   // Mobile redirect for event-organizer routes
   if (pathname.startsWith("/event-organizer")) {
     const ua = request.headers.get("user-agent")?.toLowerCase() || "";
@@ -66,7 +71,8 @@ export function middleware(request: NextRequest) {
       // If user is organizer, redirect to event-organizer from main site
       if (
         userData.role === "ORGANIZER" &&
-        !pathname.startsWith("/event-organizer")
+        !pathname.startsWith("/event-organizer") &&
+        !pathname.startsWith("/mobile-not-supported")
       ) {
         return NextResponse.redirect(new URL("/event-organizer", request.url));
       }
