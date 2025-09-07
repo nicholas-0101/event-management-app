@@ -203,7 +203,7 @@ function AttendeesContent() {
   }, [attendees]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#f6ffea] to-[#e9ffd1]">
+    <div className="min-h-screen bg-white">
       <EOSidebar />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
@@ -354,7 +354,7 @@ export default function AttendeesPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-[#f6ffea] to-[#e9ffd1]">
+        <div className="flex items-center justify-center min-h-screen bg-white">
           <div className="text-center">
             <div className="animate-spin rounded-full h-16 w-16 border-4 border-[#09431C] border-t-transparent mx-auto mb-4" />
             <p className="text-gray-600 text-lg font-medium">
