@@ -197,12 +197,6 @@ export default function EOSidebar({ className }: SidebarProps) {
             {!isCollapsed && (
               <div className="flex items-center space-x-2">
                 <img src="/TicketNest-nobg.png" className="h-8 w-auto" />
-                <div>
-                  <h1 className="text-lg font-bold text-gray-900">
-                    Event Organizer
-                  </h1>
-                  <p className="text-xs text-gray-500">Dashboard</p>
-                </div>
               </div>
             )}
             <Button
