@@ -5,7 +5,7 @@ import Link from "next/link";
 
 export default function MobileNotSupported() {
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4">
       <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center">
         <div className="mb-6">
           <div className="mx-auto w-20 h-20 bg-[#c6ee9a] rounded-full flex items-center justify-center mb-4">
