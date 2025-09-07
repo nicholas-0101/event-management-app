@@ -400,7 +400,7 @@ function EventManagementContent() {
                     onClick={() =>
                       router.push("/event-organizer/transaction-management")
                     }
-                    className="flex-1 sm:flex-none border-2 border-gray-300 hover:border-blue-500 hover:bg-blue-50 text-gray-700 hover:text-blue-700 font-medium py-2 px-6 transition-all duration-300"
+                    className="flex-1 sm:flex-none border-2 border-gray-300 hover:border-[#97d753] hover:bg-[#c6ee9a]/30 text-gray-700 hover:text-[#09431C] font-medium py-2 px-6 transition-all duration-300"
                   >
                     View Transactions
                   </Button>
@@ -482,7 +482,7 @@ function EventManagementContent() {
                         </div>
 
                         <CardHeader className="pb-2">
-                          <CardTitle className="text-xl font-bold text-gray-900 line-clamp-2 pr-2 group-hover:text-blue-600 transition-colors duration-300">
+                          <CardTitle className="text-xl font-bold text-gray-900 line-clamp-2 pr-2 group-hover:text-[#09431C] transition-colors duration-300">
                             {event.event_name}
                           </CardTitle>
                           <p className="text-gray-600 line-clamp-2 mt-2 leading-relaxed">
