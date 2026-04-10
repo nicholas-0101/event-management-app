@@ -3,7 +3,7 @@ import { clearAuthData } from "@/lib/auth-utils";
 
 // Create axios instance with better error handling
 export const apiCall = axios.create({
-  baseURL: "http://localhost:4400", // "https://event-management-api-sigma.vercel.app", // http://localhost:4400  ||  https://event-management-api-sigma.vercel.app/
+  baseURL: process.env.NEXT_PUBLIC_API_URL || "https://event-management-api-sigma.vercel.app",
   timeout: 30000, // 30 second timeout
   headers: {
     "Content-Type": "application/json",
@@ -19,9 +19,8 @@ const maxRetries = 3;
 export const checkBackendHealth = async (): Promise<boolean> => {
   try {
     const response = await fetch(
-      "http://localhost:4400", // "https://event-management-api-sigma.vercel.app",
+      process.env.NEXT_PUBLIC_API_URL || "https://event-management-api-sigma.vercel.app",
       {
-        // http://localhost:4400  ||  https://event-management-api-sigma.vercel.app/
         method: "GET",
         mode: "cors",
       }
