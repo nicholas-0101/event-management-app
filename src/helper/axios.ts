@@ -19,7 +19,7 @@ const maxRetries = 3;
 export const checkBackendHealth = async (): Promise<boolean> => {
   try {
     const response = await fetch(
-      process.env.NEXT_PUBLIC_API_URL || "https://event-management-api-pi.vercel.app", //"http://localhost:4400"
+      process.env.NEXT_PUBLIC_API_URL || "https://event-management-api-pi.vercel.app",
       {
         method: "GET",
         mode: "cors",
