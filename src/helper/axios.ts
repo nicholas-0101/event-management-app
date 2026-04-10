@@ -3,7 +3,7 @@ import { clearAuthData } from "@/lib/auth-utils";
 
 // Create axios instance with better error handling
 export const apiCall = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "https://event-management-api-pi.vercel.app" || "https://event-management-api-nicholas-projects-769f8fb7.vercel.app" || "https://event-management-api-nicholas-0101-nicholas-projects-769f8fb7.vercel.app", //"http://localhost:4400"
+  baseURL: process.env.NEXT_PUBLIC_API_URL || "https://event-management-api-pi.vercel.app",
   timeout: 30000, // 30 second timeout
   headers: {
     "Content-Type": "application/json",
@@ -19,7 +19,7 @@ const maxRetries = 3;
 export const checkBackendHealth = async (): Promise<boolean> => {
   try {
     const response = await fetch(
-      process.env.NEXT_PUBLIC_API_URL || "https://event-management-api-pi.vercel.app"  || "https://event-management-api-nicholas-projects-769f8fb7.vercel.app" || "https://event-management-api-nicholas-0101-nicholas-projects-769f8fb7.vercel.app", //"http://localhost:4400",
+      process.env.NEXT_PUBLIC_API_URL || "https://event-management-api-pi.vercel.app",
       {
         method: "GET",
         mode: "cors",
