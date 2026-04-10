@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -48,7 +48,7 @@ interface UpdateProfileForm {
   username: string;
 }
 
-export default function EditProfile() {
+export default function EditProfile({ standalone = true }: { standalone?: boolean }) {
   const router = useRouter();
   const [userData, setUserData] = useState<UserData | null>(null);
 
@@ -56,7 +56,7 @@ export default function EditProfile() {
     if (!pic)
       return "https://i.pinimg.com/736x/1c/c5/35/1cc535901e32f18db87fa5e340a18aff.jpg";
     if (pic.startsWith("http")) return pic;
-    return `http://localhost:4400/${pic}`;
+    return `https://event-management-api-sigma.vercel.app/${pic}`;
   };
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
@@ -357,9 +357,9 @@ export default function EditProfile() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background py-8 px-4 flex items-center justify-center">
+      <div className={standalone ? "min-h-screen bg-background py-8 px-4 flex items-center justify-center" : "py-8 flex items-center justify-center"}>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#09431C] mx-auto"></div>
           <p className="mt-2 text-muted-foreground">Loading profile...</p>
         </div>
       </div>
@@ -368,7 +368,7 @@ export default function EditProfile() {
 
   if (!userData) {
     return (
-      <div className="min-h-screen bg-background py-8 px-4 flex items-center justify-center">
+      <div className={standalone ? "min-h-screen bg-background py-8 px-4 flex items-center justify-center" : "py-8 flex items-center justify-center"}>
         <div className="text-center">
           <p className="text-muted-foreground">User data not found.</p>
         </div>
@@ -376,423 +376,318 @@ export default function EditProfile() {
     );
   }
 
-  return (
-    <div className="min-h-screen bg-background py-8 px-4">
-      <div className="max-w-4xl mx-auto">
-        <Card className="pt-6">
-          <CardHeader className="border-b">
-            <div className="flex items-center gap-4">
-              <div className="relative">
-                <img
-                  src={getProfilePicUrl(userData.profile_pic)}
-                  alt="Profile"
-                  className="size-16 rounded-full object-cover border-2 border-gray-200"
-                />
+  const card = (
+    <Card className="rounded-2xl shadow-md border border-gray-100">
+      <CardHeader className="border-b">
+        <div className="flex items-center gap-4">
+          <div className="relative">
+            <img
+              src={getProfilePicUrl(userData.profile_pic)}
+              alt="Profile"
+              className="size-16 rounded-full object-cover border-2 border-[#c6ee9a]"
+            />
+          </div>
+          <div className="flex-1">
+            <CardTitle className="text-xl font-bold text-[#09431C]">{userData.username}</CardTitle>
+            <CardDescription>Update your account information and security settings.</CardDescription>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent className="py-6">
+        {/* Error and Success Messages */}
+        {error && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl">
+            <div className="flex items-center gap-2">
+              <X className="w-4 h-4 text-red-500" />
+              <p className="text-red-600 text-sm font-medium">{error}</p>
+            </div>
+          </div>
+        )}
+        {success && (
+          <div className="mb-4 p-3 bg-[#c6ee9a]/30 border border-[#97d753] rounded-xl">
+            <div className="flex items-center gap-2">
+              <CheckCircle className="w-4 h-4 text-[#09431C]" />
+              <p className="text-[#09431C] text-sm font-medium">{success}</p>
+            </div>
+          </div>
+        )}
+
+        <Tabs defaultValue="profile" className="w-full">
+          <div className="w-full overflow-x-auto">
+            <TabsList className="grid w-full grid-cols-4 min-w-max whitespace-nowrap rounded-xl">
+              <TabsTrigger value="profile" className="flex items-center gap-2 rounded-xl">
+                <User className="w-4 h-4" />
+                Edit Profile
+              </TabsTrigger>
+              <TabsTrigger value="photo" className="flex items-center gap-2 rounded-xl">
+                <Camera className="w-4 h-4" />
+                Profile Picture
+              </TabsTrigger>
+              <TabsTrigger value="email" className="flex items-center gap-2 rounded-xl">
+                <Mail className="w-4 h-4" />
+                Change Email
+              </TabsTrigger>
+              <TabsTrigger value="password" className="flex items-center gap-2 rounded-xl">
+                <Lock className="w-4 h-4" />
+                Change Password
+              </TabsTrigger>
+            </TabsList>
+          </div>
+
+          {/* Profile Tab */}
+          <TabsContent value="profile" className="space-y-4 mt-6">
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-lg font-semibold text-[#09431C]">Profile Information</h3>
+                <p className="text-sm text-muted-foreground">Update your basic profile information.</p>
               </div>
-              <div className="flex-1">
-                <CardTitle>Edit Profile</CardTitle>
-                <CardDescription>
-                  Update your account information and security settings.
-                </CardDescription>
+              <form onSubmit={handleUpdateProfile} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="username">Username</Label>
+                  <Input
+                    id="username"
+                    value={updateProfileForm.username}
+                    onChange={(e) => setUpdateProfileForm({ username: e.target.value })}
+                    placeholder="Enter your username"
+                    className="rounded-full"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Current Email</Label>
+                  <Input value={userData.email} disabled className="bg-muted rounded-full" />
+                  <p className="text-xs text-muted-foreground">To change your email, use the "Change Email" tab.</p>
+                </div>
+                <div className="space-y-2">
+                  <Label>Role</Label>
+                  <Input value={userData.role} disabled className="bg-muted rounded-full" />
+                </div>
+                <Button
+                  type="submit"
+                  disabled={isLoadingProfile}
+                  className="w-full rounded-full bg-[#6fb229] hover:bg-[#6fb229]/80"
+                >
+                  {isLoadingProfile ? "Updating..." : "Update Profile"}
+                </Button>
+              </form>
+            </div>
+          </TabsContent>
+
+          {/* Photo Tab */}
+          <TabsContent value="photo" className="space-y-4 mt-6">
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-lg font-semibold text-[#09431C]">Profile Photo</h3>
+                <p className="text-sm text-muted-foreground">Upload a new profile photo. Supported formats: JPG, PNG, GIF. Max size: 5MB.</p>
+              </div>
+              <div className="space-y-4">
+                <div>
+                  <Label>Current Photo</Label>
+                  <div className="mt-2 flex items-center gap-4">
+                    <div className="relative">
+                      <img
+                        src={getProfilePicUrl(userData.profile_pic)}
+                        alt="Profile"
+                        className="w-20 h-20 rounded-full object-cover border-2 border-[#c6ee9a]"
+                      />
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      {userData.profile_pic ? "Current profile photo" : "Using default profile photo"}
+                    </div>
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="profile-photo-input">Select New Photo</Label>
+                    <Input
+                      id="profile-photo-input"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileSelect}
+                      className="mt-1 rounded-full"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">Click to select an image file</p>
+                  </div>
+                  {previewUrl && (
+                    <div className="space-y-2">
+                      <Label>Preview</Label>
+                      <div className="relative inline-block">
+                        <img
+                          src={previewUrl}
+                          alt="Preview"
+                          className="w-32 h-32 rounded-2xl object-cover border-2 border-[#c6ee9a]"
+                        />
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="sm"
+                          onClick={clearSelectedFile}
+                          className="absolute -top-2 -right-2 w-6 h-6 p-0 rounded-full"
+                        >
+                          <X className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                  {selectedFile && (
+                    <Button
+                      onClick={handlePhotoUpload}
+                      disabled={isLoadingPhoto}
+                      className="w-full rounded-full bg-[#6fb229] hover:bg-[#6fb229]/80"
+                    >
+                      {isLoadingPhoto ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                          Uploading...
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="w-4 h-4 mr-2" />
+                          Upload Photo
+                        </>
+                      )}
+                    </Button>
+                  )}
+                </div>
               </div>
             </div>
-          </CardHeader>
-          <CardContent className="py-6">
-            {/* Error and Success Messages */}
-            {error && (
-              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                <div className="flex items-center gap-2">
-                  <X className="w-4 h-4 text-red-500" />
-                  <p className="text-red-600 text-sm font-medium">{error}</p>
-                </div>
+          </TabsContent>
+
+          {/* Change Email Tab */}
+          <TabsContent value="email" className="space-y-4 mt-6">
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-lg font-semibold text-[#09431C]">Change Email Address</h3>
+                <p className="text-sm text-muted-foreground">Enter your new email address. A verification link will be sent to confirm the change.</p>
               </div>
-            )}
-            {success && (
-              <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-500" />
-                  <p className="text-green-600 text-sm font-medium">
-                    {success}
-                  </p>
+              <form onSubmit={handleChangeEmail} className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Current Email</Label>
+                  <Input value={userData.email} disabled className="bg-muted rounded-full" />
                 </div>
+                <div className="space-y-2">
+                  <Label htmlFor="newEmail">New Email Address</Label>
+                  <Input
+                    id="newEmail"
+                    type="email"
+                    value={changeEmailForm.newEmail}
+                    onChange={(e) => setChangeEmailForm({ newEmail: e.target.value })}
+                    placeholder="New email address"
+                    required
+                    className="rounded-full"
+                  />
+                  <p className="text-xs text-muted-foreground">A verification link will be sent to this email address. Make sure you have access to this email.</p>
+                </div>
+                <Button
+                  type="submit"
+                  disabled={isLoadingEmail || !changeEmailForm.newEmail}
+                  className="w-full rounded-full bg-[#6fb229] hover:bg-[#6fb229]/80"
+                >
+                  {isLoadingEmail ? "Sending Verification..." : "Send Verification Email"}
+                </Button>
+              </form>
+            </div>
+          </TabsContent>
+
+          {/* Change Password Tab */}
+          <TabsContent value="password" className="space-y-4 mt-6">
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-lg font-semibold text-[#09431C]">Change Password</h3>
+                <p className="text-sm text-muted-foreground">Enter your current password and choose a new one.</p>
               </div>
-            )}
-
-            <Tabs defaultValue="profile" className="w-full">
-              <div className="w-full overflow-x-auto">
-                <TabsList className="grid w-full grid-cols-4 min-w-max whitespace-nowrap">
-                  <TabsTrigger
-                    value="profile"
-                    className="flex items-center gap-2"
-                  >
-                    <User className="w-4 h-4" />
-                    Edit Profile
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="photo"
-                    className="flex items-center gap-2"
-                  >
-                    <Camera className="w-4 h-4" />
-                    Profile Picture
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="email"
-                    className="flex items-center gap-2"
-                  >
-                    <Mail className="w-4 h-4" />
-                    Change Email
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="password"
-                    className="flex items-center gap-2"
-                  >
-                    <Lock className="w-4 h-4" />
-                    Change Password
-                  </TabsTrigger>
-                </TabsList>
-              </div>
-
-              {/* Profile Tab */}
-              <TabsContent value="profile" className="space-y-4">
-                <div className="space-y-4">
-                  <div>
-                    <h3 className="text-lg font-medium">Profile Information</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Update your basic profile information.
-                    </p>
-                  </div>
-
-                  <form onSubmit={handleUpdateProfile} className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="username">Username</Label>
-                      <Input
-                        id="username"
-                        value={updateProfileForm.username}
-                        onChange={(e) =>
-                          setUpdateProfileForm({ username: e.target.value })
-                        }
-                        placeholder="Enter your username"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label>Current Email</Label>
-                      <Input
-                        value={userData.email}
-                        disabled
-                        className="bg-muted"
-                      />
-                      <p className="text-xs text-muted-foreground">
-                        To change your email, use the "Change Email" tab.
-                      </p>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label>Role</Label>
-                      <Input
-                        value={userData.role}
-                        disabled
-                        className="bg-muted"
-                      />
-                    </div>
-
+              <form onSubmit={handleChangePassword} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="oldPassword">Current Password</Label>
+                  <div className="relative">
+                    <Input
+                      id="oldPassword"
+                      type={showOldPassword ? "text" : "password"}
+                      value={changePasswordForm.oldPassword}
+                      onChange={(e) => setChangePasswordForm({ ...changePasswordForm, oldPassword: e.target.value })}
+                      placeholder="Current password"
+                      required
+                      className="rounded-full pr-12"
+                    />
                     <Button
-                      type="submit"
-                      disabled={isLoadingProfile}
-                      className="w-full"
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                      onClick={() => setShowOldPassword(!showOldPassword)}
                     >
-                      {isLoadingProfile ? "Updating..." : "Update Profile"}
+                      {showOldPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </Button>
-                  </form>
-                </div>
-              </TabsContent>
-
-              {/* Photo Tab */}
-              <TabsContent value="photo" className="space-y-4">
-                <div className="space-y-4">
-                  <div>
-                    <h3 className="text-lg font-medium">Profile Photo</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Upload a new profile photo. Supported formats: JPG, PNG,
-                      GIF. Max size: 5MB.
-                    </p>
-                  </div>
-
-                  {/* Current Photo Display */}
-                  <div className="space-y-4">
-                    <div>
-                      <Label>Current Photo</Label>
-                      <div className="mt-2 flex items-center gap-4">
-                        <div className="relative">
-                          <img
-                            src={getProfilePicUrl(userData.profile_pic)}
-                            alt="Profile"
-                            className="w-16 h-16 md:w-20 md:h-20 rounded-full object-cover border-2 border-gray-200"
-                          />
-                        </div>
-                        <div className="text-sm text-muted-foreground">
-                          {userData.profile_pic
-                            ? "Current profile photo"
-                            : "Using default profile photo"}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* File Upload */}
-                    <div className="space-y-4">
-                      <div>
-                        <Label htmlFor="profile-photo-input">
-                          Select New Photo
-                        </Label>
-                        <Input
-                          id="profile-photo-input"
-                          type="file"
-                          accept="image/*"
-                          onChange={handleFileSelect}
-                          className="mt-1"
-                        />
-                        <p className="text-xs text-muted-foreground mt-1">
-                          Click to select an image file
-                        </p>
-                      </div>
-
-                      {/* Preview */}
-                      {previewUrl && (
-                        <div className="space-y-2">
-                          <Label>Preview</Label>
-                          <div className="relative inline-block">
-                            <img
-                              src={previewUrl}
-                              alt="Preview"
-                              className="w-32 h-32 rounded-lg object-cover border-2 border-gray-200"
-                            />
-                            <Button
-                              type="button"
-                              variant="destructive"
-                              size="sm"
-                              onClick={clearSelectedFile}
-                              className="absolute -top-2 -right-2 w-6 h-6 p-0 rounded-full"
-                            >
-                              <X className="w-3 h-3" />
-                            </Button>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Upload Button */}
-                      {selectedFile && (
-                        <Button
-                          onClick={handlePhotoUpload}
-                          disabled={isLoadingPhoto}
-                          className="w-full"
-                        >
-                          {isLoadingPhoto ? (
-                            <>
-                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                              Uploading...
-                            </>
-                          ) : (
-                            <>
-                              <Upload className="w-4 h-4 mr-2" />
-                              Upload Photo
-                            </>
-                          )}
-                        </Button>
-                      )}
-                    </div>
                   </div>
                 </div>
-              </TabsContent>
-
-              {/* Change Email Tab */}
-              <TabsContent value="email" className="space-y-4">
-                <div className="space-y-4">
-                  <div>
-                    <h3 className="text-lg font-medium">
-                      Change Email Address
-                    </h3>
-                    <p className="text-sm text-muted-foreground">
-                      Enter your new email address. A verification link will be
-                      sent to confirm the change.
-                    </p>
-                  </div>
-
-                  <form onSubmit={handleChangeEmail} className="space-y-4">
-                    <div className="space-y-2">
-                      <Label>Current Email</Label>
-                      <Input
-                        value={userData.email}
-                        disabled
-                        className="bg-muted"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="newEmail">New Email Address</Label>
-                      <Input
-                        id="newEmail"
-                        type="email"
-                        value={changeEmailForm.newEmail}
-                        onChange={(e) =>
-                          setChangeEmailForm({ newEmail: e.target.value })
-                        }
-                        placeholder="New email address"
-                        required
-                      />
-                      <p className="text-xs text-muted-foreground">
-                        A verification link will be sent to this email address.
-                        Make sure you have access to this email.
-                      </p>
-                    </div>
-
+                <div className="space-y-2">
+                  <Label htmlFor="newPassword">New Password</Label>
+                  <div className="relative">
+                    <Input
+                      id="newPassword"
+                      type={showNewPassword ? "text" : "password"}
+                      value={changePasswordForm.newPassword}
+                      onChange={(e) => setChangePasswordForm({ ...changePasswordForm, newPassword: e.target.value })}
+                      placeholder="New password"
+                      required
+                      className="rounded-full pr-12"
+                    />
                     <Button
-                      type="submit"
-                      disabled={isLoadingEmail || !changeEmailForm.newEmail}
-                      className="w-full"
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                      onClick={() => setShowNewPassword(!showNewPassword)}
                     >
-                      {isLoadingEmail
-                        ? "Sending Verification..."
-                        : "Send Verification Email"}
+                      {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </Button>
-                  </form>
-                </div>
-              </TabsContent>
-
-              {/* Change Password Tab */}
-              <TabsContent value="password" className="space-y-4">
-                <div className="space-y-4">
-                  <div>
-                    <h3 className="text-lg font-medium">Change Password</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Enter your current password and choose a new one.
-                    </p>
                   </div>
-
-                  <form onSubmit={handleChangePassword} className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="oldPassword">Current Password</Label>
-                      <div className="relative">
-                        <Input
-                          id="oldPassword"
-                          type={showOldPassword ? "text" : "password"}
-                          value={changePasswordForm.oldPassword}
-                          onChange={(e) =>
-                            setChangePasswordForm({
-                              ...changePasswordForm,
-                              oldPassword: e.target.value,
-                            })
-                          }
-                          placeholder="Current password"
-                          required
-                        />
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                          onClick={() => setShowOldPassword(!showOldPassword)}
-                        >
-                          {showOldPassword ? (
-                            <EyeOff className="h-4 w-4" />
-                          ) : (
-                            <Eye className="h-4 w-4" />
-                          )}
-                        </Button>
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="newPassword">New Password</Label>
-                      <div className="relative">
-                        <Input
-                          id="newPassword"
-                          type={showNewPassword ? "text" : "password"}
-                          value={changePasswordForm.newPassword}
-                          onChange={(e) =>
-                            setChangePasswordForm({
-                              ...changePasswordForm,
-                              newPassword: e.target.value,
-                            })
-                          }
-                          placeholder="New password"
-                          required
-                        />
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                          onClick={() => setShowNewPassword(!showNewPassword)}
-                        >
-                          {showNewPassword ? (
-                            <EyeOff className="h-4 w-4" />
-                          ) : (
-                            <Eye className="h-4 w-4" />
-                          )}
-                        </Button>
-                      </div>
-                      <p className="text-xs text-muted-foreground">
-                        Password must be at least 6 characters long.
-                      </p>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="confirmPassword">
-                        Confirm New Password
-                      </Label>
-                      <div className="relative">
-                        <Input
-                          id="confirmPassword"
-                          type={showConfirmPassword ? "text" : "password"}
-                          value={changePasswordForm.confirmPassword}
-                          onChange={(e) =>
-                            setChangePasswordForm({
-                              ...changePasswordForm,
-                              confirmPassword: e.target.value,
-                            })
-                          }
-                          placeholder="Confirm new password"
-                          required
-                        />
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                          onClick={() =>
-                            setShowConfirmPassword(!showConfirmPassword)
-                          }
-                        >
-                          {showConfirmPassword ? (
-                            <EyeOff className="h-4 w-4" />
-                          ) : (
-                            <Eye className="h-4 w-4" />
-                          )}
-                        </Button>
-                      </div>
-                    </div>
-
-                    <Button
-                      type="submit"
-                      disabled={
-                        isLoadingPassword ||
-                        !changePasswordForm.oldPassword ||
-                        !changePasswordForm.newPassword ||
-                        !changePasswordForm.confirmPassword
-                      }
-                      className="w-full"
-                    >
-                      {isLoadingPassword
-                        ? "Changing Password..."
-                        : "Change Password"}
-                    </Button>
-                  </form>
+                  <p className="text-xs text-muted-foreground">Password must be at least 6 characters long.</p>
                 </div>
-              </TabsContent>
-            </Tabs>
-          </CardContent>
-        </Card>
-      </div>
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                  <div className="relative">
+                    <Input
+                      id="confirmPassword"
+                      type={showConfirmPassword ? "text" : "password"}
+                      value={changePasswordForm.confirmPassword}
+                      onChange={(e) => setChangePasswordForm({ ...changePasswordForm, confirmPassword: e.target.value })}
+                      placeholder="Confirm new password"
+                      required
+                      className="rounded-full pr-12"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    >
+                      {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </Button>
+                  </div>
+                </div>
+                <Button
+                  type="submit"
+                  disabled={isLoadingPassword || !changePasswordForm.oldPassword || !changePasswordForm.newPassword || !changePasswordForm.confirmPassword}
+                  className="w-full rounded-full bg-[#6fb229] hover:bg-[#6fb229]/80"
+                >
+                  {isLoadingPassword ? "Changing Password..." : "Change Password"}
+                </Button>
+              </form>
+            </div>
+          </TabsContent>
+        </Tabs>
+      </CardContent>
+    </Card>
+  );
+
+  if (!standalone) {
+    return card;
+  }
+
+  return (
+    <div className="min-h-screen bg-background py-8 px-4">
+      <div className="max-w-4xl mx-auto">{card}</div>
     </div>
   );
 }

@@ -15,7 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import EOSidebar from "../../../core-components/eo-sidebar";
+
 import { apiCall } from "@/helper/axios";
 import { format } from "date-fns";
 import { id as localeId } from "date-fns/locale";
@@ -118,10 +118,7 @@ export default function EditEventPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br">
-      <EOSidebar />
-      <div className="flex justify-center w-full">
-        <section className="w-full max-w-5xl p-6 mt-8">
+    <div className="w-full max-w-5xl mx-auto px-6 py-8">
           <h1 className="text-3xl font-bold mb-6 text-center text-[#09431C]">
             Edit Event
           </h1>
@@ -312,8 +309,6 @@ export default function EditEventPage() {
               </Form>
             )}
           </Formik>
-        </section>
-      </div>
     </div>
   );
 }

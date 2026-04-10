@@ -23,7 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { apiCall } from "@/helper/axios";
-import EOSidebar from "../core-components/eo-sidebar";
+
 import { useRouter } from "next/navigation";
 import {
   Dialog,
@@ -103,11 +103,7 @@ export default function EventCreationPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br">
-      <EOSidebar />
-
-      <div className="flex justify-center w-full">
-        <section className="w-full max-w-5xl p-6 mt-8">
+    <div className="w-full max-w-5xl mx-auto px-6 py-8">
           <h1 className="text-3xl font-bold mb-6 text-center text-[#09431C]">
             Create New Event
           </h1>
@@ -395,30 +391,30 @@ export default function EventCreationPage() {
               </Form>
             )}
           </Formik>
-        </section>
-      </div>
 
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-md !rounded-3xl">
-          <DialogHeader>
-            <DialogTitle className="text-3xl text-[#09431C]">Create Event</DialogTitle>
-            <DialogDescription className="text-lg">{dialogMessage}</DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button
-              onClick={() => {
-                setDialogOpen(false);
-                if (dialogMessage === "Event created successfully!") {
-                  router.push("/event-organizer"); 
-                }
-              }}
-              className=" bg-[#6FB229] hover:bg-[#09431C] rounded-lg"
-            >
-              OK
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <DialogContent className="sm:max-w-md !rounded-3xl">
+              <DialogHeader>
+                <DialogTitle className="text-3xl text-[#09431C]">Create Event</DialogTitle>
+                <DialogDescription className="text-lg">{dialogMessage}</DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <Button
+                  onClick={() => {
+                    setDialogOpen(false);
+                    if (dialogMessage === "Event created successfully!") {
+                      router.push("/event-organizer");
+                    }
+                  }}
+                  className="bg-[#6FB229] hover:bg-[#09431C] rounded-lg"
+                >
+                  OK
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
     </div>
   );
 }
+
+

@@ -38,7 +38,7 @@ import {
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
-import EOSidebar from "../core-components/eo-sidebar";
+
 import { apiCall } from "@/helper/axios";
 
 interface Event {
@@ -222,26 +222,22 @@ function EventManagementContent() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      <EOSidebar />
-
-      <div className="flex justify-center">
-        <div className="w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
-          <div className="bg-white/80 backdrop-blur-sm shadow-lg border-b border-gray-200/50 rounded-lg mt-8 mb-8">
-            <div className="px-6 py-8">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-                <div className="space-y-2">
+          <div className="bg-white/80 backdrop-blur-sm shadow-md border border-gray-100 rounded-2xl mt-8 mb-8">
+            <div className="px-6 py-7">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="space-y-1">
                   <h1 className="text-3xl md:text-4xl font-bold text-[#09431C]">
                     Event Management
                   </h1>
-                  <p className="text-gray-600 text-lg">
+                  <p className="text-gray-500 text-base">
                     Create, edit, and manage your events with ease
                   </p>
                 </div>
                 <Button
                   onClick={handleCreateEvent}
-                  className="bg-[#09431C] hover:bg-[#09431C]/90 text-white px-8 py-3 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                  className="rounded-full bg-[#09431C] hover:bg-[#09431C]/90 text-white px-8 py-3 text-base font-semibold shadow-md hover:shadow-lg transition-all duration-300"
                 >
                   <Plus className="w-5 h-5 mr-2" />
                   Create New Event
@@ -254,83 +250,83 @@ function EventManagementContent() {
           <div className="space-y-8">
             {/* Stats Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              <Card className="h-full bg-white/70 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
+              <Card className="h-full bg-white border border-gray-100 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:scale-105">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                  <CardTitle className="text-sm font-medium text-gray-700">
+                  <CardTitle className="text-sm font-medium text-gray-600">
                     Total Events
                   </CardTitle>
-                  <div className="p-2 bg-[#97d753] rounded-lg">
-                    <Calendar className="h-5 w-5 text-[#00481a]" />
+                  <div className="p-2 bg-[#97d753]/30 rounded-xl">
+                    <Calendar className="h-5 w-5 text-[#09431C]" />
                   </div>
                 </CardHeader>
                 <CardContent className="flex flex-col items-center justify-center gap-1 px-2 pb-5 pt-2">
-                  <div className="text-3xl font-bold text-gray-900 text-center">
+                  <div className="text-3xl font-bold text-[#09431C] text-center">
                     {events.length}
                   </div>
-                  <p className="text-sm text-gray-600 text-center">
+                  <p className="text-sm text-gray-500 text-center">
                     All time events
                   </p>
                 </CardContent>
               </Card>
 
-              <Card className="h-full bg-white/70 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
+              <Card className="h-full bg-white border border-gray-100 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:scale-105">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                  <CardTitle className="text-sm font-medium text-gray-700">
+                  <CardTitle className="text-sm font-medium text-gray-600">
                     Total Seats
                   </CardTitle>
-                  <div className="p-2 bg-[#c6ee9a] rounded-lg">
-                    <Users className="h-5 w-5 text-[#00481a]" />
+                  <div className="p-2 bg-[#c6ee9a]/40 rounded-xl">
+                    <Users className="h-5 w-5 text-[#09431C]" />
                   </div>
                 </CardHeader>
                 <CardContent className="flex flex-col items-center justify-center gap-1 px-2 pb-5 pt-2">
-                  <div className="text-3xl font-bold text-gray-900 text-center">
+                  <div className="text-3xl font-bold text-[#09431C] text-center">
                     {events
                       .reduce((sum, event) => sum + event.total_seats, 0)
                       .toLocaleString()}
                   </div>
-                  <p className="text-sm text-gray-600 text-center">
+                  <p className="text-sm text-gray-500 text-center">
                     Combined capacity
                   </p>
                 </CardContent>
               </Card>
 
-              <Card className="h-full bg-white/70 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
+              <Card className="h-full bg-white border border-gray-100 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:scale-105">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                  <CardTitle className="text-sm font-medium text-gray-700">
+                  <CardTitle className="text-sm font-medium text-gray-600">
                     Active Events
                   </CardTitle>
-                  <div className="p-2 bg-[#97d753] rounded-lg">
-                    <TrendingUp className="h-5 w-5 text-[#00481a]" />
+                  <div className="p-2 bg-[#97d753]/30 rounded-xl">
+                    <TrendingUp className="h-5 w-5 text-[#09431C]" />
                   </div>
                 </CardHeader>
                 <CardContent className="flex flex-col items-center justify-center gap-1 px-2 pb-5 pt-2">
-                  <div className="text-3xl font-bold text-gray-900 text-center">
+                  <div className="text-3xl font-bold text-[#09431C] text-center">
                     {
                       events.filter(
                         (event) => new Date(event.event_start_date) > new Date()
                       ).length
                     }
                   </div>
-                  <p className="text-sm text-gray-600 text-center">
+                  <p className="text-sm text-gray-500 text-center">
                     Upcoming & ongoing
                   </p>
                 </CardContent>
               </Card>
 
-              <Card className="h-full bg-white/70 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
+              <Card className="h-full bg-white border border-gray-100 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:scale-105">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                  <CardTitle className="text-sm font-medium text-gray-700">
+                  <CardTitle className="text-sm font-medium text-gray-600">
                     Filtered Events
                   </CardTitle>
-                  <div className="p-2 bg-[#c6ee9a] rounded-lg">
-                    <Filter className="h-5 w-5 text-[#00481a]" />
+                  <div className="p-2 bg-[#c6ee9a]/40 rounded-xl">
+                    <Filter className="h-5 w-5 text-[#09431C]" />
                   </div>
                 </CardHeader>
                 <CardContent className="flex flex-col items-center justify-center gap-1 px-2 pb-5 pt-2">
-                  <div className="text-3xl font-bold text-gray-900 text-center">
+                  <div className="text-3xl font-bold text-[#09431C] text-center">
                     {filteredEvents.length}
                   </div>
-                  <p className="text-sm text-gray-600 text-center">
+                  <p className="text-sm text-gray-500 text-center">
                     Current results
                   </p>
                 </CardContent>
@@ -338,22 +334,22 @@ function EventManagementContent() {
             </div>
 
             {/* Filters Section */}
-            <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl">
+            <Card className="bg-white border border-gray-100 rounded-2xl shadow-md">
               <CardHeader className="pb-3">
                 <CardTitle className="text-xl font-semibold text-gray-900 flex items-center">
-                  <Filter className="w-5 h-5 mr-2 text-[#00481a]" />
+                  <Filter className="w-5 h-5 mr-2 text-[#09431C]" />
                   Filter & Search Events
                 </CardTitle>
               </CardHeader>
               <CardContent className="py-3 px-4 md:px-6">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                     <Input
                       placeholder="Search events by name or location..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-12 pr-3 py-2 border-gray-200 focus:border-[#00481a] focus:ring-[#00481a] text-base"
+                      className="pl-12 pr-3 py-2 rounded-full border-gray-200 focus:border-[#09431C] focus:ring-[#09431C] text-base"
                     />
                   </div>
 
@@ -361,10 +357,10 @@ function EventManagementContent() {
                     value={categoryFilter}
                     onValueChange={setCategoryFilter}
                   >
-                    <SelectTrigger className="py-2 border-gray-200 focus:border-[#00481a] focus:ring-[#00481a] text-base">
+                    <SelectTrigger className="py-2 rounded-full border-gray-200 focus:border-[#09431C] text-base">
                       <SelectValue placeholder="All Categories" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="rounded-xl">
                       <SelectItem value="all">All Categories</SelectItem>
                       <SelectItem value="CONCERT">Concert</SelectItem>
                       <SelectItem value="FESTIVAL">Festival</SelectItem>
@@ -374,10 +370,10 @@ function EventManagementContent() {
                   </Select>
 
                   <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger className="py-2 border-gray-200 focus:border-[#00481a] focus:ring-[#00481a] text-base">
+                    <SelectTrigger className="py-2 rounded-full border-gray-200 focus:border-[#09431C] text-base">
                       <SelectValue placeholder="All Status" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="rounded-xl">
                       <SelectItem value="all">All Status</SelectItem>
                       <SelectItem value="upcoming">Upcoming</SelectItem>
                       <SelectItem value="ongoing">Live</SelectItem>
@@ -400,7 +396,7 @@ function EventManagementContent() {
                     onClick={() =>
                       router.push("/event-organizer/transaction-management")
                     }
-                    className="flex-1 sm:flex-none border-2 border-gray-300 hover:border-[#97d753] hover:bg-[#c6ee9a]/30 text-gray-700 hover:text-[#09431C] font-medium py-2 px-6 transition-all duration-300"
+                    className="flex-1 sm:flex-none rounded-full border-2 border-[#09431C] hover:bg-[#c6ee9a] text-[#09431C] hover:text-[#09431C] font-medium py-2 px-6 transition-all duration-300"
                   >
                     View Transactions
                   </Button>
@@ -408,17 +404,17 @@ function EventManagementContent() {
               </div>
 
               {filteredEvents.length === 0 ? (
-                <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl">
+                <Card className="bg-white border border-gray-100 rounded-2xl shadow-md">
                   <CardContent className="flex flex-col items-center justify-center py-16">
-                    <div className="p-4 bg-gray-100 rounded-full mb-6">
-                      <Calendar className="h-16 w-16 text-gray-400" />
+                    <div className="p-4 bg-[#c6ee9a]/30 rounded-full mb-6">
+                      <Calendar className="h-16 w-16 text-[#09431C]/50" />
                     </div>
                     <h3 className="text-xl font-semibold text-gray-900 mb-3 text-center">
                       {events.length === 0
                         ? "No events yet"
                         : "No events match your filters"}
                     </h3>
-                    <p className="text-gray-600 mb-6 text-center text-lg max-w-md">
+                    <p className="text-gray-500 mb-6 text-center text-base max-w-md">
                       {events.length === 0
                         ? "Create your first event to get started with your event management journey"
                         : "Try adjusting your search criteria or filters to find more events"}
@@ -426,7 +422,7 @@ function EventManagementContent() {
                     {events.length === 0 && (
                       <Button
                         onClick={handleCreateEvent}
-                        className="bg-[#09431C] hover:bg-[#09431C]/90 text-white px-8 py-3 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                        className="rounded-full bg-[#09431C] hover:bg-[#09431C]/90 text-white px-8 py-3 text-base font-semibold shadow-md hover:shadow-lg transition-all duration-300"
                       >
                         <Plus className="w-5 h-5 mr-2" />
                         Create Your First Event
@@ -449,9 +445,9 @@ function EventManagementContent() {
                     return (
                       <Card
                         key={event.id}
-                        className="bg-white/80 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 h-full flex flex-col group"
+                        className="bg-white border border-gray-100 rounded-3xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:scale-105 h-full flex flex-col group overflow-hidden"
                       >
-                        <div className="aspect-video bg-gradient-to-br from-gray-200 to-gray-300 rounded-t-lg flex items-center justify-center overflow-hidden relative">
+                        <div className="relative w-full h-44 overflow-hidden">
                           {event.event_thumbnail ? (
                             <img
                               src={event.event_thumbnail}
@@ -459,13 +455,13 @@ function EventManagementContent() {
                               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                             />
                           ) : (
-                            <div className="text-center">
-                              <Calendar className="h-16 w-16 text-gray-400 mx-auto mb-2" />
-                              <p className="text-gray-500 text-sm">No Image</p>
+                            <div className="w-full h-full bg-gradient-to-br from-[#c6ee9a]/40 to-[#97d753]/20 flex flex-col items-center justify-center">
+                              <Calendar className="h-12 w-12 text-[#09431C]/40 mb-1" />
+                              <p className="text-gray-400 text-sm">No Image</p>
                             </div>
                           )}
                           <div className="absolute top-3 right-3">
-                            <Badge className={`${eventStatus.color} shadow-lg`}>
+                            <Badge className={`${eventStatus.color} rounded-full shadow-md text-xs font-semibold px-3`}>
                               <eventStatus.icon className="w-3 h-3 mr-1" />
                               {eventStatus.status}
                             </Badge>
@@ -474,49 +470,49 @@ function EventManagementContent() {
                             <Badge
                               className={`${getCategoryColor(
                                 event.event_category
-                              )} shadow-lg`}
+                              )} rounded-full shadow-md text-xs font-semibold px-3`}
                             >
                               {event.event_category}
                             </Badge>
                           </div>
                         </div>
 
-                        <CardHeader className="pb-2">
-                          <CardTitle className="text-xl font-bold text-gray-900 line-clamp-2 pr-2 group-hover:text-[#09431C] transition-colors duration-300">
+                        <CardHeader className="pb-2 pt-4">
+                          <CardTitle className="text-lg font-bold text-gray-900 line-clamp-2 group-hover:text-[#09431C] transition-colors duration-300">
                             {event.event_name}
                           </CardTitle>
-                          <p className="text-gray-600 line-clamp-2 mt-2 leading-relaxed">
+                          <p className="text-gray-500 line-clamp-2 mt-1 text-sm leading-relaxed">
                             {event.event_description}
                           </p>
                         </CardHeader>
 
-                        <CardContent className="space-y-2 flex-grow flex flex-col">
+                        <CardContent className="space-y-2 flex-grow flex flex-col pt-0">
                           <div className="flex items-center text-sm text-gray-600">
-                            <Calendar className="w-4 h-4 mr-2 text-[#00481a]" />
+                            <Calendar className="w-4 h-4 mr-2 text-[#09431C]" />
                             {format(new Date(event.event_start_date), "PPP", {
                               locale: id,
                             })}
                           </div>
 
                           <div className="flex items-center text-sm text-gray-600">
-                            <MapPin className="w-4 h-4 mr-2 text-[#00481a]" />
+                            <MapPin className="w-4 h-4 mr-2 text-[#09431C]" />
                             {event.event_location}
                           </div>
 
                           <div className="flex items-center text-sm text-gray-600">
-                            <Users className="w-4 h-4 mr-2 text-[#00481a]" />
+                            <Users className="w-4 h-4 mr-2 text-[#09431C]" />
                             {event.total_seats - event.available_seats} /{" "}
                             {event.total_seats} seats
                           </div>
 
                           {/* Occupancy Bar */}
-                          <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div className="w-full bg-gray-100 rounded-full h-2">
                             <div
-                              className="bg-gradient-to-r from-[#97d753] to-[#c6ee9a] h-2 rounded-full transition-all duration-300"
+                              className="bg-gradient-to-r from-[#97d753] to-[#6FB229] h-2 rounded-full transition-all duration-300"
                               style={{ width: `${occupancyRate}%` }}
                             ></div>
                           </div>
-                          <p className="text-xs text-gray-500 text-center">
+                          <p className="text-xs text-gray-400 text-center">
                             {occupancyRate.toFixed(1)}% occupied
                           </p>
 
@@ -527,12 +523,12 @@ function EventManagementContent() {
                                 <Button
                                   variant="outline"
                                   size="sm"
-                                  className="border-2 border-gray-300 hover:border-gray-400 text-gray-700"
+                                  className="rounded-full border-2 border-gray-200 hover:border-[#09431C] text-gray-600 hover:text-[#09431C]"
                                 >
                                   <MoreHorizontal className="w-4 h-4" />
                                 </Button>
                               </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
+                              <DropdownMenuContent align="end" className="rounded-xl">
                                 <DropdownMenuItem
                                   onClick={() =>
                                     handleViewEvent(event.event_name)
@@ -569,8 +565,6 @@ function EventManagementContent() {
               )}
             </div>
           </div>
-        </div>
-      </div>
     </div>
   );
 }

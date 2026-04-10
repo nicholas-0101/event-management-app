@@ -51,7 +51,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={roboto.className}>
+      <body className={roboto.className} suppressHydrationWarning>
         <AutoRedirect />
         <div className="px-4 sm:px-10 md:px-20 lg:px-36">
           <Navbar />

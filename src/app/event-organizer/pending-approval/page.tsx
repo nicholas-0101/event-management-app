@@ -37,7 +37,7 @@ import {
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
-import EOSidebar from "../core-components/eo-sidebar";
+
 import { apiCall } from "@/helper/axios";
 
 interface Transaction {
@@ -342,20 +342,16 @@ function PendingApprovalContent() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      <EOSidebar />
-
-      <div className="flex justify-center">
-        <div className="w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
-          <div className="bg-white/80 backdrop-blur-sm shadow-lg border-b border-gray-200/50 rounded-lg mt-8 mb-8">
-            <div className="px-6 py-8">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-                <div className="space-y-2">
+          <div className="bg-white/80 backdrop-blur-sm shadow-md border border-gray-100 rounded-2xl mt-8 mb-8">
+            <div className="px-6 py-7">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="space-y-1">
                   <h1 className="text-3xl md:text-4xl font-bold text-[#09431C]">
                     Pending Approval
                   </h1>
-                  <p className="text-gray-600 text-lg">
+                  <p className="text-gray-500 text-base">
                     Review and approve pending transaction payments
                   </p>
                 </div>
@@ -365,7 +361,7 @@ function PendingApprovalContent() {
                     onClick={() =>
                       router.push("/event-organizer/transaction-management")
                     }
-                    className="border-2 border-[#00481a] hover:border-[#97d753] hover:bg-[#c6ee9a] text-[#00481a] hover:text-[#00481a] font-medium"
+                    className="rounded-full border-2 border-[#09431C] hover:bg-[#c6ee9a] text-[#09431C] hover:text-[#09431C] font-medium"
                   >
                     Back to Transactions
                   </Button>
@@ -378,66 +374,66 @@ function PendingApprovalContent() {
           <div className="space-y-8">
             {/* Stats Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-              <Card className="h-full bg-white/70 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
+              <Card className="h-full bg-white border border-gray-100 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:scale-105">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                  <CardTitle className="text-sm font-medium text-gray-700">
+                  <CardTitle className="text-sm font-medium text-gray-600">
                     Pending Transactions
                   </CardTitle>
-                  <div className="p-2 bg-yellow-100 rounded-lg">
-                    <Clock className="h-5 w-5 text-yellow-600" />
+                  <div className="p-2 bg-amber-100/70 rounded-xl">
+                    <Clock className="h-5 w-5 text-amber-600" />
                   </div>
                 </CardHeader>
                 <CardContent className="flex flex-col items-center justify-center gap-1 px-2 pb-5 pt-2">
-                  <div className="text-3xl font-bold text-gray-900 text-center">
+                  <div className="text-3xl font-bold text-[#09431C] text-center">
                     {
                       transactions.filter(
                         (t) => t.status === "WAITING_CONFIRMATION"
                       ).length
                     }
                   </div>
-                  <p className="text-sm text-gray-600 text-center">
+                  <p className="text-sm text-gray-500 text-center">
                     Awaiting approval
                   </p>
                 </CardContent>
               </Card>
 
-              <Card className="h-full bg-white/70 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
+              <Card className="h-full bg-white border border-gray-100 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:scale-105">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                  <CardTitle className="text-sm font-medium text-gray-700">
+                  <CardTitle className="text-sm font-medium text-gray-600">
                     Total Value
                   </CardTitle>
-                  <div className="p-2 bg-[#97d753] rounded-lg">
-                    <CreditCard className="h-5 w-5 text-[#00481a]" />
+                  <div className="p-2 bg-[#97d753]/30 rounded-xl">
+                    <CreditCard className="h-5 w-5 text-[#09431C]" />
                   </div>
                 </CardHeader>
                 <CardContent className="flex flex-col items-center justify-center gap-1 px-2 pb-5 pt-2">
-                  <div className="text-2xl font-bold text-gray-900 text-center">
+                  <div className="text-2xl font-bold text-[#09431C] text-center">
                     {formatCurrency(
                       transactions
                         .filter((t) => t.status === "WAITING_CONFIRMATION")
                         .reduce((sum, t) => sum + t.total_price, 0)
                     )}
                   </div>
-                  <p className="text-sm text-gray-600 text-center">
+                  <p className="text-sm text-gray-500 text-center">
                     Pending amount
                   </p>
                 </CardContent>
               </Card>
 
-              <Card className="h-full bg-white/70 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
+              <Card className="h-full bg-white border border-gray-100 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:scale-105">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                  <CardTitle className="text-sm font-medium text-gray-700">
+                  <CardTitle className="text-sm font-medium text-gray-600">
                     Filtered Results
                   </CardTitle>
-                  <div className="p-2 bg-[#c6ee9a] rounded-lg">
-                    <Filter className="h-5 w-5 text-[#00481a]" />
+                  <div className="p-2 bg-[#c6ee9a]/40 rounded-xl">
+                    <Filter className="h-5 w-5 text-[#09431C]" />
                   </div>
                 </CardHeader>
                 <CardContent className="flex flex-col items-center justify-center gap-1 px-2 pb-5 pt-2">
-                  <div className="text-3xl font-bold text-gray-900 text-center">
+                  <div className="text-3xl font-bold text-[#09431C] text-center">
                     {filteredTransactions.length}
                   </div>
-                  <p className="text-sm text-gray-600 text-center">
+                  <p className="text-sm text-gray-500 text-center">
                     Current results
                   </p>
                 </CardContent>
@@ -445,10 +441,10 @@ function PendingApprovalContent() {
             </div>
 
             {/* Filters Section */}
-            <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl">
+            <Card className="bg-white border border-gray-100 rounded-2xl shadow-md">
               <CardHeader className="pb-2">
                 <CardTitle className="text-xl font-semibold text-gray-900 flex items-center">
-                  <Filter className="w-5 h-5 mr-2 text-[#00481a]" />
+                  <Filter className="w-5 h-5 mr-2 text-[#09431C]" />
                   Filter & Search Transactions
                 </CardTitle>
               </CardHeader>
@@ -461,7 +457,7 @@ function PendingApprovalContent() {
                         placeholder="Search by user name, email, or event..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-10 pr-3 py-2 text-sm border-gray-200 focus:border-[#00481a] focus:ring-[#00481a]"
+                        className="pl-10 pr-3 py-2 rounded-full text-sm border-gray-200 focus:border-[#09431C] focus:ring-[#09431C]"
                       />
                     </div>
                   </div>
@@ -473,10 +469,10 @@ function PendingApprovalContent() {
                         updateURL(value);
                       }}
                     >
-                      <SelectTrigger className="w-full py-2 text-sm border-gray-200 focus:border-[#00481a] focus:ring-[#00481a]">
+                      <SelectTrigger className="w-full py-2 rounded-full text-sm border-gray-200 focus:border-[#09431C] focus:ring-[#09431C]">
                         <SelectValue placeholder="Filter by status" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="rounded-xl">
                         <SelectItem value="all">All Status</SelectItem>
                         <SelectItem value="WAITING_CONFIRMATION">
                           Waiting Confirmation
@@ -499,17 +495,17 @@ function PendingApprovalContent() {
               </div>
 
               {filteredTransactions.length === 0 ? (
-                <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl">
+                <Card className="bg-white border border-gray-100 rounded-2xl shadow-md">
                   <CardContent className="flex flex-col items-center justify-center py-16">
-                    <div className="p-4 bg-gray-100 rounded-full mb-6">
-                      <Clock className="h-16 w-16 text-gray-400" />
+                    <div className="p-4 bg-[#c6ee9a]/30 rounded-full mb-6">
+                      <Clock className="h-16 w-16 text-[#09431C]/50" />
                     </div>
                     <h3 className="text-xl font-semibold text-gray-900 mb-3 text-center">
                       {transactions.length === 0
                         ? "No pending transactions"
                         : "No transactions match your filters"}
                     </h3>
-                    <p className="text-gray-600 mb-6 text-center text-lg max-w-md">
+                    <p className="text-gray-500 mb-6 text-center text-base max-w-md">
                       {transactions.length === 0
                         ? "All transactions have been processed"
                         : "Try adjusting your search criteria or filters"}
@@ -521,7 +517,7 @@ function PendingApprovalContent() {
                   {filteredTransactions.map((transaction) => (
                     <Card
                       key={transaction.id}
-                      className="bg-white/80 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
+                      className="bg-white border border-gray-100 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]"
                     >
                       <CardHeader className="pb-4">
                         <div className="flex items-start justify-between">
@@ -544,11 +540,11 @@ function PendingApprovalContent() {
                         </div>
                       </CardHeader>
 
-                      <CardContent className="space-y-4">
-                        <div className="space-y-3">
-                          <div className="flex items-center text-sm text-gray-700">
-                            <Calendar className="w-4 h-4 mr-3 text-blue-600" />
-                            <span className="font-medium">
+                      <CardContent className="space-y-4 pt-0">
+                        <div className="space-y-2.5 pt-2">
+                          <div className="flex items-center text-sm text-gray-600">
+                            <Calendar className="w-4 h-4 mr-3 text-[#09431C] flex-shrink-0" />
+                            <span>
                               {format(
                                 new Date(
                                   transaction.tickets[0]?.ticket.event.event_start_date
@@ -559,9 +555,9 @@ function PendingApprovalContent() {
                             </span>
                           </div>
 
-                          <div className="flex items-center text-sm text-gray-700">
-                            <MapPin className="w-4 h-4 mr-3 text-red-600" />
-                            <span className="font-medium">
+                          <div className="flex items-center text-sm text-gray-600">
+                            <MapPin className="w-4 h-4 mr-3 text-[#09431C] flex-shrink-0" />
+                            <span>
                               {
                                 transaction.tickets[0]?.ticket.event
                                   .event_location
@@ -569,16 +565,16 @@ function PendingApprovalContent() {
                             </span>
                           </div>
 
-                          <div className="flex items-center text-sm text-gray-700">
-                            <CreditCard className="w-4 h-4 mr-3 text-green-600" />
-                            <span className="font-bold text-lg text-[#00481a]">
+                          <div className="flex items-center text-sm">
+                            <CreditCard className="w-4 h-4 mr-3 text-[#09431C] flex-shrink-0" />
+                            <span className="font-bold text-base text-[#09431C]">
                               {formatCurrency(transaction.total_price)}
                             </span>
                           </div>
 
-                          <div className="flex items-center text-sm text-gray-700">
-                            <Clock className="w-4 h-4 mr-3 text-gray-600" />
-                            <span className="font-medium">
+                          <div className="flex items-center text-xs text-gray-400">
+                            <Clock className="w-3.5 h-3.5 mr-3 flex-shrink-0" />
+                            <span>
                               Requested:{" "}
                               {format(
                                 new Date(transaction.transaction_date_time),
@@ -590,12 +586,12 @@ function PendingApprovalContent() {
                         </div>
 
                         {/* Action Buttons */}
-                        <div className="flex space-x-2 pt-4">
+                        <div className="flex gap-2 pt-4 border-t border-gray-100">
                           <Button
                             variant="outline"
                             size="sm"
                             onClick={() => handleViewPaymentProof(transaction)}
-                            className="flex-1 border-2 border-blue-300 hover:border-blue-500 hover:bg-blue-50 text-blue-700 hover:text-blue-800 font-medium"
+                            className="flex-1 rounded-full border-2 border-[#09431C] hover:bg-[#c6ee9a] text-[#09431C] hover:text-[#09431C] font-medium h-10 text-sm transition-all duration-300"
                           >
                             <Eye className="w-4 h-4 mr-2" />
                             View Proof
@@ -608,7 +604,7 @@ function PendingApprovalContent() {
                                 onClick={() =>
                                   handleAcceptTransaction(transaction)
                                 }
-                                className="flex-1 bg-green-600 hover:bg-green-700 text-white font-medium"
+                                className="flex-1 rounded-full bg-[#09431C] hover:bg-[#09431C]/90 text-white font-medium h-10 text-sm shadow-sm hover:shadow-md transition-all duration-300"
                               >
                                 <CheckCircle className="w-4 h-4 mr-2" />
                                 Accept
@@ -618,7 +614,7 @@ function PendingApprovalContent() {
                                 onClick={() =>
                                   handleRejectTransaction(transaction)
                                 }
-                                className="flex-1 bg-red-600 hover:bg-red-700 text-white font-medium"
+                                className="flex-1 rounded-full bg-red-500 hover:bg-red-600 text-white font-medium h-10 text-sm shadow-sm hover:shadow-md transition-all duration-300"
                               >
                                 <XCircle className="w-4 h-4 mr-2" />
                                 Reject
@@ -627,14 +623,14 @@ function PendingApprovalContent() {
                           )}
 
                           {transaction.status === "SUCCESS" && (
-                            <div className="flex-1 flex items-center justify-center bg-green-100 text-green-800 px-3 py-2 rounded-lg font-medium">
+                            <div className="flex-1 flex items-center justify-center border-2 border-green-200 bg-green-50 text-green-700 rounded-full font-medium h-10 text-sm">
                               <CheckCircle className="w-4 h-4 mr-2" />
                               Accepted
                             </div>
                           )}
 
                           {transaction.status === "REJECTED" && (
-                            <div className="flex-1 flex items-center justify-center bg-red-100 text-red-800 px-3 py-2 rounded-lg font-medium">
+                            <div className="flex-1 flex items-center justify-center border-2 border-red-200 bg-red-50 text-red-600 rounded-full font-medium h-10 text-sm">
                               <XCircle className="w-4 h-4 mr-2" />
                               Rejected
                             </div>
@@ -647,8 +643,6 @@ function PendingApprovalContent() {
               )}
             </div>
           </div>
-        </div>
-      </div>
 
       {/* Payment Proof Modal */}
       <Dialog open={showPaymentModal} onOpenChange={setShowPaymentModal}>

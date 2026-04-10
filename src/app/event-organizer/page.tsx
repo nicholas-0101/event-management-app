@@ -29,7 +29,7 @@ import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
 import { apiCall } from "@/helper/axios";
-import EOSidebar from "./core-components/eo-sidebar";
+
 import StatisticsVisualization from "./core-components/statistics-visualization";
 
 interface Event {
@@ -402,45 +402,39 @@ export default function EventOrganizerPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      <EOSidebar />
-
-      <div className="flex justify-center">
-        <div className="w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
-          <div className="bg-white/80 backdrop-blur-sm shadow-lg border-b border-gray-200/50 rounded-lg mt-8 mb-8">
-            <div className="px-6 py-8">
-              <div className="flex items-start sm:items-center justify-between gap-3 flex-col sm:flex-row">
-                <div className="w-full sm:w-auto text-center sm:text-left">
+          <div className="bg-white/80 backdrop-blur-sm shadow-md border border-gray-100 rounded-2xl mt-8 mb-8">
+            <div className="px-6 py-7">
+              <div className="flex items-start sm:items-center justify-between gap-4 flex-col sm:flex-row">
+                <div className="w-full sm:w-auto">
                   <h1 className="text-3xl font-bold text-[#09431C]">
                     Event Organizer Dashboard
                   </h1>
-                  <p className="text-2xl font-bold text-[#09431C] flex gap-2">
+                  <div className="flex items-center gap-2 mt-1">
                     {loadingRating ? (
-                      "Loading average rating..."
+                      <p className="text-sm text-gray-500">Loading rating...</p>
                     ) : (
-                      <>
-                        Average Rating:{" "}
-                        <span className="font-semibold">
-                          {avgRating?.toFixed(1) ?? "0"}
-                        </span>
-                        <Star fill="#FDC700" color="#FDC700" className="mt-1"/>
-                      </>
+                      <div className="flex items-center gap-1.5">
+                        <Star fill="#FDC700" color="#FDC700" className="w-5 h-5" />
+                        <span className="text-lg font-semibold text-gray-700">{avgRating?.toFixed(1) ?? "0"}</span>
+                        <span className="text-sm text-gray-500">Average Rating</span>
+                      </div>
                     )}
-                  </p>
+                  </div>
                 </div>
-                <div className="flex gap-3 flex-wrap w-full sm:w-auto justify-center sm:justify-end">
+                <div className="flex gap-2 flex-wrap w-full sm:w-auto justify-start sm:justify-end">
                   <Button
                     variant="outline"
                     onClick={() => setShowStatistics(!showStatistics)}
-                    className="border-2 border-[#00481a] hover:border-[#97d753] hover:bg-[#c6ee9a] text-[#00481a] hover:text-[#00481a] font-medium w-full sm:w-auto"
+                    className="rounded-full border-2 border-[#09431C] hover:bg-[#c6ee9a] text-[#09431C] hover:text-[#09431C] font-medium w-full sm:w-auto"
                   >
                     <BarChart3 className="w-4 h-4 mr-2" />
                     {showStatistics ? "Hide Statistics" : "View Statistics"}
                   </Button>
                   <Button
                     onClick={handleCreateEvent}
-                    className="bg-[#09431C] hover:bg-[#09431C]/90 text-white w-full sm:w-auto"
+                    className="rounded-full bg-[#09431C] hover:bg-[#09431C]/90 text-white w-full sm:w-auto"
                   >
                     <Plus className="w-4 h-4 mr-2" />
                     Create New Event
@@ -449,7 +443,7 @@ export default function EventOrganizerPage() {
                     variant="outline"
                     onClick={fetchOrganizerStats}
                     disabled={statsLoading}
-                    className="border-2 border-[#00481a] hover:border-[#97d753] hover:bg-[#c6ee9a] text-[#00481a] hover:text-[#00481a] font-medium w-full sm:w-auto"
+                    className="rounded-full border-2 border-[#09431C] hover:bg-[#c6ee9a] text-[#09431C] hover:text-[#09431C] font-medium w-full sm:w-auto"
                   >
                     <BarChart3 className="w-4 h-4 mr-2" />
                     {statsLoading ? "Refreshing..." : "Refresh Stats"}
@@ -462,70 +456,70 @@ export default function EventOrganizerPage() {
           {/* Stats Cards */}
           <div className="py-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              <Card className="h-full bg-white/70 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
+              <Card className="h-full bg-white border border-gray-100 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:scale-105">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
+                  <CardTitle className="text-sm font-medium text-gray-600">
                     Total Events
                   </CardTitle>
-                  <div className="p-2 bg-[#97d753] rounded-lg">
-                    <Calendar className="h-4 w-4 text-[#00481a]" />
+                  <div className="p-2 bg-[#97d753]/30 rounded-xl">
+                    <Calendar className="h-4 w-4 text-[#09431C]" />
                   </div>
                 </CardHeader>
                 <CardContent className="flex flex-col items-center justify-center gap-1 px-2 py-3">
-                  <div className="text-2xl font-bold text-center">
+                  <div className="text-2xl font-bold text-center text-[#09431C]">
                     {statsLoading ? (
-                      <div className="animate-pulse bg-gray-200 h-8 w-16 rounded"></div>
+                      <div className="animate-pulse bg-gray-200 h-8 w-16 rounded-xl"></div>
                     ) : (
                       stats.totalEvents
                     )}
                   </div>
-                  <p className="text-xs text-muted-foreground text-center">
+                  <p className="text-xs text-gray-500 text-center">
                     All time events
                   </p>
                 </CardContent>
               </Card>
 
-              <Card className="h-full bg-white/70 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
+              <Card className="h-full bg-white border border-gray-100 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:scale-105">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
+                  <CardTitle className="text-sm font-medium text-gray-600">
                     Total Seats
                   </CardTitle>
-                  <div className="p-2 bg-[#c6ee9a] rounded-lg">
-                    <Users className="h-4 w-4 text-[#00481a]" />
+                  <div className="p-2 bg-[#c6ee9a]/40 rounded-xl">
+                    <Users className="h-4 w-4 text-[#09431C]" />
                   </div>
                 </CardHeader>
                 <CardContent className="flex flex-col items-center justify-center gap-1 px-2 py-3">
-                  <div className="text-2xl font-bold text-center">
+                  <div className="text-2xl font-bold text-center text-[#09431C]">
                     {statsLoading ? (
-                      <div className="animate-pulse bg-gray-200 h-8 w-16 rounded"></div>
+                      <div className="animate-pulse bg-gray-200 h-8 w-16 rounded-xl"></div>
                     ) : (
                       stats.totalSeats.toLocaleString()
                     )}
                   </div>
-                  <p className="text-xs text-muted-foreground text-center">
+                  <p className="text-xs text-gray-500 text-center">
                     Combined capacity
                   </p>
                 </CardContent>
               </Card>
 
-              <Card className="h-full bg-white/70 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 overflow-hidden">
+              <Card className="h-full bg-white border border-gray-100 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:scale-105 overflow-hidden">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium leading-tight">
+                  <CardTitle className="text-sm font-medium text-gray-600 leading-tight">
                     Total Revenue
                   </CardTitle>
-                  <div className="text-[#00481a] font-semibold text-lg">Rp</div>
+                  <div className="px-3 py-1 bg-[#97d753]/30 rounded-full text-[#09431C] font-bold text-sm">Rp</div>
                 </CardHeader>
                 <CardContent className="flex flex-col items-center justify-center gap-1 px-2 py-3">
                   <div
-                    className={`font-bold ${revenueSizeClass} whitespace-nowrap leading-tight text-center`}
+                    className={`font-bold ${revenueSizeClass} whitespace-nowrap leading-tight text-center text-[#09431C]`}
                   >
                     {statsLoading ? (
-                      <div className="animate-pulse bg-gray-200 h-8 w-16 rounded"></div>
+                      <div className="animate-pulse bg-gray-200 h-8 w-16 rounded-xl"></div>
                     ) : (
                       revenueNumericText
                     )}
                   </div>
-                  <p className="text-xs text-muted-foreground truncate text-center">
+                  <p className="text-xs text-gray-500 truncate text-center">
                     From successful transactions
                   </p>
                 </CardContent>
@@ -551,7 +545,7 @@ export default function EventOrganizerPage() {
                     onClick={() =>
                       router.push("/event-organizer/transaction-management")
                     }
-                    className="border-2 border-[#00481a] hover:border-[#97d753] hover:bg-[#c6ee9a] text-[#00481a] hover:text-[#00481a] font-medium"
+                    className="rounded-full border-2 border-[#09431C] hover:bg-[#c6ee9a] text-[#09431C] hover:text-[#09431C] font-medium"
                   >
                     <CreditCard className="w-4 h-4 mr-2" />
                     View Transactions
@@ -561,7 +555,7 @@ export default function EventOrganizerPage() {
                     onClick={() =>
                       router.push("/event-organizer/pending-approval")
                     }
-                    className="border-2 border-yellow-300 hover:border-yellow-500 hover:bg-yellow-50 text-yellow-700 hover:text-yellow-800 font-medium"
+                    className="rounded-full border-2 border-amber-400 hover:bg-amber-50 text-amber-700 hover:text-amber-800 font-medium"
                   >
                     <Users className="w-4 h-4 mr-2" />
                     Pending Approval
@@ -570,20 +564,20 @@ export default function EventOrganizerPage() {
               </div>
 
               {events.length === 0 ? (
-                <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl">
-                  <CardContent className="flex flex-col items-center justify-center py-12">
-                    <div className="p-4 bg-gray-100 rounded-full mb-4">
-                      <Calendar className="h-12 w-12 text-gray-400" />
+                <Card className="bg-white border border-gray-100 rounded-2xl shadow-md">
+                  <CardContent className="flex flex-col items-center justify-center py-16">
+                    <div className="p-4 bg-[#c6ee9a]/30 rounded-full mb-4">
+                      <Calendar className="h-12 w-12 text-[#09431C]" />
                     </div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
                       No events yet
                     </h3>
-                    <p className="text-gray-500 mb-4">
+                    <p className="text-gray-500 mb-6">
                       Create your first event to get started
                     </p>
                     <Button
                       onClick={handleCreateEvent}
-                      className="bg-[#09431C] hover:bg-[#09431C]/90 text-white w-full sm:w-auto"
+                      className="rounded-full bg-[#09431C] hover:bg-[#09431C]/90 text-white px-8"
                     >
                       <Plus className="w-4 h-4 mr-2" />
                       Create Event
@@ -605,9 +599,9 @@ export default function EventOrganizerPage() {
                     return (
                       <Card
                         key={event.id}
-                        className="bg-white/80 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 h-full flex flex-col group"
+                        className="bg-white border border-gray-100 rounded-3xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:scale-105 h-full flex flex-col group overflow-hidden"
                       >
-                        <div className="aspect-video bg-gradient-to-br from-gray-200 to-gray-300 rounded-t-lg flex items-center justify-center overflow-hidden relative">
+                        <div className="relative w-full h-44 overflow-hidden">
                           {event.event_thumbnail ? (
                             <img
                               src={event.event_thumbnail}
@@ -615,75 +609,34 @@ export default function EventOrganizerPage() {
                               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                             />
                           ) : (
-                            <div className="text-center">
-                              <Calendar className="h-16 w-16 text-gray-400 mx-auto mb-2" />
-                              <p className="text-gray-500 text-sm">No Image</p>
+                            <div className="w-full h-full bg-gradient-to-br from-[#c6ee9a]/40 to-[#97d753]/20 flex flex-col items-center justify-center">
+                              <Calendar className="h-12 w-12 text-[#09431C]/40 mb-1" />
+                              <p className="text-gray-400 text-sm">No Image</p>
                             </div>
                           )}
                           <div className="absolute top-3 right-3">
-                            <Badge className={`${eventStatus.color} shadow-lg`}>
+                            <Badge className={`${eventStatus.color} rounded-full shadow-md text-xs font-semibold px-3`}>
                               {eventStatus.status}
                             </Badge>
                           </div>
                         </div>
 
-                        <CardHeader className="pb-2">
-                          <div className="flex items-start justify-between">
-                            <CardTitle className="text-base sm:text-lg line-clamp-2 group-hover:text-[#00481a] transition-colors duration-300">
+                        <CardHeader className="pb-2 pt-4">
+                          <div className="flex items-start justify-between gap-2">
+                            <CardTitle className="text-base sm:text-lg line-clamp-2 group-hover:text-[#09431C] transition-colors duration-300 flex-1">
                               {event.event_name}
                             </CardTitle>
-                            <Badge className={eventStatus.color}>
-                              {eventStatus.status}
-                            </Badge>
-                          </div>
-                          <p className="text-sm text-gray-600 line-clamp-2">
-                            {event.event_description}
-                          </p>
-                        </CardHeader>
-
-                        <CardContent className="space-y-2 flex-grow flex flex-col">
-                          <div className="flex items-center text-sm text-gray-600">
-                            <Calendar className="w-4 h-4 mr-2 text-[#00481a]" />
-                            {format(new Date(event.event_start_date), "PPP", {
-                              locale: id,
-                            })}
-                          </div>
-
-                          <div className="flex items-center text-sm text-gray-600">
-                            <MapPin className="w-4 h-4 mr-2 text-[#00481a]" />
-                            {event.event_location}
-                          </div>
-
-                          <div className="flex items-center text-sm text-gray-600">
-                            <Users className="w-4 h-4 mr-2 text-[#00481a]" />
-                            {event.total_seats - event.available_seats} /{" "}
-                            {event.total_seats} seats
-                          </div>
-
-                          {/* Occupancy Bar */}
-                          <div className="w-full bg-gray-200 rounded-full h-2">
-                            <div
-                              className="bg-gradient-to-r from-[#97d753] to-[#c6ee9a] h-2 rounded-full transition-all duration-300"
-                              style={{ width: `${occupancyRate}%` }}
-                            ></div>
-                          </div>
-                          <p className="text-xs text-gray-500 text-center">
-                            {occupancyRate.toFixed(1)}% occupied
-                          </p>
-
-                          {/* Actions Dropdown */}
-                          <div className="flex justify-end pt-2 mt-auto">
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
                                 <Button
-                                  variant="outline"
+                                  variant="ghost"
                                   size="sm"
-                                  className="border-2 border-gray-300 hover:border-gray-400 text-gray-700"
+                                  className="rounded-full text-gray-400 hover:text-[#09431C] hover:bg-[#c6ee9a]/30 h-8 w-8 p-0 flex-shrink-0"
                                 >
                                   <MoreHorizontal className="w-4 h-4" />
                                 </Button>
                               </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
+                              <DropdownMenuContent align="end" className="rounded-xl">
                                 <DropdownMenuItem
                                   onClick={() =>
                                     handleViewEvent(event.event_name)
@@ -711,6 +664,42 @@ export default function EventOrganizerPage() {
                               </DropdownMenuContent>
                             </DropdownMenu>
                           </div>
+                          <p className="text-sm text-gray-500 line-clamp-2 mt-1">
+                            {event.event_description}
+                          </p>
+                        </CardHeader>
+
+                        <CardContent className="space-y-2 flex-grow flex flex-col pt-0 pb-5">
+                          <div className="flex items-center text-sm text-gray-600">
+                            <Calendar className="w-4 h-4 mr-2 text-[#09431C]" />
+                            {format(new Date(event.event_start_date), "PPP", {
+                              locale: id,
+                            })}
+                          </div>
+
+                          <div className="flex items-center text-sm text-gray-600">
+                            <MapPin className="w-4 h-4 mr-2 text-[#09431C]" />
+                            {event.event_location}
+                          </div>
+
+                          <div className="flex items-center text-sm text-gray-600">
+                            <Users className="w-4 h-4 mr-2 text-[#09431C]" />
+                            {event.total_seats - event.available_seats} /{" "}
+                            {event.total_seats} seats
+                          </div>
+
+                          {/* Occupancy Bar */}
+                          <div className="w-full bg-gray-100 rounded-full h-2">
+                            <div
+                              className="bg-gradient-to-r from-[#97d753] to-[#6FB229] h-2 rounded-full transition-all duration-300"
+                              style={{ width: `${occupancyRate}%` }}
+                            ></div>
+                          </div>
+                          <p className="text-xs text-gray-400 text-center">
+                            {occupancyRate.toFixed(1)}% occupied
+                          </p>
+
+
                         </CardContent>
                       </Card>
                     );
@@ -719,8 +708,6 @@ export default function EventOrganizerPage() {
               )}
             </div>
           </div>
-        </div>
-      </div>
     </div>
   );
 }

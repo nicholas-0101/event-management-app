@@ -5,8 +5,8 @@ import Link from "next/link";
 export default function Footer() {
   const pathname = usePathname();
 
-  // list of routes where navbar should be hidden
-  const hiddenRoutes = ["/signin", "/signup", "/verify", "/pre-verify"];
+  // list of routes where footer should be hidden
+  const hiddenRoutes = ["/signin", "/signup", "/verify", "/pre-verify", "/event-organizer"];
   const hideFooter = hiddenRoutes.some((route) => pathname.startsWith(route));
   if (hideFooter) {
     return null;

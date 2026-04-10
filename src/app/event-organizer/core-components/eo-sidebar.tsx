@@ -232,10 +232,10 @@ export default function EOSidebar({ className }: SidebarProps) {
                       }
                     }}
                     className={cn(
-                      "w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200",
+                      "w-full flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200",
                       isMenuActive
-                        ? "bg-[#c6ee9a] text-[#00481a] border-r-2 border-[#00481a]"
-                        : "text-gray-700 hover:bg-[#c6ee9a] hover:text-[#00481a]",
+                        ? "bg-[#c6ee9a] text-[#09431C] font-semibold shadow-sm"
+                        : "text-gray-700 hover:bg-[#c6ee9a]/50 hover:text-[#09431C]",
                       isCollapsed && "justify-center"
                     )}
                   >
@@ -265,10 +265,10 @@ export default function EOSidebar({ className }: SidebarProps) {
                           key={`${subItem.href}-${subItem.title}`}
                           onClick={() => handleNavigation(subItem.href)}
                           className={cn(
-                            "w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200",
+                            "w-full flex items-center px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200",
                             isSubItemActive(subItem)
-                              ? "bg-[#97d753] text-[#00481a]"
-                              : "text-gray-600 hover:bg-[#c6ee9a] hover:text-[#00481a]"
+                              ? "bg-[#97d753]/70 text-[#09431C] font-semibold"
+                              : "text-gray-600 hover:bg-[#c6ee9a]/40 hover:text-[#09431C]"
                           )}
                         >
                           <div className="w-2 h-2 bg-[#00481a] rounded-full mr-3" />

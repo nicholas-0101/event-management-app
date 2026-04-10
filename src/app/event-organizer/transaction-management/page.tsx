@@ -23,12 +23,11 @@ import {
   Clock,
   User,
   Calendar,
-  MapPin,
 } from "lucide-react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
-import EOSidebar from "../core-components/eo-sidebar";
+
 import { apiCall, checkBackendHealth } from "@/helper/axios";
 import { formatCurrency } from "@/lib/utils";
 // DebugTools removed
@@ -71,11 +70,43 @@ interface TransactionStats {
   pending_revenue: number;
 }
 
-// Transform raw SQL data to expected structure
+// Transform data to expected structure - handles both Prisma nested objects and raw SQL rows
 const transformTransactionData = (rawData: any[]): Transaction[] => {
   if (!Array.isArray(rawData)) return [];
+  if (rawData.length === 0) return [];
 
-  // Group by transaction ID to handle multiple tickets per transaction
+  // Detect if data is already in Prisma nested format (has .user object and .tickets array)
+  const firstItem = rawData[0];
+  if (firstItem.user && typeof firstItem.user === "object" && Array.isArray(firstItem.tickets)) {
+    // Prisma nested format - map directly
+    return rawData.map((t: any) => ({
+      id: t.id,
+      user_id: t.user_id,
+      status: t.status,
+      total_price: t.total_price,
+      payment_proof_url: t.payment_proof_url,
+      transaction_date_time: t.transaction_date_time,
+      is_accepted: t.is_accepted,
+      user: {
+        id: t.user?.id || t.user_id,
+        username: t.user?.username || "Unknown",
+        email: t.user?.email || "",
+      },
+      tickets: (t.tickets || []).map((tt: any) => ({
+        qty: tt.qty,
+        subtotal_price: tt.subtotal_price,
+        ticket: {
+          ticket_type: tt.ticket?.ticket_type || "",
+          price: tt.ticket?.price || 0,
+          event: {
+            event_name: tt.ticket?.event?.event_name || "",
+          },
+        },
+      })),
+    }));
+  }
+
+  // Raw SQL flat row format - group by transaction ID
   const transactionMap = new Map<number, any>();
 
   rawData.forEach((row: any) => {
@@ -371,20 +402,16 @@ function TransactionManagementContent() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      <EOSidebar />
-
-      <div className="flex justify-center">
-        <div className="w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
-          <div className="bg-white/80 backdrop-blur-sm shadow-lg border-b border-gray-200/50 rounded-lg mt-8 mb-8">
-            <div className="px-6 py-8">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-                <div className="space-y-2">
+          <div className="bg-white/80 backdrop-blur-sm shadow-md border border-gray-100 rounded-2xl mt-8 mb-8">
+            <div className="px-6 py-7">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="space-y-1">
                   <h1 className="text-3xl md:text-4xl font-bold text-[#09431C]">
                     Transaction Management
                   </h1>
-                  <p className="text-gray-600 text-lg">
+                  <p className="text-gray-500 text-base">
                     Review and manage payment transactions with ease
                   </p>
                 </div>
@@ -394,7 +421,7 @@ function TransactionManagementContent() {
                     onClick={() =>
                       router.push("/event-organizer/pending-approval")
                     }
-                    className="border-2 border-[#00481a] hover:border-[#97d753] hover:bg-[#c6ee9a] text-[#00481a] hover:text-[#00481a] font-medium"
+                    className="rounded-full border-2 border-[#09431C] hover:bg-[#c6ee9a] text-[#09431C] hover:text-[#09431C] font-medium"
                   >
                     <Clock className="w-4 h-4 mr-2" />
                     Pending Approval
@@ -460,77 +487,73 @@ function TransactionManagementContent() {
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
-              <Card className="h-full bg-white/70 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
+              <Card className="h-full bg-white border border-gray-100 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:scale-105">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                  <CardTitle className="text-sm font-medium text-gray-700">
+                  <CardTitle className="text-sm font-medium text-gray-600">
                     Total Transactions
                   </CardTitle>
-                  <div className="p-2 bg-[#97d753] rounded-lg">
-                    <CreditCard className="h-5 w-5 text-[#00481a]" />
+                  <div className="p-2 bg-[#97d753]/30 rounded-xl">
+                    <CreditCard className="h-5 w-5 text-[#09431C]" />
                   </div>
                 </CardHeader>
                 <CardContent className="flex flex-col items-center justify-center gap-1 px-2 pb-5 pt-2">
-                  <div className="text-3xl font-bold text-gray-900 text-center">
+                  <div className="text-3xl font-bold text-[#09431C] text-center">
                     {stats.total}
                   </div>
-                  <p className="text-sm text-gray-600 text-center">All time</p>
+                  <p className="text-sm text-gray-500 text-center">All time</p>
                 </CardContent>
               </Card>
 
-              <Card className="h-full bg-white/70 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
+              <Card className="h-full bg-white border border-gray-100 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:scale-105">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                  <CardTitle className="text-sm font-medium text-gray-700">
+                  <CardTitle className="text-sm font-medium text-gray-600">
                     Pending Approval
                   </CardTitle>
-                  <div className="p-2 bg-[#c6ee9a] rounded-lg">
-                    <Clock className="h-5 w-5 text-[#00481a]" />
+                  <div className="p-2 bg-[#c6ee9a]/40 rounded-xl">
+                    <Clock className="h-5 w-5 text-[#09431C]" />
                   </div>
                 </CardHeader>
                 <CardContent className="flex flex-col items-center justify-center gap-1 px-2 pb-5 pt-2">
-                  <div className="text-3xl font-bold text-[#00481a] text-center">
+                  <div className="text-3xl font-bold text-[#09431C] text-center">
                     {stats.waiting_confirmation}
                   </div>
-                  <p className="text-sm text-gray-600 text-center">
+                  <p className="text-sm text-gray-500 text-center">
                     Need review
                   </p>
                 </CardContent>
               </Card>
 
-              <Card className="h-full bg-white/70 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
+              <Card className="h-full bg-white border border-gray-100 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:scale-105">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                  <CardTitle className="text-sm font-medium text-gray-700">
+                  <CardTitle className="text-sm font-medium text-gray-600">
                     Total Revenue
                   </CardTitle>
-                  <div className="p-2 bg-[#97d753] rounded-lg">
-                    <div className="text-white font-bold text-sm">Rp</div>
-                  </div>
+                  <div className="px-3 py-1 bg-[#97d753]/30 rounded-full text-[#09431C] font-bold text-sm">Rp</div>
                 </CardHeader>
                 <CardContent className="flex flex-col items-center justify-center gap-1 px-2 pb-5 pt-2">
-                  <div className="text-2xl font-bold text-[#00481a] break-words text-center">
+                  <div className="text-2xl font-bold text-[#09431C] break-words text-center">
                     {formatCurrency(totalRevenueSuccess)}
                   </div>
-                  <p className="text-sm text-gray-600 text-center">
+                  <p className="text-sm text-gray-500 text-center">
                     From successful transactions only
                   </p>
                 </CardContent>
               </Card>
 
-              <Card className="h-full bg-white/70 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
+              <Card className="h-full bg-white border border-gray-100 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:scale-105">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                  <CardTitle className="text-sm font-medium text-gray-700">
+                  <CardTitle className="text-sm font-medium text-gray-600">
                     Pending Revenue
                   </CardTitle>
-                  <div className="p-2 bg-[#c6ee9a] rounded-lg">
-                    <div className="text-white font-bold text-sm">Rp</div>
-                  </div>
+                  <div className="px-3 py-1 bg-[#c6ee9a]/40 rounded-full text-[#09431C] font-bold text-sm">Rp</div>
                 </CardHeader>
                 <CardContent className="flex flex-col items-center justify-center gap-1 px-2 pb-5 pt-2">
-                  <div className="text-2xl font-bold text-[#00481a] break-words text-center">
+                  <div className="text-2xl font-bold text-[#09431C] break-words text-center">
                     {stats.pending_revenue
                       ? formatCurrency(stats.pending_revenue)
                       : "Rp 0"}
                   </div>
-                  <p className="text-sm text-gray-600 text-center">
+                  <p className="text-sm text-gray-500 text-center">
                     Awaiting approval
                   </p>
                 </CardContent>
@@ -538,10 +561,10 @@ function TransactionManagementContent() {
             </div>
 
             {/* Filters and Search */}
-            <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl">
+            <Card className="bg-white border border-gray-100 rounded-2xl shadow-md">
               <CardHeader className="pb-4">
                 <CardTitle className="text-xl font-semibold text-gray-900 flex items-center">
-                  <Filter className="w-5 h-5 mr-2 text-[#00481a]" />
+                  <Filter className="w-5 h-5 mr-2 text-[#09431C]" />
                   Filters & Search
                 </CardTitle>
               </CardHeader>
@@ -554,7 +577,7 @@ function TransactionManagementContent() {
                         placeholder="Search by user or event..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-12 py-2 border-gray-200 focus:border-[#00481a] focus:ring-[#00481a] text-lg"
+                        className="pl-12 py-2 rounded-full border-gray-200 focus:border-[#09431C] focus:ring-[#09431C] text-base"
                       />
                     </div>
                   </div>
@@ -564,10 +587,10 @@ function TransactionManagementContent() {
                       value={statusFilter}
                       onValueChange={setStatusFilter}
                     >
-                      <SelectTrigger className="w-full py-2 border-gray-200 focus:border-[#00481a] focus:ring-[#00481a] text-lg">
+                      <SelectTrigger className="w-full py-2 rounded-full border-gray-200 focus:border-[#09431C] text-base">
                         <SelectValue placeholder="All Status" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="rounded-xl">
                         <SelectItem value="all">All Status</SelectItem>
                         <SelectItem value="WAITING_PAYMENT">
                           Waiting Payment
@@ -590,7 +613,7 @@ function TransactionManagementContent() {
                         setSearchTerm("");
                         setStatusFilter("all");
                       }}
-                      className="border-2 border-[#00481a] hover:border-[#97d753] hover:bg-[#c6ee9a] text-[#00481a] hover:text-[#00481a] font-medium py-2 px-6 transition-all duration-300 w-full md:w-auto"
+                      className="rounded-full border-2 border-[#09431C] hover:bg-[#c6ee9a] text-[#09431C] hover:text-[#09431C] font-medium py-2 px-6 transition-all duration-300 w-full md:w-auto"
                     >
                       Clear Filters
                     </Button>
@@ -600,10 +623,10 @@ function TransactionManagementContent() {
             </Card>
 
             {/* Transactions Table */}
-            <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl">
+            <Card className="bg-white border border-gray-100 rounded-2xl shadow-md">
               <CardHeader className="pb-4">
                 <CardTitle className="text-xl font-semibold text-gray-900 flex items-center">
-                  <CreditCard className="w-5 h-5 mr-2 text-blue-600" />
+                  <CreditCard className="w-5 h-5 mr-2 text-[#09431C]" />
                   Transaction List
                 </CardTitle>
               </CardHeader>
@@ -653,8 +676,8 @@ function TransactionManagementContent() {
                           >
                             <td className="py-4 px-4">
                               <div className="flex items-center space-x-3">
-                                <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
-                                  <User className="w-5 h-5 text-white" />
+                                <div className="w-10 h-10 bg-gradient-to-r from-[#09431C] to-[#6FB229] rounded-full flex items-center justify-center">
+                                   <User className="w-5 h-5 text-white" />
                                 </div>
                                 <div>
                                   <div className="font-medium text-gray-900">
@@ -672,13 +695,6 @@ function TransactionManagementContent() {
                                   {
                                     transaction.tickets[0]?.ticket.event
                                       .event_name
-                                  }
-                                </div>
-                                <div className="flex items-center text-sm text-gray-500">
-                                  <MapPin className="w-4 h-4 mr-1" />
-                                  {
-                                    transaction.tickets[0]?.ticket.event
-                                      .event_location
                                   }
                                 </div>
                               </div>
@@ -719,12 +735,12 @@ function TransactionManagementContent() {
                               </div>
                             </td>
                             <td className="py-4 px-4">
-                              <div className="flex space-x-2">
+                              <div className="flex gap-2">
                                 <Button
                                   variant="outline"
                                   size="sm"
                                   onClick={() => showPaymentProof(transaction)}
-                                  className="border-2 border-gray-300 hover:border-blue-500 hover:bg-blue-50 text-gray-700 hover:text-blue-700 font-medium py-2 transition-all duration-300"
+                                  className="rounded-full border-2 border-[#09431C] hover:bg-[#c6ee9a] text-[#09431C] hover:text-[#09431C] font-medium transition-all duration-300"
                                 >
                                   <Eye className="w-4 h-4 mr-1" />
                                   View
@@ -733,23 +749,21 @@ function TransactionManagementContent() {
                                   "WAITING_CONFIRMATION" && (
                                   <>
                                     <Button
-                                      variant="outline"
                                       size="sm"
                                       onClick={() =>
                                         handleAcceptTransaction(transaction.id)
                                       }
-                                      className="border-2 border-gray-300 hover:border-green-500 hover:bg-green-50 text-gray-700 hover:text-green-700 font-medium py-2 transition-all duration-300"
+                                      className="rounded-full bg-[#09431C] hover:bg-[#09431C]/90 text-white font-medium shadow-sm hover:shadow-md transition-all duration-300"
                                     >
                                       <CheckCircle className="w-4 h-4 mr-1" />
                                       Accept
                                     </Button>
                                     <Button
-                                      variant="outline"
                                       size="sm"
                                       onClick={() =>
                                         openRejectModal(transaction)
                                       }
-                                      className="border-2 border-gray-300 hover:border-red-500 hover:bg-red-50 text-gray-700 hover:text-red-700 font-medium py-2 transition-all duration-300"
+                                      className="rounded-full bg-red-500 hover:bg-red-600 text-white font-medium shadow-sm hover:shadow-md transition-all duration-300"
                                     >
                                       <XCircle className="w-4 h-4 mr-1" />
                                       Reject
@@ -767,8 +781,6 @@ function TransactionManagementContent() {
               </CardContent>
             </Card>
           </div>
-        </div>
-      </div>
 
       {/* Payment Proof Modal */}
       {showProofModal && selectedTransaction && (
@@ -815,7 +827,7 @@ function TransactionManagementContent() {
               <div className="flex justify-end">
                 <Button
                   onClick={() => setShowProofModal(false)}
-                  className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-2 font-medium shadow-lg hover:shadow-xl transition-all duration-300"
+                  className="rounded-full bg-[#09431C] hover:bg-[#09431C]/90 text-white px-6 py-2 font-medium shadow-md hover:shadow-lg transition-all duration-300"
                 >
                   Close
                 </Button>
@@ -854,7 +866,7 @@ function TransactionManagementContent() {
                     setRejectionReason("");
                     setSelectedTransaction(null);
                   }}
-                  className="border-2 border-gray-300 hover:border-gray-400 hover:bg-gray-50 text-gray-700 font-medium px-6 py-2 transition-all duration-300"
+                  className="rounded-full border-2 border-gray-300 hover:bg-gray-50 text-gray-700 font-medium px-6 py-2 transition-all duration-300"
                 >
                   Cancel
                 </Button>
@@ -862,7 +874,7 @@ function TransactionManagementContent() {
                   onClick={() =>
                     handleRejectTransaction(selectedTransaction.id)
                   }
-                  className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-6 py-2 font-medium shadow-lg hover:shadow-xl transition-all duration-300"
+                  className="rounded-full bg-red-500 hover:bg-red-600 text-white px-6 py-2 font-medium shadow-md hover:shadow-lg transition-all duration-300"
                 >
                   Reject
                 </Button>

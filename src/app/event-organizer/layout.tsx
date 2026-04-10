@@ -3,6 +3,7 @@ import { Roboto } from "next/font/google";
 import "../globals.css";
 import AuthGuard from "@/components/core-components/auth-guard";
 import ViewportGuard from "@/components/core-components/viewport-guard";
+import SidebarLayout from "./core-components/sidebar-layout";
 
 const roboto = Roboto({
   variable: "--font-roboto",
@@ -26,11 +27,8 @@ export default function EventOrganizerLayout({
       redirectTo="/"
       requireVerification={false}
     >
-      {/* client-only guard; renders nothing */}
       <ViewportGuard />
-      <div className="px-36">
-        <div className="pt-4 pb-15">{children}</div>
-      </div>
+      <SidebarLayout>{children}</SidebarLayout>
     </AuthGuard>
   );
 }

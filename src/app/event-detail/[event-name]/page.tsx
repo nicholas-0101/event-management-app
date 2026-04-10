@@ -1,6 +1,6 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -90,12 +90,13 @@ function StarRating({ rating }: { rating: number }) {
 
 export default function EventDetailPage() {
   const params = useParams();
+  const router = useRouter();
 
   const slugParam = Array.isArray(params["event-name"])
     ? params["event-name"][0]
     : params["event-name"];
 
-  const eventNameParam = slugParam?.replace(/-/g, " ");
+  const eventNameParam = slugParam ? decodeURIComponent(slugParam) : "";
 
   const [event, setEvent] = useState<IEvent | null>(null);
   const [loading, setLoading] = useState(true);
@@ -333,11 +334,19 @@ export default function EventDetailPage() {
                 Sold Out
               </Button>
             ) : (
-              <Link href={`/transaction/${event.id}`}>
-                <Button className="w-full bg-[#6FB229] hover:bg-[#09431C] rounded-lg">
-                  Buy Ticket
-                </Button>
-              </Link>
+              <Button
+                className="w-full bg-[#6FB229] hover:bg-[#09431C] rounded-lg cursor-pointer"
+                onClick={() => {
+                  const token = localStorage.getItem("token");
+                  if (!token) {
+                    router.push("/signin");
+                  } else {
+                    router.push(`/transaction/${event.id}`);
+                  }
+                }}
+              >
+                Buy Ticket
+              </Button>
             )}
           </div>
         </div>

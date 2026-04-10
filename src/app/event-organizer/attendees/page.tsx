@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useState, Suspense } from "react";
-import EOSidebar from "../core-components/eo-sidebar";
+
 import { apiCall } from "@/helper/axios";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -203,33 +203,35 @@ function AttendeesContent() {
   }, [attendees]);
 
   return (
-    <div className="min-h-screen bg-white">
-      <EOSidebar />
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        <div className="flex items-center justify-between mb-10">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">
-              Attendee Management
-            </h1>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        {/* Header */}
+        <div className="bg-white/80 backdrop-blur-sm shadow-md border border-gray-100 rounded-2xl mt-8 mb-8">
+          <div className="px-6 py-7">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl font-bold text-[#09431C]">
+                  Attendee Management
+                </h1>
+                <p className="text-gray-500 text-base mt-1">View and manage event attendees</p>
+              </div>
+              <Badge
+                className="text-[#09431C] bg-[#c6ee9a]/50 border border-[#97d753] rounded-full px-4 py-1.5 font-semibold"
+              >
+                <Users className="w-4 h-4 mr-2" /> {totalTicketsAll} Attendees
+              </Badge>
+            </div>
           </div>
-          <Badge
-            variant="secondary"
-            className="text-[#00481a] bg-[#c6ee9a] border border-[#97d753]"
-          >
-            <Users className="w-4 h-4 mr-2" /> {totalTicketsAll} Attendee
-          </Badge>
         </div>
 
-        <Card className="mb-6">
+        <Card className="mb-6 rounded-2xl border border-gray-100 shadow-md">
           <CardContent className="p-4 md:p-6">
             <div className="flex flex-col md:flex-row gap-4 md:gap-6 items-stretch">
               <div className="flex-1">
                 <div className="relative h-full">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                   <Input
-                    placeholder="Cari nama atau email attendee..."
-                    className="pl-10 pr-3 py-2 h-full"
+                    placeholder="Search attendee by name or email..."
+                    className="pl-10 pr-3 py-2 h-full rounded-full border-gray-200 focus:border-[#09431C] focus:ring-[#09431C]"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                   />
@@ -239,11 +241,11 @@ function AttendeesContent() {
                 <div className="relative h-full">
                   <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                   <select
-                    className="w-full appearance-none bg-white border border-gray-300 rounded-md pl-10 pr-3 py-2 h-full text-sm focus:outline-none focus:ring-2 focus:ring-[#97d753]"
+                    className="w-full appearance-none bg-white border border-gray-200 rounded-full pl-10 pr-3 py-2 h-full text-sm focus:outline-none focus:ring-2 focus:ring-[#09431C]"
                     value={selectedEventId}
                     onChange={(e) => setSelectedEventId(e.target.value)}
                   >
-                    <option value="all">Semua Event</option>
+                    <option value="all">All Events</option>
                     {eventOptions.map((ev) => (
                       <option key={ev.id} value={ev.id}>
                         {ev.name}
@@ -267,13 +269,13 @@ function AttendeesContent() {
           <Card>
             <CardContent className="py-16 text-center">
               <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                Belum ada attendee
+                No attendees yet
               </h3>
               <p className="text-gray-600">
-                Tidak ditemukan transaksi SUCCESS{" "}
+                No successful transactions found{" "}
                 {selectedEventId !== "all"
-                  ? "untuk event terpilih"
-                  : "untuk event Anda"}
+                  ? "for the selected event"
+                  : "for your events"}
                 .
               </p>
             </CardContent>
@@ -282,11 +284,11 @@ function AttendeesContent() {
           <Card className="overflow-x-auto">
             <CardContent className="p-0">
               <div className="min-w-full">
-                <div className="sticky top-0 z-10 grid grid-cols-12 gap-0 px-4 py-3 bg-[#e9f7cc] text-[#08340a] font-semibold border-b shadow-sm divide-x divide-[#d9eab5]">
+                <div className="sticky top-0 z-10 grid grid-cols-12 gap-0 px-4 py-3 bg-[#09431C] text-white font-semibold border-b rounded-t-2xl divide-x divide-white/20">
                   <div className="col-span-3">User</div>
                   <div className="col-span-4">Email</div>
                   <div className="col-span-2">Event</div>
-                  <div className="col-span-2">Jenis Tiket (qty)</div>
+                  <div className="col-span-2">Ticket Type (qty)</div>
                   <div className="col-span-1 text-right">Total</div>
                 </div>
                 <div>
@@ -294,8 +296,8 @@ function AttendeesContent() {
                     <div
                       key={`${a.userId}-${a.eventId}`}
                       className={`grid grid-cols-12 gap-0 px-4 py-3 border-b ${
-                        idx % 2 === 0 ? "bg-white" : "bg-white/70"
-                      } hover:bg-[#f9ffe9] transition-colors divide-x divide-gray-200`}
+                        idx % 2 === 0 ? "bg-white" : "bg-gray-50/50"
+                      } hover:bg-[#f9ffe9] transition-colors divide-x divide-gray-100`}
                     >
                       <div className="col-span-3 flex items-center gap-3 min-w-0">
                         <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#dff4be] text-[#0f3d00] flex items-center justify-center text-xs font-bold">
@@ -346,7 +348,6 @@ function AttendeesContent() {
           </Card>
         )}
       </div>
-    </div>
   );
 }
 
