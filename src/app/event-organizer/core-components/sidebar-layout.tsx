@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { apiCall } from "@/helper/axios";
 import { clearAuthData } from "@/lib/auth-utils";
+import logoPic from "@/assets/logo.png";
 
 const menuItems = [
   {
@@ -203,7 +204,7 @@ export default function SidebarLayout({
         <div className="flex h-16 items-center justify-between px-3 border-b border-gray-100 flex-shrink-0">
           {!isCollapsed && (
             <div className="flex items-center space-x-2 overflow-hidden">
-              <img src="/TicketNest-nobg.png" className="h-8 w-auto flex-shrink-0" alt="TicketNest" />
+              <Image src={logoPic} className="h-8 w-auto flex-shrink-0" alt="TicketNest" priority />
             </div>
           )}
           <Button

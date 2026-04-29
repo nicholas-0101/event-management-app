@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { apiCall } from "@/helper/axios";
 import { clearAuthData } from "@/lib/auth-utils";
+import logoPic from "@/assets/logo.png";
 
 interface SidebarProps {
   className?: string;
@@ -208,7 +209,7 @@ export default function EOSidebar({ className }: SidebarProps) {
           <div className="flex h-16 items-center justify-between px-4 border-b border-gray-200">
             {!isCollapsed && (
               <div className="flex items-center space-x-2">
-                <img src="/TicketNest-nobg.png" className="h-8 w-auto flex-shrink-0" alt="TicketNest" />
+                <Image src={logoPic} className="h-8 w-auto flex-shrink-0" alt="TicketNest" priority />
               </div>
             )}
             <Button
