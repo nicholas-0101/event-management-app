@@ -208,7 +208,7 @@ export default function EOSidebar({ className }: SidebarProps) {
           <div className="flex h-16 items-center justify-between px-4 border-b border-gray-200">
             {!isCollapsed && (
               <div className="flex items-center space-x-2">
-                <Image src="/TicketNest-nobg.png" height={32} width={120} className="h-8 w-auto flex-shrink-0" alt="TicketNest" priority />
+                <img src="/TicketNest-nobg.png" className="h-8 w-auto flex-shrink-0" alt="TicketNest" />
               </div>
             )}
             <Button
