@@ -49,7 +49,7 @@ export default function EventCard({
 }: CardItemProps) {
   return (
     <a href={href}>
-      <Card className="rounded-3xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 group transform hover:scale-105 flex flex-col gap-4 pb-5 w-full md:w-73 lg:w-90 xl:w-92 2xl:w-98">
+      <Card className="rounded-3xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 group transform hover:scale-[1.02] flex flex-col h-full w-full pb-5">
         <div className="relative w-full h-40">
           <Image src={thumbnail} alt={title} fill className="object-cover group-hover:scale-110 transition-all duration-300" />
         </div>

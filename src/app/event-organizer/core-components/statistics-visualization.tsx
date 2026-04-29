@@ -496,11 +496,11 @@ export default function StatisticsVisualization({
             <ResponsiveContainer width="100%" height={540}>
               <BarChart
                 data={monthlyData}
-                margin={{ top: 16, right: 24, left: 12, bottom: 80 }}
-                barCategoryGap={"10%"}
-                barGap={0}
+                margin={{ top: 20, right: 24, left: metric === "revenue" ? 40 : 12, bottom: 20 }}
+                barCategoryGap={"15%"}
+                barGap={2}
               >
-                <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" vertical={false} />
                 <XAxis
                   dataKey="name"
                   tickLine={false}
@@ -508,8 +508,9 @@ export default function StatisticsVisualization({
                   interval={timeRange === "day" ? 2 : 0}
                   angle={-35}
                   textAnchor="end"
-                  height={110}
-                  tick={{ fontSize: 20 }}
+                  height={80}
+                  tick={{ fontSize: 13, fill: "#6B7280" }}
+                  dy={10}
                 />
                 <YAxis
                   tickLine={false}
@@ -519,25 +520,30 @@ export default function StatisticsVisualization({
                       ? formatCurrency(Number(v))
                       : Number(v).toLocaleString("id-ID")
                   }
-                  tick={{ fontSize: 20 }}
+                  tick={{ fontSize: 13, fill: "#6B7280" }}
+                  width={metric === "revenue" ? 90 : 60}
                 />
                 <Tooltip
                   cursor={{ fill: "#F9FAFB" }}
+                  contentStyle={{ borderRadius: '8px', border: '1px solid #E5E7EB', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                   formatter={(value: any) =>
                     metric === "revenue"
                       ? formatCurrency(Number(value))
                       : Number(value).toLocaleString("id-ID")
                   }
                 />
-                <Legend wrapperStyle={{ fontSize: 20 }} />
+                <Legend 
+                  wrapperStyle={{ fontSize: 13, paddingTop: "20px" }}
+                  iconType="circle"
+                />
                 {activeEventNames.map((ev, idx) => (
                   <Bar
                     key={ev}
                     dataKey={ev}
                     name={ev}
                     fill={COLORS[idx % COLORS.length]}
-                    radius={[6, 6, 0, 0]}
-                    maxBarSize={240}
+                    radius={[4, 4, 0, 0]}
+                    maxBarSize={50}
                   />
                 ))}
               </BarChart>

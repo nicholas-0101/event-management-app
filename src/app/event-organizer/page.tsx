@@ -306,18 +306,7 @@ export default function EventOrganizerPage() {
     () => formatCurrency(totalRevenueSuccess),
     [totalRevenueSuccess]
   );
-  const revenueNumericText = useMemo(
-    () => revenueText.replace(/^Rp\s?/, ""),
-    [revenueText]
-  );
-  const revenueSizeClass = useMemo(() => {
-    const len = revenueNumericText.length;
-    if (len <= 8) return "text-3xl"; // e.g., 12.345.678
-    if (len <= 10) return "text-2xl"; // e.g., 123.456.789
-    if (len <= 13) return "text-xl"; // e.g., 1.234.567.890
-    if (len <= 16) return "text-lg"; // e.g., 12.345.678.901
-    return "text-base";
-  }, [revenueNumericText]);
+
 
   const handleCreateEvent = () => {
     router.push("/event-organizer/event-creation");
@@ -456,70 +445,76 @@ export default function EventOrganizerPage() {
           {/* Stats Cards */}
           <div className="py-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              <Card className="h-full bg-white border border-gray-100 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-600">
-                    Total Events
-                  </CardTitle>
-                  <div className="p-2 bg-[#97d753]/30 rounded-xl">
-                    <Calendar className="h-4 w-4 text-[#09431C]" />
+              <Card className="h-full bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300">
+                <CardContent className="p-5">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-gray-500 mb-1">
+                        Total Events
+                      </p>
+                      <div className="text-2xl font-bold text-gray-900 break-words">
+                        {statsLoading ? (
+                          <div className="animate-pulse bg-gray-200 h-8 w-16 rounded-xl"></div>
+                        ) : (
+                          stats.totalEvents
+                        )}
+                      </div>
+                    </div>
+                    <div className="p-3 bg-[#c6ee9a]/30 rounded-2xl shrink-0">
+                      <Calendar className="h-6 w-6 text-[#09431C]" />
+                    </div>
                   </div>
-                </CardHeader>
-                <CardContent className="flex flex-col items-center justify-center gap-1 px-2 py-3">
-                  <div className="text-2xl font-bold text-center text-[#09431C]">
-                    {statsLoading ? (
-                      <div className="animate-pulse bg-gray-200 h-8 w-16 rounded-xl"></div>
-                    ) : (
-                      stats.totalEvents
-                    )}
-                  </div>
-                  <p className="text-xs text-gray-500 text-center">
-                    All time events
+                  <p className="text-sm text-gray-500 mt-3">
+                    All time events created
                   </p>
                 </CardContent>
               </Card>
 
-              <Card className="h-full bg-white border border-gray-100 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-600">
-                    Total Seats
-                  </CardTitle>
-                  <div className="p-2 bg-[#c6ee9a]/40 rounded-xl">
-                    <Users className="h-4 w-4 text-[#09431C]" />
+              <Card className="h-full bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300">
+                <CardContent className="p-5">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-gray-500 mb-1">
+                        Total Seats
+                      </p>
+                      <div className="text-2xl font-bold text-gray-900 break-words">
+                        {statsLoading ? (
+                          <div className="animate-pulse bg-gray-200 h-8 w-16 rounded-xl"></div>
+                        ) : (
+                          stats.totalSeats.toLocaleString()
+                        )}
+                      </div>
+                    </div>
+                    <div className="p-3 bg-[#c6ee9a]/30 rounded-2xl shrink-0">
+                      <Users className="h-6 w-6 text-[#09431C]" />
+                    </div>
                   </div>
-                </CardHeader>
-                <CardContent className="flex flex-col items-center justify-center gap-1 px-2 py-3">
-                  <div className="text-2xl font-bold text-center text-[#09431C]">
-                    {statsLoading ? (
-                      <div className="animate-pulse bg-gray-200 h-8 w-16 rounded-xl"></div>
-                    ) : (
-                      stats.totalSeats.toLocaleString()
-                    )}
-                  </div>
-                  <p className="text-xs text-gray-500 text-center">
-                    Combined capacity
+                  <p className="text-sm text-gray-500 mt-3">
+                    Combined capacity across events
                   </p>
                 </CardContent>
               </Card>
 
-              <Card className="h-full bg-white border border-gray-100 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:scale-105 overflow-hidden">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-600 leading-tight">
-                    Total Revenue
-                  </CardTitle>
-                  <div className="px-3 py-1 bg-[#97d753]/30 rounded-full text-[#09431C] font-bold text-sm">Rp</div>
-                </CardHeader>
-                <CardContent className="flex flex-col items-center justify-center gap-1 px-2 py-3">
-                  <div
-                    className={`font-bold ${revenueSizeClass} whitespace-nowrap leading-tight text-center text-[#09431C]`}
-                  >
-                    {statsLoading ? (
-                      <div className="animate-pulse bg-gray-200 h-8 w-16 rounded-xl"></div>
-                    ) : (
-                      revenueNumericText
-                    )}
+              <Card className="h-full bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
+                <CardContent className="p-5">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-gray-500 mb-1">
+                        Total Revenue
+                      </p>
+                      <div className="text-2xl font-bold text-gray-900 break-words">
+                        {statsLoading ? (
+                          <div className="animate-pulse bg-gray-200 h-8 w-24 rounded-xl"></div>
+                        ) : (
+                          revenueText
+                        )}
+                      </div>
+                    </div>
+                    <div className="p-3 bg-[#c6ee9a]/30 rounded-2xl shrink-0">
+                      <CreditCard className="h-6 w-6 text-[#09431C]" />
+                    </div>
                   </div>
-                  <p className="text-xs text-gray-500 truncate text-center">
+                  <p className="text-sm text-gray-500 mt-3 truncate">
                     From successful transactions
                   </p>
                 </CardContent>

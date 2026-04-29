@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
+import Image from "next/image";
 import {
   Calendar,
   CreditCard,
@@ -126,6 +127,16 @@ export default function SidebarLayout({
     fetchProfile();
   }, []);
 
+  useEffect(() => {
+    const activeItem = menuItems.find((item) => 
+      isActive(item.href) || 
+      (item.subItems?.some(subItem => isSubItemActive(subItem)) ?? false)
+    );
+    if (activeItem && activeItem.subItems && activeItem.subItems.length > 0) {
+      setExpandedMenu(activeItem.title);
+    }
+  }, [pathname]);
+
   const handleLogout = () => {
     clearAuthData();
     window.location.href = "/";
@@ -192,7 +203,7 @@ export default function SidebarLayout({
         <div className="flex h-16 items-center justify-between px-3 border-b border-gray-100 flex-shrink-0">
           {!isCollapsed && (
             <div className="flex items-center space-x-2 overflow-hidden">
-              <img src="/TicketNest-nobg.png" className="h-8 w-auto flex-shrink-0" alt="TicketNest" />
+              <Image src="/TicketNest-nobg.png" height={32} width={120} className="h-8 w-auto flex-shrink-0" alt="TicketNest" priority />
             </div>
           )}
           <Button
@@ -209,7 +220,9 @@ export default function SidebarLayout({
         <nav className="flex-1 overflow-y-auto px-2 py-4 space-y-1">
           {menuItems.map((item) => {
             const Icon = item.icon;
-            const isMenuActive = isActive(item.href);
+            const isMenuActive = 
+              isActive(item.href) || 
+              (item.subItems?.some(subItem => isSubItemActive(subItem)) ?? false);
             const hasSubItems = item.subItems && item.subItems.length > 0;
             const isExpanded = expandedMenu === item.title;
 
@@ -283,6 +296,9 @@ export default function SidebarLayout({
                 src={profilePicUrl || "/TicketNest-nobg.png"}
                 className="h-9 w-9 rounded-full object-cover border-2 border-gray-200"
                 alt="Profile"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = "/TicketNest-nobg.png";
+                }}
               />
             </div>
           ) : (
@@ -292,6 +308,9 @@ export default function SidebarLayout({
                 src={profilePicUrl || "/TicketNest-nobg.png"}
                 className="h-9 w-9 rounded-full object-cover border-2 border-gray-200 flex-shrink-0"
                 alt="Profile"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = "/TicketNest-nobg.png";
+                }}
               />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-gray-900 truncate">{username || "Organizer"}</p>
@@ -327,7 +346,7 @@ export default function SidebarLayout({
       {/* ── Main content — shifts with sidebar ── */}
       <main
         className={cn(
-          "transition-all duration-300 ease-in-out min-h-screen bg-white",
+          "transition-all duration-300 ease-in-out min-h-screen bg-white py-8",
           isCollapsed ? collapsedML : expandedML
         )}
       >

@@ -1,6 +1,7 @@
 "use client";
 import { usePathname } from "next/navigation";
-import { FaFacebook, FaInstagram, FaTwitter } from "react-icons/fa";
+import { FaFacebook, FaInstagram } from "react-icons/fa";
+import { FaXTwitter } from "react-icons/fa6";
 import Link from "next/link";
 export default function Footer() {
   const pathname = usePathname();
@@ -14,7 +15,7 @@ export default function Footer() {
 
   return (
     <footer className="w-full text-neutral-600 pb-10">
-      <hr className="my-8 border-t border-gray-600 w-full mx-0" />
+      <hr className="my-8 border-t border-gray-400 w-full mx-0" />
       <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-8">
         <div>
           <Link href={"/"}>
@@ -56,13 +57,13 @@ export default function Footer() {
               <FaInstagram size={32} />
             </a>
             <a href="https://x.com/" className="hover:text-[#00481a]">
-              <FaTwitter size={32} />
+              <FaXTwitter size={32} />
             </a>
           </div>
         </div>
       </div>
 
-      <div className="border-t border-gray-600 mt-10 pt-4 text-center text-sm text-gray-400">
+      <div className="border-t border-gray-400 mt-10 pt-4 text-center text-sm text-gray-400">
         © {new Date().getFullYear()} TicketNest. All rights reserved.
       </div>
     </footer>

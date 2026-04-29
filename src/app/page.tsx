@@ -127,7 +127,7 @@ function LandingPageContent() {
           new Date(b.event_start_date).getTime() -
           new Date(a.event_start_date).getTime()
       )
-      .slice(0, 6);
+      .slice(0, 12);
   }, [filteredEvents]);
 
   if (loading)
@@ -180,7 +180,7 @@ function LandingPageContent() {
           </p>
         ) : (
           <>
-            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
               {newestEvents.map((event) => (
                 <EventCard
                   key={event.id}
@@ -197,7 +197,7 @@ function LandingPageContent() {
               ))}
             </div>
 
-            {filteredEvents.length > 6 && (
+            {filteredEvents.length > 12 && (
               <div className="flex justify-end pt-6">
                 <Link href="/explore">
                   <Button variant={"link"} size="lg" className="text-[#6FB229]">

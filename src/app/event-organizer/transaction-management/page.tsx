@@ -23,6 +23,7 @@ import {
   Clock,
   User,
   Calendar,
+  MapPin,
 } from "lucide-react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { format } from "date-fns";
@@ -100,6 +101,7 @@ const transformTransactionData = (rawData: any[]): Transaction[] => {
           price: tt.ticket?.price || 0,
           event: {
             event_name: tt.ticket?.event?.event_name || "",
+            event_location: tt.ticket?.event?.event_location || "Unknown Location",
           },
         },
       })),
@@ -148,6 +150,11 @@ const transformTransactionData = (rawData: any[]): Transaction[] => {
   });
 
   return Array.from(transactionMap.values());
+};
+
+const getInitials = (name: string) => {
+  const parts = name.trim().split(/\s+/).slice(0, 2);
+  return parts.map((p) => p[0]?.toUpperCase() || "").join("") || "U";
 };
 
 function TransactionManagementContent() {
@@ -486,74 +493,88 @@ function TransactionManagementContent() {
             )}
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
-              <Card className="h-full bg-white border border-gray-100 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                  <CardTitle className="text-sm font-medium text-gray-600">
-                    Total Transactions
-                  </CardTitle>
-                  <div className="p-2 bg-[#97d753]/30 rounded-xl">
-                    <CreditCard className="h-5 w-5 text-[#09431C]" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <Card className="h-full bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300">
+                <CardContent className="p-5">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-gray-500 mb-1">
+                        Total Transactions
+                      </p>
+                      <div className="text-2xl font-bold text-gray-900 break-words">
+                        {stats.total}
+                      </div>
+                    </div>
+                    <div className="p-3 bg-[#c6ee9a]/30 rounded-2xl shrink-0">
+                      <CreditCard className="h-6 w-6 text-[#09431C]" />
+                    </div>
                   </div>
-                </CardHeader>
-                <CardContent className="flex flex-col items-center justify-center gap-1 px-2 pb-5 pt-2">
-                  <div className="text-3xl font-bold text-[#09431C] text-center">
-                    {stats.total}
-                  </div>
-                  <p className="text-sm text-gray-500 text-center">All time</p>
+                  <p className="text-sm text-gray-500 mt-3">
+                    All time
+                  </p>
                 </CardContent>
               </Card>
 
-              <Card className="h-full bg-white border border-gray-100 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                  <CardTitle className="text-sm font-medium text-gray-600">
-                    Pending Approval
-                  </CardTitle>
-                  <div className="p-2 bg-[#c6ee9a]/40 rounded-xl">
-                    <Clock className="h-5 w-5 text-[#09431C]" />
+              <Card className="h-full bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300">
+                <CardContent className="p-5">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-gray-500 mb-1">
+                        Pending Approval
+                      </p>
+                      <div className="text-2xl font-bold text-gray-900 break-words">
+                        {stats.waiting_confirmation}
+                      </div>
+                    </div>
+                    <div className="p-3 bg-[#c6ee9a]/30 rounded-2xl shrink-0">
+                      <Clock className="h-6 w-6 text-[#09431C]" />
+                    </div>
                   </div>
-                </CardHeader>
-                <CardContent className="flex flex-col items-center justify-center gap-1 px-2 pb-5 pt-2">
-                  <div className="text-3xl font-bold text-[#09431C] text-center">
-                    {stats.waiting_confirmation}
-                  </div>
-                  <p className="text-sm text-gray-500 text-center">
+                  <p className="text-sm text-gray-500 mt-3">
                     Need review
                   </p>
                 </CardContent>
               </Card>
 
-              <Card className="h-full bg-white border border-gray-100 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                  <CardTitle className="text-sm font-medium text-gray-600">
-                    Total Revenue
-                  </CardTitle>
-                  <div className="px-3 py-1 bg-[#97d753]/30 rounded-full text-[#09431C] font-bold text-sm">Rp</div>
-                </CardHeader>
-                <CardContent className="flex flex-col items-center justify-center gap-1 px-2 pb-5 pt-2">
-                  <div className="text-2xl font-bold text-[#09431C] break-words text-center">
-                    {formatCurrency(totalRevenueSuccess)}
+              <Card className="h-full bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
+                <CardContent className="p-5">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-gray-500 mb-1">
+                        Total Revenue
+                      </p>
+                      <div className="text-2xl font-bold text-gray-900 break-words">
+                        {formatCurrency(totalRevenueSuccess)}
+                      </div>
+                    </div>
+                    <div className="p-3 bg-[#c6ee9a]/30 rounded-2xl shrink-0">
+                      <CreditCard className="h-6 w-6 text-[#09431C]" />
+                    </div>
                   </div>
-                  <p className="text-sm text-gray-500 text-center">
-                    From successful transactions only
+                  <p className="text-sm text-gray-500 mt-3 truncate">
+                    Successful transactions
                   </p>
                 </CardContent>
               </Card>
 
-              <Card className="h-full bg-white border border-gray-100 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                  <CardTitle className="text-sm font-medium text-gray-600">
-                    Pending Revenue
-                  </CardTitle>
-                  <div className="px-3 py-1 bg-[#c6ee9a]/40 rounded-full text-[#09431C] font-bold text-sm">Rp</div>
-                </CardHeader>
-                <CardContent className="flex flex-col items-center justify-center gap-1 px-2 pb-5 pt-2">
-                  <div className="text-2xl font-bold text-[#09431C] break-words text-center">
-                    {stats.pending_revenue
-                      ? formatCurrency(stats.pending_revenue)
-                      : "Rp 0"}
+              <Card className="h-full bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
+                <CardContent className="p-5">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-gray-500 mb-1">
+                        Pending Revenue
+                      </p>
+                      <div className="text-2xl font-bold text-gray-900 break-words">
+                        {stats.pending_revenue
+                          ? formatCurrency(stats.pending_revenue)
+                          : "Rp 0"}
+                      </div>
+                    </div>
+                    <div className="p-3 bg-[#c6ee9a]/30 rounded-2xl shrink-0">
+                      <CreditCard className="h-6 w-6 text-[#09431C]" />
+                    </div>
                   </div>
-                  <p className="text-sm text-gray-500 text-center">
+                  <p className="text-sm text-gray-500 mt-3 truncate">
                     Awaiting approval
                   </p>
                 </CardContent>
@@ -562,13 +583,13 @@ function TransactionManagementContent() {
 
             {/* Filters and Search */}
             <Card className="bg-white border border-gray-100 rounded-2xl shadow-md">
-              <CardHeader className="pb-4">
+              <CardHeader>
                 <CardTitle className="text-xl font-semibold text-gray-900 flex items-center">
                   <Filter className="w-5 h-5 mr-2 text-[#09431C]" />
                   Filters & Search
                 </CardTitle>
               </CardHeader>
-              <CardContent className="p-4 md:p-6 min-h-[120px] flex items-center">
+              <CardContent className="flex items-center">
                 <div className="flex flex-col md:flex-row gap-4 md:gap-6 items-center justify-center w-full">
                   <div className="flex-1">
                     <div className="relative">
@@ -582,7 +603,7 @@ function TransactionManagementContent() {
                     </div>
                   </div>
 
-                  <div className="w-full md:w-64 flex-shrink-0">
+                  <div className="w-full md:w-48 flex-shrink-0">
                     <Select
                       value={statusFilter}
                       onValueChange={setStatusFilter}
@@ -605,181 +626,151 @@ function TransactionManagementContent() {
                       </SelectContent>
                     </Select>
                   </div>
-
-                  <div className="w-full md:w-auto flex items-center justify-end">
-                    <Button
-                      variant="outline"
-                      onClick={() => {
-                        setSearchTerm("");
-                        setStatusFilter("all");
-                      }}
-                      className="rounded-full border-2 border-[#09431C] hover:bg-[#c6ee9a] text-[#09431C] hover:text-[#09431C] font-medium py-2 px-6 transition-all duration-300 w-full md:w-auto"
-                    >
-                      Clear Filters
-                    </Button>
-                  </div>
                 </div>
               </CardContent>
             </Card>
 
             {/* Transactions Table */}
-            <Card className="bg-white border border-gray-100 rounded-2xl shadow-md">
-              <CardHeader className="pb-4">
-                <CardTitle className="text-xl font-semibold text-gray-900 flex items-center">
-                  <CreditCard className="w-5 h-5 mr-2 text-[#09431C]" />
+            <div className="space-y-6">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
                   Transaction List
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {filteredTransactions.length === 0 ? (
-                  <div className="text-center py-12">
-                    <CreditCard className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">
-                      No transactions found
-                    </h3>
-                    <p className="text-gray-600">
-                      {transactions.length === 0
-                        ? "No transactions available yet"
-                        : "No transactions match your filters"}
-                    </p>
-                  </div>
-                ) : (
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="border-b border-gray-200">
-                          <th className="text-left py-3 px-4 font-semibold text-gray-900">
-                            User
-                          </th>
-                          <th className="text-left py-3 px-4 font-semibold text-gray-900">
-                            Event
-                          </th>
-                          <th className="text-left py-3 px-4 font-semibold text-gray-900">
-                            Amount
-                          </th>
-                          <th className="text-left py-3 px-4 font-semibold text-gray-900">
-                            Status
-                          </th>
-                          <th className="text-left py-3 px-4 font-semibold text-gray-900">
-                            Date
-                          </th>
-                          <th className="text-left py-3 px-4 font-semibold text-gray-900">
-                            Actions
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {filteredTransactions.map((transaction) => (
-                          <tr
+                </h2>
+              </div>
+              <Card className="bg-white border border-gray-100 rounded-2xl shadow-md overflow-x-auto">
+                <CardContent className="p-0">
+                  {filteredTransactions.length === 0 ? (
+                    <div className="text-center py-12 px-6">
+                      <CreditCard className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">
+                        No transactions found
+                      </h3>
+                      <p className="text-gray-600">
+                        {transactions.length === 0
+                          ? "No transactions available yet"
+                          : "No transactions match your filters"}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="min-w-[1000px]">
+                      <div className="sticky top-0 z-10 grid grid-cols-12 gap-4 px-6 py-4 bg-[#09431C] text-white font-semibold border-b rounded-t-2xl">
+                      <div className="col-span-3">User</div>
+                      <div className="col-span-3">Event</div>
+                      <div className="col-span-2">Amount & Date</div>
+                      <div className="col-span-2 text-center">Status</div>
+                      <div className="col-span-2 text-right">Actions</div>
+                    </div>
+                      <div>
+                        {filteredTransactions.map((transaction, idx) => (
+                          <div
                             key={transaction.id}
-                            className="border-b border-gray-100 hover:bg-gray-50/50 transition-colors duration-200"
+                            className={`grid grid-cols-12 gap-4 px-6 py-4 border-b items-center ${
+                              idx % 2 === 0 ? "bg-white" : "bg-gray-50/50"
+                            } hover:bg-[#f9ffe9] transition-colors`}
                           >
-                            <td className="py-4 px-4">
-                              <div className="flex items-center space-x-3">
-                                <div className="w-10 h-10 bg-gradient-to-r from-[#09431C] to-[#6FB229] rounded-full flex items-center justify-center">
-                                   <User className="w-5 h-5 text-white" />
-                                </div>
-                                <div>
-                                  <div className="font-medium text-gray-900">
-                                    {transaction.user.username}
-                                  </div>
-                                  <div className="text-sm text-gray-500">
-                                    {transaction.user.email}
-                                  </div>
-                                </div>
+                            {/* User */}
+                            <div className="col-span-3 flex items-center gap-3 min-w-0">
+                              <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[#dff4be] text-[#0f3d00] flex items-center justify-center text-sm font-bold">
+                                {getInitials(transaction.user.username)}
                               </div>
-                            </td>
-                            <td className="py-4 px-4">
-                              <div className="space-y-1">
-                                <div className="font-medium text-gray-900">
-                                  {
-                                    transaction.tickets[0]?.ticket.event
-                                      .event_name
-                                  }
+                              <div className="min-w-0 flex-1">
+                                <div className="font-semibold text-gray-900 truncate">
+                                  {transaction.user.username}
+                                </div>
+                                <div className="text-xs text-gray-500 truncate" title={transaction.user.email}>
+                                  {transaction.user.email}
                                 </div>
                               </div>
-                            </td>
-                            <td className="py-4 px-4">
-                              <div className="font-semibold text-gray-900">
-                                {transaction.total_price
-                                  ? formatCurrency(transaction.total_price)
-                                  : "Rp 0"}
+                            </div>
+
+                            {/* Event */}
+                            <div className="col-span-3 min-w-0">
+                              <div className="font-semibold text-gray-900 line-clamp-1" title={transaction.tickets[0]?.ticket.event.event_name}>
+                                {transaction.tickets[0]?.ticket.event.event_name}
                               </div>
-                              <div className="text-sm text-gray-500">
-                                {transaction.tickets.length} ticket(s)
+                              <div className="text-xs text-gray-500 flex items-center mt-1 truncate">
+                                <MapPin className="w-3 h-3 mr-1 flex-shrink-0 text-[#09431C]" />
+                                <span className="truncate">{transaction.tickets[0]?.ticket.event.event_location}</span>
                               </div>
-                            </td>
-                            <td className="py-4 px-4">
+                            </div>
+
+                            {/* Amount & Date */}
+                            <div className="col-span-2">
+                              <div className="font-bold text-[#09431C]">
+                                {transaction.total_price ? formatCurrency(transaction.total_price) : "Rp 0"}
+                              </div>
+                              <div className="text-xs text-gray-500 flex items-center mt-1">
+                                <Clock className="w-3 h-3 mr-1 flex-shrink-0 text-[#09431C]" />
+                                <span>
+                                  {format(
+                                    new Date(transaction.transaction_date_time),
+                                    "dd MMM yyyy, HH:mm",
+                                    { locale: id }
+                                  )}
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Status */}
+                            <div className="col-span-2 flex justify-center">
                               <Badge
-                                className={`${getStatusColor(
-                                  transaction.status
-                                )} px-3 py-1 text-sm font-medium`}
+                                className={`${getStatusColor(transaction.status)} px-3 py-1 rounded-full whitespace-nowrap text-xs shadow-sm`}
                               >
                                 {transaction.status.replace(/_/g, " ")}
                               </Badge>
-                            </td>
-                            <td className="py-4 px-4">
-                              <div className="text-sm text-gray-900">
-                                {format(
-                                  new Date(transaction.transaction_date_time),
-                                  "PPP",
-                                  { locale: id }
-                                )}
-                              </div>
-                              <div className="text-xs text-gray-500">
-                                {format(
-                                  new Date(transaction.transaction_date_time),
-                                  "HH:mm",
-                                  { locale: id }
-                                )}
-                              </div>
-                            </td>
-                            <td className="py-4 px-4">
-                              <div className="flex gap-2">
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => showPaymentProof(transaction)}
-                                  className="rounded-full border-2 border-[#09431C] hover:bg-[#c6ee9a] text-[#09431C] hover:text-[#09431C] font-medium transition-all duration-300"
-                                >
-                                  <Eye className="w-4 h-4 mr-1" />
-                                  View
-                                </Button>
-                                {transaction.status ===
-                                  "WAITING_CONFIRMATION" && (
-                                  <>
-                                    <Button
-                                      size="sm"
-                                      onClick={() =>
-                                        handleAcceptTransaction(transaction.id)
-                                      }
-                                      className="rounded-full bg-[#09431C] hover:bg-[#09431C]/90 text-white font-medium shadow-sm hover:shadow-md transition-all duration-300"
-                                    >
-                                      <CheckCircle className="w-4 h-4 mr-1" />
-                                      Accept
-                                    </Button>
-                                    <Button
-                                      size="sm"
-                                      onClick={() =>
-                                        openRejectModal(transaction)
-                                      }
-                                      className="rounded-full bg-red-500 hover:bg-red-600 text-white font-medium shadow-sm hover:shadow-md transition-all duration-300"
-                                    >
-                                      <XCircle className="w-4 h-4 mr-1" />
-                                      Reject
-                                    </Button>
-                                  </>
-                                )}
-                              </div>
-                            </td>
-                          </tr>
+                            </div>
+
+                            {/* Actions */}
+                            <div className="col-span-2 flex items-center justify-end gap-2">
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                title="View Proof"
+                                onClick={() => showPaymentProof(transaction)}
+                                className="h-8 w-8 rounded-full border border-[#09431C] text-[#09431C] hover:bg-[#c6ee9a] hover:text-[#09431C] transition-colors"
+                              >
+                                <Eye className="w-4 h-4" />
+                              </Button>
+
+                              {transaction.status === "WAITING_CONFIRMATION" && (
+                                <>
+                                  <Button
+                                    size="icon"
+                                    title="Accept"
+                                    onClick={() => handleAcceptTransaction(transaction.id)}
+                                    className="h-8 w-8 rounded-full bg-[#8ec357]/20 text-[#09431C] hover:bg-[#8ec357]/40 border border-[#8ec357] transition-colors"
+                                  >
+                                    <CheckCircle className="w-4 h-4" />
+                                  </Button>
+                                  <Button
+                                    size="icon"
+                                    title="Reject"
+                                    onClick={() => openRejectModal(transaction)}
+                                    className="h-8 w-8 rounded-full bg-red-100 text-red-700 hover:bg-red-200 border border-red-200 transition-colors"
+                                  >
+                                    <XCircle className="w-4 h-4" />
+                                  </Button>
+                                </>
+                              )}
+                              {transaction.status === "SUCCESS" && (
+                                <div className="h-8 w-8 flex items-center justify-center rounded-full bg-[#8ec357]/20 text-[#09431C] border border-[#8ec357]" title="Accepted">
+                                  <CheckCircle className="w-4 h-4" />
+                                </div>
+                              )}
+                              {transaction.status === "REJECTED" && (
+                                <div className="h-8 w-8 flex items-center justify-center rounded-full bg-red-100 text-red-700 border border-red-200" title="Rejected">
+                                  <XCircle className="w-4 h-4" />
+                                </div>
+                              )}
+                            </div>
+                          </div>
                         ))}
-                      </tbody>
-                    </table>
-                  </div>
+                      </div>
+                    </div>
                 )}
               </CardContent>
             </Card>
+            </div>
           </div>
 
       {/* Payment Proof Modal */}
